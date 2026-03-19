@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Job {{ job_id }} — mix-extractor{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+      <li class="breadcrumb-item active">Analysis Job</li>
+    </ol>
+  </nav>
+  <h4 class="fw-bold">
+    <i class="bi bi-gear-wide-connected me-2 text-primary"></i>Analysis Job
+    <span class="badge {% if job.status == 'running' %}bg-warning text-dark{% elif job.status == 'done' %}bg-success{% elif job.status == 'error' %}bg-danger{% else %}bg-secondary{% endif %} ms-2 fs-6">
+      {{ job.status }}
+    </span>
+  </h4>
+  <div class="text-body-secondary small">Source: {{ job.source }}</div>
+</div>
+
+{% if job.status in ('pending', 'running') %}
+<div class="alert alert-info d-flex align-items-center gap-3">
+  <div class="spinner-border spinner-border-sm" role="status"></div>
+  <span>Analysis is running… this may take several minutes. Page will auto-refresh.</span>
+</div>
+{% elif job.status == 'done' %}
+<div class="alert alert-success">
+  <i class="bi bi-check-circle-fill me-2"></i>Analysis complete!
+  <a href="/" class="alert-link ms-2">Return to dashboard</a> to view results.
+</div>
+{% elif job.status == 'error' %}
+<div class="alert alert-danger">
+  <i class="bi bi-exclamation-triangle-fill me-2"></i>Analysis failed. Check the log below.
+</div>
+{% endif %}
+
+{% if job.log %}
+<div class="card">
+  <div class="card-header fw-semibold">
+    <i class="bi bi-terminal me-2"></i>Output Log
+  </div>
+  <div class="card-body p-0">
+    <pre class="p-3 mb-0 text-body small" style="max-height:500px;overflow:auto;white-space:pre-wrap">{% for line in job.log %}{{ line }}
+{% endfor %}</pre>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{% if job.status in ('pending', 'running') %}
+<script>
+  // Poll every 4 seconds while job is still running
+  setTimeout(() => { window.location.reload(); }, 4000);
+</script>
+{% endif %}
+{% endblock %}

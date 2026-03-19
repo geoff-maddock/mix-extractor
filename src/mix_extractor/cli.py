@@ -267,5 +267,33 @@ def config() -> None:
     console.print(f"\n[green]Saved:[/green] {env_path}")
 
 
+# ── serve ─────────────────────────────────────────────────────────────────────
+
+@app.command()
+def serve(
+    host: Annotated[str, typer.Option("--host", help="Bind address")] = "127.0.0.1",
+    port: Annotated[int, typer.Option("--port", help="Port number")] = 8000,
+    reload: Annotated[bool, typer.Option("--reload", help="Auto-reload on code changes (development)")] = False,
+) -> None:
+    """Start the web GUI server."""
+    try:
+        import uvicorn  # noqa: PLC0415
+    except ImportError:
+        console.print(
+            "[red]uvicorn is not installed.[/red] "
+            "Run: [bold]pip install 'mix-extractor[web]'[/bold]"
+        )
+        raise typer.Exit(1)
+
+    console.print(f"\n[bold green]mix-extractor web UI[/bold green]")
+    console.print(f"  Open [link=http://{host}:{port}]http://{host}:{port}[/link] in your browser\n")
+    uvicorn.run(
+        "mix_extractor.web.app:app",
+        host=host,
+        port=port,
+        reload=reload,
+    )
+
+
 if __name__ == "__main__":
     app()

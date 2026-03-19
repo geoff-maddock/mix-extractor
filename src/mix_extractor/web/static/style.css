@@ -1,0 +1,30 @@
+/* mix-extractor web UI — custom styles */
+
+/* Extra-small button size (Bootstrap doesn't include btn-xs) */
+.btn-xs {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.35rem;
+  line-height: 1.4;
+  border-radius: 0.25rem;
+}
+
+/* Sortable table headers */
+th.sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+th.sortable:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+th.sort-asc .sort-icon::before { content: "\F235"; }   /* bi-chevron-up */
+th.sort-desc .sort-icon::before { content: "\F229"; }  /* bi-chevron-down */
+
+/* Genre display inline edit */
+.genre-display { cursor: pointer; }
+
+/* Log pre */
+pre.text-body { background: var(--bs-body-bg); color: var(--bs-body-color); }
+
+/* Navbar brand icon */
+.navbar-brand .bi-vinyl { font-size: 1.2rem; }

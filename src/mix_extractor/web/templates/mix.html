@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+{% block title %}{{ mix_name }} — mix-extractor{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+      <li class="breadcrumb-item active">{{ mix.source or mix_name }}</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex align-items-start gap-3 flex-wrap">
+    <div>
+      <h4 class="fw-bold mb-1">{{ mix.source or mix_name }}</h4>
+      <div class="d-flex gap-3 text-body-secondary small">
+        {% if mix.analyzed_at %}
+        <span><i class="bi bi-calendar3 me-1"></i>{{ mix.analyzed_at[:10] }}</span>
+        {% endif %}
+        {% if mix.duration_seconds %}
+        <span><i class="bi bi-clock me-1"></i>
+          {{ '%d:%02d:%02d' % (mix.duration_seconds // 3600,
+                               (mix.duration_seconds % 3600) // 60,
+                               mix.duration_seconds % 60) }}
+        </span>
+        {% endif %}
+        <span><i class="bi bi-mic me-1"></i>{{ mix.transcription_provider }}</span>
+      </div>
+    </div>
+    <div class="ms-auto d-flex gap-2">
+      <span class="badge bg-primary align-self-center">{{ tracks | length }} tracks</span>
+    </div>
+  </div>
+</div>
+
+<!-- Preview embed modal trigger area -->
+<div id="previewArea" class="mb-3" style="display:none">
+  <div class="card">
+    <div class="card-header d-flex align-items-center gap-2">
+      <span id="previewTitle" class="fw-semibold me-auto"></span>
+      <button class="btn btn-sm btn-outline-secondary" onclick="closePreview()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="card-body p-0" id="previewContent"></div>
+  </div>
+</div>
+
+{% if not tracks %}
+<div class="text-center text-body-secondary py-5">
+  <i class="bi bi-inbox display-4 d-block mb-3"></i>No tracks found in this mix.
+</div>
+{% else %}
+<div class="table-responsive">
+  <table class="table table-hover align-middle sortable-table" id="mixTable">
+    <thead class="table-group-divider">
+      <tr>
+        <th style="width:44px" class="text-center">#</th>
+        <th style="width:44px" class="text-center">
+          <i class="bi bi-bookmark-heart" title="Keep"></i>
+        </th>
+        <th>Time</th>
+        <th class="sortable">Artist <i class="bi bi-chevron-expand sort-icon"></i></th>
+        <th class="sortable">Title <i class="bi bi-chevron-expand sort-icon"></i></th>
+        <th>Label</th>
+        <th>Genre</th>
+        <th>Source</th>
+        <th>Links &amp; Preview</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for track in tracks %}
+      <tr class="track-row" data-mix="{{ mix_name }}" data-index="{{ track.index }}">
+
+        <!-- Index -->
+        <td class="text-center text-body-secondary small">{{ track.index }}</td>
+
+        <!-- Keep toggle -->
+        <td class="text-center">
+          <button class="btn btn-sm keep-btn p-0 border-0 bg-transparent {% if track.keep %}text-success{% else %}text-body-secondary{% endif %}"
+                  onclick="toggleKeep('{{ mix_name }}', {{ track.index }}, this)"
+                  title="{% if track.keep %}Remove from keep list{% else %}Add to keep list{% endif %}">
+            <i class="bi {% if track.keep %}bi-bookmark-heart-fill{% else %}bi-bookmark-heart{% endif %} fs-5"></i>
+          </button>
+        </td>
+
+        <!-- Timestamp -->
+        <td><small class="text-body-secondary font-monospace">{{ track.timestamp or '—' }}</small></td>
+
+        <!-- Artist -->
+        <td class="fw-semibold">{{ track.artist }}</td>
+
+        <!-- Title + remix -->
+        <td>
+          {{ track.title }}
+          {% if track.remix %}
+          <small class="text-body-secondary">({{ track.remix }})</small>
+          {% endif %}
+          {% if track.extra_info %}
+          <div class="text-body-secondary small">{{ track.extra_info }}</div>
+          {% endif %}
+        </td>
+
+        <!-- Label -->
+        <td><small class="text-body-secondary">{{ track.label or '—' }}</small></td>
+
+        <!-- Genre (editable) -->
+        <td>
+          <span class="genre-display" onclick="editGenre(this, '{{ mix_name }}', {{ track.index }})">
+            {% if track.genre %}
+            <span class="badge bg-info text-dark">{{ track.genre }}</span>
+            {% else %}
+            <span class="text-body-secondary fst-italic small">+ genre</span>
+            {% endif %}
+          </span>
+        </td>
+
+        <!-- Detection source -->
+        <td>
+          <small>
+          {% if track.detection_source == 'fingerprint' %}
+            <span class="badge bg-success"><i class="bi bi-soundwave me-1"></i>FP</span>
+          {% elif track.detection_source == 'transcript' %}
+            <span class="badge bg-info text-dark"><i class="bi bi-chat-text me-1"></i>TX</span>
+          {% elif track.detection_source == 'fingerprint+transcript' %}
+            <span class="badge bg-warning text-dark"><i class="bi bi-check2-all me-1"></i>Both</span>
+          {% else %}
+            <span class="text-body-secondary">{{ track.detection_source or '—' }}</span>
+          {% endif %}
+          </small>
+        </td>
+
+        <!-- Links & Preview -->
+        <td>
+          <div class="d-flex gap-1 flex-wrap align-items-center">
+
+            {% if track.links.get('spotify') %}
+            <a href="{{ track.links.spotify }}" target="_blank"
+               class="btn btn-xs btn-outline-success py-0 px-2" title="Spotify">
+              <i class="bi bi-spotify me-1"></i>Spotify
+            </a>
+            {% endif %}
+
+            {% if track.links.get('youtube_music') %}
+            <a href="{{ track.links.youtube_music }}" target="_blank"
+               class="btn btn-xs btn-outline-danger py-0 px-2" title="YouTube Music">
+              <i class="bi bi-youtube me-1"></i>YT
+            </a>
+            <button class="btn btn-xs btn-outline-danger py-0 px-1"
+                    onclick="previewYouTube('{{ track.links.youtube_music }}', '{{ track.artist|e }} – {{ track.title|e }}')"
+                    title="Preview">
+              <i class="bi bi-play-fill"></i>
+            </button>
+            {% endif %}
+
+            {% if track.links.get('soundcloud') %}
+            <a href="{{ track.links.soundcloud }}" target="_blank"
+               class="btn btn-xs btn-outline-warning py-0 px-2" title="SoundCloud">
+              <i class="bi bi-headphones me-1"></i>SC
+            </a>
+            {% endif %}
+
+            {% if track.links.get('bandcamp') %}
+            <a href="{{ track.links.bandcamp }}" target="_blank"
+               class="btn btn-xs btn-outline-primary py-0 px-2" title="Search on Bandcamp">
+              <i class="bi bi-bag me-1"></i>BC
+            </a>
+            {% endif %}
+
+            {% if track.links.get('musicbrainz') %}
+            <a href="{{ track.links.musicbrainz }}" target="_blank"
+               class="btn btn-xs btn-outline-secondary py-0 px-1" title="MusicBrainz">
+              <i class="bi bi-database"></i>
+            </a>
+            {% endif %}
+
+            {% if track.links.get('discogs') %}
+            <a href="{{ track.links.discogs }}" target="_blank"
+               class="btn btn-xs btn-outline-secondary py-0 px-1" title="Discogs">
+              <i class="bi bi-vinyl"></i>
+            </a>
+            {% endif %}
+
+          </div>
+        </td>
+
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function toggleKeep(mixName, trackIndex, btn) {
+  const isKeep = btn.querySelector('i').classList.contains('bi-bookmark-heart-fill');
+  const newKeep = !isKeep;
+  fetch(`/api/track/${mixName}/keep`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ index: trackIndex, keep: newKeep })
+  }).then(r => r.json()).then(data => {
+    const icon = btn.querySelector('i');
+    if (data.keep) {
+      icon.className = 'bi bi-bookmark-heart-fill fs-5';
+      btn.classList.remove('text-body-secondary');
+      btn.classList.add('text-success');
+      btn.title = 'Remove from keep list';
+    } else {
+      icon.className = 'bi bi-bookmark-heart fs-5';
+      btn.classList.remove('text-success');
+      btn.classList.add('text-body-secondary');
+      btn.title = 'Add to keep list';
+    }
+  });
+}
+
+function editGenre(span, mixName, trackIndex) {
+  const currentGenre = span.querySelector('.badge')?.textContent.trim() || '';
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = currentGenre;
+  input.className = 'form-control form-control-sm d-inline-block';
+  input.style.width = '120px';
+  span.replaceWith(input);
+  input.focus();
+  function save() {
+    const genre = input.value.trim();
+    fetch(`/api/track/${mixName}/genre`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index: trackIndex, genre })
+    }).then(r => r.json()).then(data => {
+      const newSpan = document.createElement('span');
+      newSpan.className = 'genre-display';
+      newSpan.setAttribute('onclick', `editGenre(this, '${mixName}', ${trackIndex})`);
+      if (genre) {
+        const badge = document.createElement('span');
+        badge.className = 'badge bg-info text-dark';
+        badge.textContent = genre;
+        newSpan.appendChild(badge);
+      } else {
+        const placeholder = document.createElement('span');
+        placeholder.className = 'text-body-secondary fst-italic small';
+        placeholder.textContent = '+ genre';
+        newSpan.appendChild(placeholder);
+      }
+      input.replaceWith(newSpan);
+    });
+  }
+  input.addEventListener('blur', save);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') input.blur(); });
+}
+
+function previewYouTube(url, title) {
+  // Extract video ID from YouTube Music URL
+  const match = url.match(/[?&]v=([^&]+)/);
+  if (!match) { window.open(url, '_blank'); return; }
+  const vid = encodeURIComponent(match[1]);
+  document.getElementById('previewTitle').textContent = title;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'ratio ratio-16x9';
+  const iframe = document.createElement('iframe');
+  iframe.src = `https://www.youtube.com/embed/${vid}?autoplay=1`;
+  iframe.style.border = '0';
+  iframe.allowFullscreen = true;
+  iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+  wrapper.appendChild(iframe);
+  const content = document.getElementById('previewContent');
+  content.textContent = '';
+  content.appendChild(wrapper);
+  const area = document.getElementById('previewArea');
+  area.style.display = '';
+  area.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closePreview() {
+  document.getElementById('previewArea').style.display = 'none';
+  document.getElementById('previewContent').textContent = '';
+}
+</script>
+{% endblock %}

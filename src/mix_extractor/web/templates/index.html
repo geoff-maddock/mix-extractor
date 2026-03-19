@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block title %}mix-extractor — Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  <!-- ── Left column: Analyze + Upload ──────────────────────────────── -->
+  <div class="col-lg-5">
+
+    <!-- Analyze form -->
+    <div class="card mb-4">
+      <div class="card-header fw-semibold">
+        <i class="bi bi-search me-2 text-primary"></i>Analyze a Mix
+      </div>
+      <div class="card-body">
+        <form action="/analyze" method="post">
+          <div class="mb-3">
+            <label class="form-label">Audio file or URL</label>
+            <input type="text" name="source" class="form-control"
+                   placeholder="content/input/mymix.mp3  or  https://soundcloud.com/…"
+                   required />
+            <div class="form-text">Paste a SoundCloud, YouTube, Mixcloud, or Bandcamp URL, or enter a local filename from the input folder.</div>
+          </div>
+
+          <!-- Advanced options (collapsed by default) -->
+          <div class="accordion accordion-flush mb-3" id="advancedOptions">
+            <div class="accordion-item bg-transparent border rounded">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed bg-transparent text-body py-2 px-3"
+                        type="button" data-bs-toggle="collapse"
+                        data-bs-target="#advancedBody">
+                  Advanced options
+                </button>
+              </h2>
+              <div id="advancedBody" class="accordion-collapse collapse">
+                <div class="accordion-body pt-2">
+                  <div class="row g-2 mb-2">
+                    <div class="col-6">
+                      <label class="form-label small">LLM provider</label>
+                      <select name="llm" class="form-select form-select-sm">
+                        <option value="">default</option>
+                        <option value="openai">openai</option>
+                        <option value="anthropic">anthropic</option>
+                      </select>
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label small">LLM model</label>
+                      <input type="text" name="model" class="form-control form-control-sm"
+                             placeholder="gpt-4o" />
+                    </div>
+                  </div>
+                  <div class="mb-2">
+                    <label class="form-label small">Transcription backend</label>
+                    <select name="transcriber" class="form-select form-select-sm">
+                      <option value="">default</option>
+                      <option value="whisper_api">whisper_api</option>
+                      <option value="whisper_local">whisper_local</option>
+                      <option value="assemblyai">assemblyai</option>
+                      <option value="deepgram">deepgram</option>
+                    </select>
+                  </div>
+                  <div class="d-flex gap-3 flex-wrap">
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" name="no_enrich" id="no_enrich" value="true" />
+                      <label class="form-check-label small" for="no_enrich">Skip enrichment</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" name="no_fingerprint" id="no_fp" value="true" />
+                      <label class="form-check-label small" for="no_fp">Skip fingerprinting</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="checkbox" name="fingerprint_only" id="fp_only" value="true" />
+                      <label class="form-check-label small" for="fp_only">Fingerprint only</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-play-circle me-2"></i>Start Analysis
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Upload file -->
+    <div class="card mb-4">
+      <div class="card-header fw-semibold">
+        <i class="bi bi-upload me-2 text-success"></i>Upload Audio File
+      </div>
+      <div class="card-body">
+        <form action="/upload" method="post" enctype="multipart/form-data">
+          <div class="mb-3">
+            <input type="file" name="file" class="form-control"
+                   accept=".mp3,.flac,.wav,.m4a,.ogg,.opus,.aac,.webm,.mp4" required />
+          </div>
+          <button type="submit" class="btn btn-success w-100">
+            <i class="bi bi-cloud-upload me-2"></i>Upload to Input Folder
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Input folder files -->
+    {% if input_files %}
+    <div class="card">
+      <div class="card-header fw-semibold d-flex align-items-center gap-2">
+        <i class="bi bi-folder2-open text-warning"></i>Input Folder
+        <span class="badge bg-secondary ms-auto">{{ input_files | length }}</span>
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for f in input_files %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span class="text-truncate me-2" title="{{ f.name }}">{{ f.name }}</span>
+          <div class="d-flex align-items-center gap-2">
+            <span class="badge bg-body-secondary text-body-secondary">{{ f.size_mb }} MB</span>
+            <button class="btn btn-sm btn-outline-primary py-0 px-2"
+                    onclick="document.querySelector('[name=source]').value='{{ f.name }}'">
+              <i class="bi bi-play-fill"></i>
+            </button>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+  </div>
+
+  <!-- ── Right column: Mixes list ──────────────────────────────────── -->
+  <div class="col-lg-7">
+
+    {% if active_jobs %}
+    <div class="card mb-4 border-warning">
+      <div class="card-header fw-semibold text-warning">
+        <i class="bi bi-hourglass-split me-2"></i>Running Jobs
+      </div>
+      <ul class="list-group list-group-flush">
+        {% for jid, job in active_jobs.items() %}
+        <li class="list-group-item">
+          <div class="d-flex justify-content-between align-items-center">
+            <span>{{ job.source }}</span>
+            <div class="d-flex align-items-center gap-2">
+              <span class="badge {% if job.status == 'running' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                {{ job.status }}
+              </span>
+              <a href="/job/{{ jid }}" class="btn btn-sm btn-outline-secondary py-0 px-2">View</a>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <div class="card">
+      <div class="card-header fw-semibold d-flex align-items-center gap-2">
+        <i class="bi bi-collection-play text-primary"></i>Analyzed Mixes
+        <span class="badge bg-secondary ms-auto">{{ mixes | length }}</span>
+      </div>
+      {% if not mixes %}
+      <div class="card-body text-body-secondary text-center py-5">
+        <i class="bi bi-inbox display-4 d-block mb-3"></i>
+        No mixes analyzed yet.<br />Upload a file or paste a URL above to get started.
+      </div>
+      {% else %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="table-group-divider">
+            <tr>
+              <th>Mix</th>
+              <th class="text-center">Tracks</th>
+              <th>Analyzed</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for mix in mixes | sort(attribute='analyzed_at', reverse=True) %}
+            <tr>
+              <td>
+                <div class="fw-semibold text-truncate" style="max-width:260px" title="{{ mix.source }}">
+                  {{ mix.source }}
+                </div>
+                <small class="text-body-secondary">{{ mix.transcription_provider }}</small>
+              </td>
+              <td class="text-center">
+                <span class="badge bg-primary">{{ mix.track_count }}</span>
+              </td>
+              <td>
+                <small class="text-body-secondary">
+                  {{ mix.analyzed_at[:10] if mix.analyzed_at else '—' }}
+                </small>
+              </td>
+              <td class="text-end">
+                <a href="/mix/{{ mix.name }}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-list-ul me-1"></i>Tracklist
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}

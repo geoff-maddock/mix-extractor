@@ -27,6 +27,12 @@ assemblyai = ["assemblyai>=0.26"]
 deepgram = ["deepgram-sdk>=3.4"]
 local-whisper = ["openai-whisper>=20231117"]
 discogs = ["discogs-client>=2.4"]
+web = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "python-multipart>=0.0.22",
+    "jinja2>=3.1.4",
+]
 
 [project.scripts]
 mix-extractor = "mix_extractor.cli:app"
