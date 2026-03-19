@@ -1,0 +1,156 @@
+{
+  "mix": {
+    "source": "cutups-ultravibe.mp3",
+    "duration_seconds": 4448.119000000001,
+    "transcription_provider": "whisper_api",
+    "analyzed_at": "2026-03-19T04:41:14.195135+00:00"
+  },
+  "tracks": [
+    {
+      "index": 1,
+      "timestamp": "00:00",
+      "artist": "2Peng",
+      "title": "Here for You (Original Mix)",
+      "label": "Hardcore Energy",
+      "remix": "",
+      "extra_info": "album: Here for You (Original Mix)",
+      "release_date": "2025-08-13",
+      "album": "Here for You (Original Mix)",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/6pkbNVZfrPkYwFZV5ic5J1",
+        "apple_music": "https://music.apple.com/us/album/here-for-you/1830296659?app=music&at=1000l33QU&i=1830296661&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=2Peng+Here+for+You+%28Original+Mix%29&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=2Peng+Here+for+You+%28Original+Mix%29",
+        "youtube_music": "https://music.youtube.com/watch?v=2FW5ZmAtpyE"
+      }
+    },
+    {
+      "index": 2,
+      "timestamp": "12:00",
+      "artist": "Scar",
+      "title": "BIG AMEN4",
+      "label": "Samurai",
+      "remix": "",
+      "extra_info": "album: BIG AMEN4",
+      "release_date": "2025-11-21",
+      "album": "BIG AMEN4",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Scar+BIG+AMEN4&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Scar+BIG+AMEN4",
+        "youtube_music": "https://music.youtube.com/watch?v=gunoBIFKcVo"
+      }
+    },
+    {
+      "index": 3,
+      "timestamp": "28:30",
+      "artist": "Chude",
+      "title": "Uplifting",
+      "label": "N4HC",
+      "remix": "",
+      "extra_info": "album: Uplifting",
+      "release_date": "2025-04-09",
+      "album": "Uplifting",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/2lBx0fwW37tDuzz0UfeE8y",
+        "apple_music": "https://music.apple.com/us/album/uplifting/1788511800?app=music&at=1000l33QU&i=1788511803&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Chude+Uplifting&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Chude+Uplifting",
+        "youtube_music": "https://music.youtube.com/watch?v=LIUfvDHEHxM"
+      }
+    },
+    {
+      "index": 4,
+      "timestamp": "39:00",
+      "artist": "No Mood",
+      "title": "Hundred Reasons to Cry",
+      "label": "MARBELLA Ambient Music",
+      "remix": "",
+      "extra_info": "album: Aquarius (Astro Ambient Zodiac)",
+      "release_date": "2023-12-08",
+      "album": "Aquarius (Astro Ambient Zodiac)",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/09SwerCeBfduneY604IuO4",
+        "apple_music": "https://music.apple.com/us/album/hundred-reasons-to-cry/1571949694?app=music&at=1000l33QU&i=1571950509&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=No+Mood+Hundred+Reasons+to+Cry&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=No+Mood+Hundred+Reasons+to+Cry",
+        "youtube_music": "https://music.youtube.com/watch?v=typwPMAPYDE"
+      }
+    },
+    {
+      "index": 5,
+      "timestamp": "43:30",
+      "artist": "Unlimited Vibes",
+      "title": "Wheel",
+      "label": "Hardcore Energy",
+      "remix": "",
+      "extra_info": "album: Vibes by the Pound EP",
+      "release_date": "2025-03-12",
+      "album": "Vibes by the Pound EP",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/1lf5I47EFzwFXXLxAU0bEY",
+        "apple_music": "https://music.apple.com/us/album/wheel/1800000595?app=music&at=1000l33QU&i=1800000598&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Unlimited+Vibes+Wheel&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Unlimited+Vibes+Wheel",
+        "youtube_music": "https://music.youtube.com/watch?v=8e52gr3lKjI"
+      }
+    },
+    {
+      "index": 6,
+      "timestamp": "52:30",
+      "artist": "Fez The Kid",
+      "title": "Ghost Ship",
+      "label": "Up Ya Archives",
+      "remix": "",
+      "extra_info": "album: Body Mover",
+      "release_date": "2025-07-11",
+      "album": "Body Mover",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/1GEatkVLQIlbXvIrVgG18q",
+        "apple_music": "https://music.apple.com/us/album/ghost-ship/1815741918?app=music&at=1000l33QU&i=1815741974&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/5fdced94-b1ad-4ea7-9bec-501d08c76c11",
+        "bandcamp": "https://bandcamp.com/search?q=Fez+The+Kid+Ghost+Ship&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Fez+The+Kid+Ghost+Ship",
+        "youtube_music": "https://music.youtube.com/watch?v=UYq1uf35C4w"
+      }
+    },
+    {
+      "index": 7,
+      "timestamp": "01:13:30",
+      "artist": "mSdoS",
+      "title": "1997",
+      "label": "Liquid Drops",
+      "remix": "",
+      "extra_info": "album: Amen Drops 03",
+      "release_date": "2024-08-09",
+      "album": "Amen Drops 03",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/6vS9o5USEq1rtWVcOdc4o0",
+        "apple_music": "https://music.apple.com/us/album/1997/1759955935?app=music&at=1000l33QU&i=1759955938&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=mSdoS+1997&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=mSdoS+1997",
+        "youtube_music": "https://music.youtube.com/watch?v=--pXks_EY6o"
+      }
+    }
+  ]
+}

@@ -78,13 +78,14 @@ def _write_markdown(
 
     # Tracklist table
     lines.append("\n## Tracklist\n")
-    lines.append("| # | Time | Artist | Title | Remix | Label | Links |")
-    lines.append("|---|------|--------|-------|-------|-------|-------|")
+    lines.append("| # | Time | Artist | Title | Remix | Label | Source | Links |")
+    lines.append("|---|------|--------|-------|-------|-------|--------|-------|")
 
     for t in enriched_tracks:
         links_md = _format_links(t.get("links", {}))
         remix = t.get("remix") or ""
         label = t.get("label") or ""
+        source = _format_source(t.get("detection_source", "transcript"))
         lines.append(
             f"| {t['index']} "
             f"| {t.get('timestamp', '')} "
@@ -92,6 +93,7 @@ def _write_markdown(
             f"| {_md_escape(t.get('title', ''))} "
             f"| {_md_escape(remix)} "
             f"| {_md_escape(label)} "
+            f"| {source} "
             f"| {links_md} |"
         )
 
@@ -105,6 +107,17 @@ def _write_markdown(
     path = out_dir / "report.md"
     path.write_text("\n".join(lines), encoding="utf-8")
     console.print(f"  [dim]→ {path}[/dim]")
+
+
+_SOURCE_LABELS = {
+    "fingerprint": "🎵 FP",
+    "transcript": "📝 TX",
+    "fingerprint+transcript": "🎵+📝",
+}
+
+
+def _format_source(source: str) -> str:
+    return _SOURCE_LABELS.get(source, source)
 
 
 def _format_links(links: dict) -> str:
@@ -149,15 +162,18 @@ def _print_summary(enriched_tracks: list[dict]) -> None:
     table.add_column("Time", width=8)
     table.add_column("Artist", style="bold cyan")
     table.add_column("Title", style="bold white")
+    table.add_column("Source", style="dim", width=8)
     table.add_column("Links", style="dim")
 
     for t in enriched_tracks:
         link_count = len(t.get("links", {}))
+        source = _format_source(t.get("detection_source", "transcript"))
         table.add_row(
             str(t["index"]),
             t.get("timestamp", ""),
             t.get("artist", ""),
             t.get("title", ""),
+            source,
             f"{link_count} source(s)" if link_count else "—",
         )
 

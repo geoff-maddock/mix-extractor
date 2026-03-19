@@ -1,0 +1,133 @@
+{
+  "mix": {
+    "source": "nikki-nair-waterworks-2026.mp3",
+    "duration_seconds": null,
+    "transcription_provider": "fingerprint_only",
+    "analyzed_at": "2026-03-19T04:51:40.444291+00:00"
+  },
+  "tracks": [
+    {
+      "index": 1,
+      "timestamp": "10:30",
+      "artist": "!TR!N!K!DD!!TR!N!K!NG!",
+      "title": "MY W!FE AND K!D$ (!N$TRUMENTAL)",
+      "label": "!TR!N!K!DD!!TR!N!K!NG!",
+      "remix": "",
+      "extra_info": "album: MY W!FE AND K!D$ (!N$TRUMENTAL)",
+      "album": "MY W!FE AND K!D$ (!N$TRUMENTAL)",
+      "release_date": "2025-10-17",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/4UfzyMD5tXPvYra1gSwlUD",
+        "apple_music": "https://music.apple.com/us/album/my-w-fe-and-k-d%24-n%24trumental/1842935384?app=music&at=1000l33QU&i=1842935385&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=%21TR%21N%21K%21DD%21%21TR%21N%21K%21NG%21+MY+W%21FE+AND+K%21D%24+%28%21N%24TRUMENTAL%29&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=%21TR%21N%21K%21DD%21%21TR%21N%21K%21NG%21+MY+W%21FE+AND+K%21D%24+%28%21N%24TRUMENTAL%29",
+        "youtube_music": "https://music.youtube.com/watch?v=fza161lEpZQ"
+      }
+    },
+    {
+      "index": 2,
+      "timestamp": "25:30",
+      "artist": "Mr. Bungle",
+      "title": "Goodbye Sober Day",
+      "label": "Warner Rhino Off Roster-Audio",
+      "remix": "",
+      "extra_info": "album: California",
+      "album": "California",
+      "release_date": "1999-07-02",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/7pLaxucJrKDuUZOrjw2epZ",
+        "apple_music": "https://music.apple.com/us/album/goodbye-sober-day/734382412?app=music&at=1000l33QU&i=734384567&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/7d51717e-b5f8-4fb2-8f1f-748d5674fbac",
+        "bandcamp": "https://bandcamp.com/search?q=Mr.+Bungle+Goodbye+Sober+Day&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Mr.+Bungle+Goodbye+Sober+Day",
+        "youtube_music": "https://music.youtube.com/watch?v=HldyUz5FR_M"
+      }
+    },
+    {
+      "index": 3,
+      "timestamp": "37:30",
+      "artist": "Ben Long",
+      "title": "A1 Untitled",
+      "label": "Fine Audio Recordings",
+      "remix": "",
+      "extra_info": "album: Untitled",
+      "album": "Untitled",
+      "release_date": "1999-06-18",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/0TVtzdJ6JHsWpnr0g4Uqvi",
+        "apple_music": "https://music.apple.com/us/album/a1-untitled/1551903510?app=music&at=1000l33QU&i=1551903511&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Ben+Long+A1+Untitled&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Ben+Long+A1+Untitled",
+        "youtube_music": "https://music.youtube.com/watch?v=GLnrDc0YVYc"
+      }
+    },
+    {
+      "index": 4,
+      "timestamp": "45:00",
+      "artist": "Prifix",
+      "title": "Vusiwana",
+      "label": "Mosbee Records",
+      "remix": "",
+      "extra_info": "album: Vusiwana",
+      "album": "Vusiwana",
+      "release_date": "2018-12-07",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Prifix+Vusiwana&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Prifix+Vusiwana",
+        "youtube_music": "https://music.youtube.com/watch?v=gUblG3R2sRQ"
+      }
+    },
+    {
+      "index": 5,
+      "timestamp": "48:00",
+      "artist": "Dj. Yago",
+      "title": "Alive",
+      "label": "Borialis music.",
+      "remix": "",
+      "extra_info": "album: Love Yourself",
+      "album": "Love Yourself",
+      "release_date": "2021-03-22",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Dj.+Yago+Alive&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Dj.+Yago+Alive",
+        "youtube_music": "https://music.youtube.com/watch?v=-B19u9tHnIs"
+      }
+    },
+    {
+      "index": 6,
+      "timestamp": "51:00",
+      "artist": "Shio",
+      "title": "PrEu5963",
+      "label": "indie",
+      "remix": "",
+      "extra_info": "album: PrEu5963",
+      "album": "PrEu5963",
+      "release_date": "2020-05-27",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/72PaLmc5ujez9ZoT4SkG5M",
+        "apple_music": "https://music.apple.com/us/album/preu5963/1516263934?app=music&at=1000l33QU&i=1516264117&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Shio+PrEu5963&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Shio+PrEu5963",
+        "youtube_music": "https://music.youtube.com/watch?v=59jbcUhmDhU"
+      }
+    }
+  ]
+}

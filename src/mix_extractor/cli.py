@@ -49,6 +49,8 @@ def analyze(
     model: Annotated[Optional[str], typer.Option("--model", help="LLM model name override")] = None,
     transcriber: Annotated[Optional[str], typer.Option("--transcriber", help="Transcription backend: whisper_api | whisper_local | assemblyai | deepgram")] = None,
     no_enrich: Annotated[bool, typer.Option("--no-enrich", help="Skip music API lookups")] = False,
+    no_fingerprint: Annotated[bool, typer.Option("--no-fingerprint", help="Skip audio fingerprinting via AudD")] = False,
+    fingerprint_only: Annotated[bool, typer.Option("--fingerprint-only", help="Run audio fingerprinting only — skip transcription and LLM parsing")] = False,
 ) -> None:
     """Run the full extraction pipeline on a mix file or URL."""
     from mix_extractor.config import get_settings  # noqa: PLC0415
@@ -74,7 +76,52 @@ def analyze(
     audio_fmt = "wav" if settings.transcription_provider == "whisper_local" else "mp3"
     normalized = normalize(local_path, work_dir, format=audio_fmt)
 
-    # 2. Transcribe
+    # 2. Audio fingerprinting
+    fingerprinted = []
+    if not no_fingerprint and settings.audd_api_key:
+        from mix_extractor.fingerprinter import fingerprint_mix  # noqa: PLC0415
+        fingerprinted = fingerprint_mix(normalized, settings)
+    elif not no_fingerprint and not settings.audd_api_key:
+        console.print("[dim]Fingerprinting skipped (no AUDD_API_KEY set)[/dim]")
+
+    # ── fingerprint-only short-circuit ────────────────────────────────────────
+    if fingerprint_only:
+        if not fingerprinted:
+            console.print("[yellow]Fingerprinting returned no results. Is AUDD_API_KEY set?[/yellow]")
+            raise typer.Exit(1)
+        merged_dicts = [
+            {
+                "index": i + 1,
+                "timestamp": fp.timestamp_str,
+                "artist": fp.artist,
+                "title": fp.title,
+                "label": fp.label,
+                "remix": "",
+                "extra_info": f"album: {fp.album}" if fp.album else "",
+                "album": fp.album,
+                "release_date": fp.release_date,
+                "score": fp.score,
+                "confidence": round(fp.score / 100, 2) if fp.score else 1.0,
+                "detection_source": fp.detection_source,
+                "links": dict(fp.links),
+            }
+            for i, fp in enumerate(fingerprinted)
+        ]
+        if not no_enrich:
+            console.print("[bold blue]Enriching tracks[/bold blue] …")
+            merged_dicts = enrich(merged_dicts, settings)
+        write_report(
+            source_name=display_name,
+            segments=[],
+            enriched_tracks=merged_dicts,
+            settings=settings,
+            transcription_provider="fingerprint_only",
+            duration_seconds=None,
+        )
+        return
+    # ── end fingerprint-only ──────────────────────────────────────────────────
+
+    # 3. Transcribe
     segments = transcribe(normalized, settings)
     transcript = segments_to_text(segments)
 
@@ -82,22 +129,30 @@ def analyze(
         console.print("[yellow]Transcription produced no text. Is there speech in the mix?[/yellow]")
         raise typer.Exit(1)
 
-    # 3. Parse tracklist via LLM
+    # 4. Parse tracklist via LLM
     tracks = parse_tracks(transcript, segments, settings)
 
-    # 4. Enrich with music API links
-    if no_enrich or not tracks:
-        enriched = [t.model_dump() | {"links": {}} for t in tracks]
+    # 5. Merge transcript tracks with fingerprinted tracks
+    if fingerprinted:
+        from mix_extractor.merger import merge_tracks  # noqa: PLC0415
+        console.print("[bold blue]Merging transcript and fingerprint results[/bold blue] …")
+        merged_dicts = merge_tracks(tracks, fingerprinted)
+    else:
+        merged_dicts = [t.model_dump() | {"detection_source": "transcript", "links": {}} for t in tracks]
+
+    # 6. Enrich with music API links
+    if no_enrich or not merged_dicts:
+        enriched = merged_dicts
     else:
         console.print("[bold blue]Enriching tracks[/bold blue] …")
-        enriched = enrich(tracks, settings)
+        enriched = enrich(merged_dicts, settings)
 
-    # 5. Detect duration (best-effort)
+    # 7. Detect duration (best-effort)
     duration: float | None = None
     if segments:
         duration = segments[-1].end
 
-    # 6. Write reports
+    # 8. Write reports
     write_report(
         source_name=display_name,
         segments=segments,

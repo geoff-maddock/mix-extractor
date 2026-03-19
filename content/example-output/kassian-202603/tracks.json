@@ -1,0 +1,342 @@
+{
+  "mix": {
+    "source": "kassian-202603.mp3",
+    "duration_seconds": 3624.512,
+    "transcription_provider": "whisper_api",
+    "analyzed_at": "2026-03-19T04:33:47.891080+00:00"
+  },
+  "tracks": [
+    {
+      "index": 1,
+      "timestamp": "00:00",
+      "artist": "Nouveau Monica",
+      "title": "Unbound",
+      "label": "Independent",
+      "remix": "",
+      "extra_info": "album: Unbound",
+      "release_date": "2026-03-13",
+      "album": "Unbound",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/6TYLnrbet5hiWmyo2T2RkW",
+        "apple_music": "https://music.apple.com/us/album/unbound/1882975692?app=music&at=1000l33QU&i=1882975698&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Nouveau+Monica+Unbound&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Nouveau+Monica+Unbound",
+        "youtube_music": "https://music.youtube.com/watch?v=j2P9uwXK3l4"
+      }
+    },
+    {
+      "index": 2,
+      "timestamp": "04:30",
+      "artist": "Edmondson",
+      "title": "Betamax (Original Mix)",
+      "label": "Lissoms",
+      "remix": "",
+      "extra_info": "album: Samarkand (Original Mix)",
+      "release_date": "2026-03-12",
+      "album": "Samarkand (Original Mix)",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/4NpOHfxnnTm2MQgNUUILKP",
+        "apple_music": "https://music.apple.com/us/album/betamax/1879257227?app=music&at=1000l33QU&i=1879257229&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Edmondson+Betamax+%28Original+Mix%29&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Edmondson+Betamax+%28Original+Mix%29",
+        "youtube_music": "https://music.youtube.com/watch?v=Jfxo-rbFW8M"
+      }
+    },
+    {
+      "index": 3,
+      "timestamp": "10:30",
+      "artist": "Roska",
+      "title": "Green Apple",
+      "label": "",
+      "remix": "",
+      "extra_info": "album: Green Apple / T-800",
+      "release_date": "2026-02-19",
+      "album": "Green Apple / T-800",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/0MEeeMA1A3T9yz53cmnBPA",
+        "apple_music": "https://music.apple.com/us/album/green-apple/1874078360?app=music&at=1000l33QU&i=1874078361&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Roska+Green+Apple&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Roska+Green+Apple",
+        "youtube_music": "https://music.youtube.com/watch?v=DTZU5uAoId8"
+      }
+    },
+    {
+      "index": 4,
+      "timestamp": "19:30",
+      "artist": "HYPNOSIS THERAPY",
+      "title": "siren///softcode",
+      "label": "HYPNOSIS THERAPY",
+      "remix": "",
+      "extra_info": "album: latency",
+      "release_date": "2026-02-03",
+      "album": "latency",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/1lt6M3U6LdgnHsC3MxGtfo",
+        "apple_music": "https://music.apple.com/us/album/siren-softcode/1872037312?app=music&at=1000l33QU&i=1872037465&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=HYPNOSIS+THERAPY+siren%2F%2F%2Fsoftcode&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=HYPNOSIS+THERAPY+siren%2F%2F%2Fsoftcode",
+        "youtube_music": "https://music.youtube.com/watch?v=nihQgb24d7g"
+      }
+    },
+    {
+      "index": 5,
+      "timestamp": "21:00",
+      "artist": "LWS",
+      "title": "Gubbins",
+      "label": "TraTraTrax",
+      "remix": "",
+      "extra_info": "album: Gubbins",
+      "release_date": "2026-02-20",
+      "album": "Gubbins",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "apple_music": "https://music.apple.com/us/album/gubbins/1874355250?app=music&at=1000l33QU&i=1874355258&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/a35bba55-1ac8-43d3-8538-c7353d5b55cd",
+        "bandcamp": "https://bandcamp.com/search?q=LWS+Gubbins&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=LWS+Gubbins",
+        "youtube_music": "https://music.youtube.com/watch?v=VKBH5RBMZUY"
+      }
+    },
+    {
+      "index": 6,
+      "timestamp": "27:00",
+      "artist": "Mak & Pasteman",
+      "title": "Listen",
+      "label": "Faux Poly",
+      "remix": "",
+      "extra_info": "album: Listen",
+      "release_date": "2026-02-18",
+      "album": "Listen",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/7tbNtnnnaarWuuiTIMApBo",
+        "apple_music": "https://music.apple.com/us/album/listen/1857957363?app=music&at=1000l33QU&i=1857957364&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Mak+%26+Pasteman+Listen&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Mak+%26+Pasteman+Listen",
+        "youtube_music": "https://music.youtube.com/watch?v=xJ0k1CvXKGs"
+      }
+    },
+    {
+      "index": 7,
+      "timestamp": "33:00",
+      "artist": "Lacuna",
+      "title": "Piff Dub",
+      "label": "Flippen Bits",
+      "remix": "",
+      "extra_info": "album: Light Work EP",
+      "release_date": "2026-03-17",
+      "album": "Light Work EP",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/4y0N2Fao09CmRn53VtHINy",
+        "apple_music": "https://music.apple.com/us/album/piff-dub/1884595991?app=music&at=1000l33QU&i=1884595992&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Lacuna+Piff+Dub&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Lacuna+Piff+Dub",
+        "youtube_music": "https://music.youtube.com/watch?v=e1JyZIFmtoY"
+      }
+    },
+    {
+      "index": 8,
+      "timestamp": "34:30",
+      "artist": "Presti",
+      "title": "Big Ting",
+      "label": "Time Is Now Records",
+      "remix": "",
+      "extra_info": "album: As We Move",
+      "release_date": "2026-02-13",
+      "album": "As We Move",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/5Yi7IaayPlkkrUTNWxQopT",
+        "apple_music": "https://music.apple.com/us/album/big-ting/1868421285?app=music&at=1000l33QU&i=1868421287&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Presti+Big+Ting&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Presti+Big+Ting",
+        "youtube_music": "https://music.youtube.com/watch?v=vc5h_qc9SWQ"
+      }
+    },
+    {
+      "index": 9,
+      "timestamp": "36:00",
+      "artist": "Kassian/Bodhi",
+      "title": "Fade (Bodhi Remix)",
+      "label": "Faux Poly",
+      "remix": "",
+      "extra_info": "album: Faux Poly: Remixed 004",
+      "release_date": "2026-01-28",
+      "album": "Faux Poly: Remixed 004",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/18OeZHc3Zroy3PySZyiWUg",
+        "apple_music": "https://music.apple.com/us/album/fade-bodhi-remix/1856002424?app=music&at=1000l33QU&i=1856002425&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Kassian%2FBodhi+Fade+%28Bodhi+Remix%29&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Kassian%2FBodhi+Fade+%28Bodhi+Remix%29",
+        "youtube_music": "https://music.youtube.com/watch?v=IrTuZrreMzY"
+      }
+    },
+    {
+      "index": 10,
+      "timestamp": "37:30",
+      "artist": "Kassian",
+      "title": "Fade (Bodhi Remix)",
+      "label": "Faux Poly",
+      "remix": "",
+      "extra_info": "album: Faux Poly: Remixed 004",
+      "release_date": "2026-01-28",
+      "album": "Faux Poly: Remixed 004",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/18OeZHc3Zroy3PySZyiWUg",
+        "apple_music": "https://music.apple.com/us/album/fade-bodhi-remix/1856002424?app=music&at=1000l33QU&i=1856002425&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Kassian+Fade+%28Bodhi+Remix%29&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Kassian+Fade+%28Bodhi+Remix%29",
+        "youtube_music": "https://music.youtube.com/watch?v=IrTuZrreMzY"
+      }
+    },
+    {
+      "index": 11,
+      "timestamp": "39:00",
+      "artist": "Smiff",
+      "title": "Hotdawgs",
+      "label": "More Time Records",
+      "remix": "",
+      "extra_info": "album: Beezknees",
+      "release_date": "2026-03-05",
+      "album": "Beezknees",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "apple_music": "https://music.apple.com/us/album/hotdawgs/1875419311?app=music&at=1000l33QU&i=1875419840&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/7d87c92d-baee-422e-9d09-12c966cccf45",
+        "bandcamp": "https://bandcamp.com/search?q=Smiff+Hotdawgs&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Smiff+Hotdawgs",
+        "youtube_music": "https://music.youtube.com/watch?v=7DH2y8s7YBo"
+      }
+    },
+    {
+      "index": 12,
+      "timestamp": "43:30",
+      "artist": "Tenten",
+      "title": "Chaleur Onslaught",
+      "label": "NFhits3",
+      "remix": "",
+      "extra_info": "album: Reduction Meter",
+      "release_date": "2023-05-03",
+      "album": "Reduction Meter",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Tenten+Chaleur+Onslaught&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Tenten+Chaleur+Onslaught",
+        "youtube_music": "https://music.youtube.com/watch?v=LVVceouXHaA"
+      }
+    },
+    {
+      "index": 13,
+      "timestamp": "45:00",
+      "artist": "Yesca",
+      "title": "Work It",
+      "label": "Homebass Records Ltd",
+      "remix": "",
+      "extra_info": "album: Work It",
+      "release_date": "2026-02-27",
+      "album": "Work It",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/2TO0icE4wPO0yZ4Ok55Nxj",
+        "apple_music": "https://music.apple.com/us/album/work-it/1875257647?app=music&at=1000l33QU&i=1875257736&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Yesca+Work+It&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Yesca+Work+It",
+        "youtube_music": "https://music.youtube.com/watch?v=B1bul1D1kc8"
+      }
+    },
+    {
+      "index": 14,
+      "timestamp": "48:00",
+      "artist": "Breaka",
+      "title": "Mangled",
+      "label": "fabric Records",
+      "remix": "",
+      "extra_info": "album: Mangled",
+      "release_date": "2026-03-13",
+      "album": "Mangled",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/68Dlx17lLlC11CexGoA5P3",
+        "apple_music": "https://music.apple.com/us/album/mangled/1877891843?app=music&at=1000l33QU&i=1877891856&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Breaka+Mangled&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Breaka+Mangled",
+        "youtube_music": "https://music.youtube.com/watch?v=qEPEKcEdeiE"
+      }
+    },
+    {
+      "index": 15,
+      "timestamp": "51:00",
+      "artist": "GABBY GUNN",
+      "title": "Mount Yasur",
+      "label": "Scuffed Recordings",
+      "remix": "",
+      "extra_info": "album: Tectonics",
+      "release_date": "2026-02-20",
+      "album": "Tectonics",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "apple_music": "https://music.apple.com/us/album/mount-yasur/1872433981?app=music&at=1000l33QU&i=1872433986&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/aeb4a322-d255-4a8c-b5d5-09a78e846c34",
+        "bandcamp": "https://bandcamp.com/search?q=GABBY+GUNN+Mount+Yasur&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=GABBY+GUNN+Mount+Yasur",
+        "youtube_music": "https://music.youtube.com/watch?v=1dyCDaKiyfA"
+      }
+    },
+    {
+      "index": 16,
+      "timestamp": "",
+      "artist": "Prince",
+      "title": "FF",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "detection_source": "transcript",
+      "album": "",
+      "release_date": "",
+      "score": 0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Prince+FF&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Prince+FF",
+        "youtube_music": "https://music.youtube.com/watch?v=GXmcPIxrVYg"
+      }
+    }
+  ]
+}

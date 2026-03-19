@@ -31,16 +31,31 @@ class TrackLinks(dict):
     """Dict subclass for {source: url} links — keeps things simple."""
 
 
-def enrich(tracks: "list[Track]", settings: "Settings") -> list[dict]:
+def enrich(tracks: "list[Track] | list[dict]", settings: "Settings") -> list[dict]:
     """Enrich each track with purchase/stream links. Returns a list of dicts
-    with the original track data plus a ``links`` key."""
+    with the original track data plus a ``links`` key.
+
+    Accepts either Pydantic ``Track`` objects or plain dicts (e.g. from the
+    merger step).
+    """
+    from types import SimpleNamespace  # noqa: PLC0415
+
     results = []
-    for track in tracks:
+    for raw_track in tracks:
+        if isinstance(raw_track, dict):
+            base = dict(raw_track)
+            existing_links = base.pop("links", {})
+            track = SimpleNamespace(**base)
+        else:
+            base = raw_track.model_dump()
+            existing_links = base.pop("links", {})
+            track = SimpleNamespace(**base)
+
         console.print(
             f"  [dim][{track.index}][/dim] "
             f"[bold]{track.artist}[/bold] — {track.title}"
         )
-        links = TrackLinks()
+        links = TrackLinks(existing_links)
         _lookup_musicbrainz(track, links)
         _lookup_bandcamp(track, links)
         _lookup_soundcloud(track, links, settings)
@@ -50,7 +65,7 @@ def enrich(tracks: "list[Track]", settings: "Settings") -> list[dict]:
         if settings.discogs_token:
             _lookup_discogs(track, links, settings)
 
-        entry = track.model_dump()
+        entry = base
         entry["links"] = dict(links)
         results.append(entry)
 
