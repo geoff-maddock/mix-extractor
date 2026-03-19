@@ -1,0 +1,196 @@
+{
+  "mix": {
+    "source": "breaka-202603.mp3",
+    "duration_seconds": 3608.912,
+    "transcription_provider": "whisper_api",
+    "analyzed_at": "2026-03-19T04:25:57.503241+00:00"
+  },
+  "tracks": [
+    {
+      "index": 1,
+      "timestamp": "03:00",
+      "artist": "Sun People/Other Worlds",
+      "title": "Sunnyview",
+      "label": "All Things Records",
+      "remix": "",
+      "extra_info": "album: Endophyte",
+      "release_date": "2026-03-06",
+      "album": "Endophyte",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/412qJEZ4caZlZ86QBRgokN",
+        "apple_music": "https://music.apple.com/us/album/sunnyview/1878436381?app=music&at=1000l33QU&i=1878436382&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Sun+People%2FOther+Worlds+Sunnyview&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Sun+People%2FOther+Worlds+Sunnyview",
+        "youtube_music": "https://music.youtube.com/watch?v=kALF1dpJNIM"
+      }
+    },
+    {
+      "index": 2,
+      "timestamp": "06:00",
+      "artist": "Sound Filter",
+      "title": "Cantiere 56",
+      "label": "",
+      "remix": "",
+      "extra_info": "album: Cantiere 56",
+      "release_date": "2012-09-26",
+      "album": "Cantiere 56",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Sound+Filter+Cantiere+56&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Sound+Filter+Cantiere+56",
+        "youtube_music": "https://music.youtube.com/watch?v=TNGDlmZ8tAY"
+      }
+    },
+    {
+      "index": 3,
+      "timestamp": "27:00",
+      "artist": "Breaka",
+      "title": "Bell Toll Bounce",
+      "label": "fabric Records",
+      "remix": "",
+      "extra_info": "album: Mangled",
+      "release_date": "2026-03-13",
+      "album": "Mangled",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/6Ooq1KNrTvng0y0zFsveMn",
+        "apple_music": "https://music.apple.com/us/album/bell-toll-bounce/1877891843?app=music&at=1000l33QU&i=1877891844&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Breaka+Bell+Toll+Bounce&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Breaka+Bell+Toll+Bounce",
+        "youtube_music": "https://music.youtube.com/watch?v=PuLOU0TEnEk"
+      }
+    },
+    {
+      "index": 4,
+      "timestamp": "31:30",
+      "artist": "LWS",
+      "title": "Gubbins",
+      "label": "TraTraTrax",
+      "remix": "",
+      "extra_info": "album: Gubbins",
+      "release_date": "2026-02-20",
+      "album": "Gubbins",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "apple_music": "https://music.apple.com/us/album/gubbins/1874355250?app=music&at=1000l33QU&i=1874355258&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/a35bba55-1ac8-43d3-8538-c7353d5b55cd",
+        "bandcamp": "https://bandcamp.com/search?q=LWS+Gubbins&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=LWS+Gubbins",
+        "youtube_music": "https://music.youtube.com/watch?v=VKBH5RBMZUY"
+      }
+    },
+    {
+      "index": 5,
+      "timestamp": "37:30",
+      "artist": "DJ SprinTer",
+      "title": "Subby",
+      "label": "Fable Records",
+      "remix": "",
+      "extra_info": "album: SAGA002",
+      "release_date": "2026-02-06",
+      "album": "SAGA002",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/3H53kNDNl0ileJRBjkETDN",
+        "apple_music": "https://music.apple.com/us/album/subby/1868675615?app=music&at=1000l33QU&i=1868675624&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=DJ+SprinTer+Subby&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=DJ+SprinTer+Subby",
+        "youtube_music": "https://music.youtube.com/watch?v=eg-xgeGvS_o"
+      }
+    },
+    {
+      "index": 6,
+      "timestamp": "46:30",
+      "artist": "Frazer Ray",
+      "title": "Midnight",
+      "label": "Ingram",
+      "remix": "",
+      "extra_info": "album: Midnight",
+      "release_date": "2026-02-06",
+      "album": "Midnight",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/7JNuZymSh8gk5E3N6HuKi0",
+        "apple_music": "https://music.apple.com/us/album/midnight/1870836486?app=music&at=1000l33QU&i=1870836494&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Frazer+Ray+Midnight&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Frazer+Ray+Midnight",
+        "youtube_music": "https://music.youtube.com/watch?v=-KJ3bdc7tLg"
+      }
+    },
+    {
+      "index": 7,
+      "timestamp": "48:00",
+      "artist": "Breaka",
+      "title": "Mangled",
+      "label": "fabric Records",
+      "remix": "",
+      "extra_info": "album: Mangled",
+      "release_date": "2026-03-13",
+      "album": "Mangled",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/68Dlx17lLlC11CexGoA5P3",
+        "apple_music": "https://music.apple.com/us/album/mangled/1877891843?app=music&at=1000l33QU&i=1877891856&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Breaka+Mangled&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Breaka+Mangled",
+        "youtube_music": "https://music.youtube.com/watch?v=qEPEKcEdeiE"
+      }
+    },
+    {
+      "index": 8,
+      "timestamp": "57:00",
+      "artist": "Commodo",
+      "title": "Deep Harbour",
+      "label": "",
+      "remix": "",
+      "extra_info": "album: Deep Harbour",
+      "release_date": "2026-02-18",
+      "album": "Deep Harbour",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "apple_music": "https://music.apple.com/us/album/deep-harbour-feat-alfa-mist/1869733850?app=music&at=1000l33QU&i=1869734283&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/f207cdfd-75ac-487f-9d13-91a6f6ef0993",
+        "bandcamp": "https://bandcamp.com/search?q=Commodo+Deep+Harbour&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Commodo+Deep+Harbour",
+        "youtube_music": "https://music.youtube.com/watch?v=8fxvsCrSEpY"
+      }
+    },
+    {
+      "index": 9,
+      "timestamp": "01:00:00",
+      "artist": "Commodo",
+      "title": "Deep Harbour feat. Alfa Mist",
+      "label": "Black Acre",
+      "remix": "",
+      "extra_info": "album: Deep Harbour feat. Alfa Mist",
+      "release_date": "2026-02-18",
+      "album": "Deep Harbour feat. Alfa Mist",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "apple_music": "https://music.apple.com/us/album/deep-harbour-feat-alfa-mist/1869733850?app=music&at=1000l33QU&i=1869734283&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Commodo+Deep+Harbour+feat.+Alfa+Mist&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Commodo+Deep+Harbour+feat.+Alfa+Mist",
+        "youtube_music": "https://music.youtube.com/watch?v=8fxvsCrSEpY"
+      }
+    }
+  ]
+}

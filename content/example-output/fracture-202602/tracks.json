@@ -1,0 +1,272 @@
+{
+  "mix": {
+    "source": "fracture-202602.mp3",
+    "duration_seconds": 3613.672,
+    "transcription_provider": "whisper_api",
+    "analyzed_at": "2026-03-19T04:05:15.305611+00:00"
+  },
+  "tracks": [
+    {
+      "index": 1,
+      "timestamp": "",
+      "artist": "Deebridge and Moene",
+      "title": "Session One",
+      "label": "",
+      "remix": "",
+      "extra_info": "4 track EP, collaborations with different artists",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Deebridge+and+Moene+Session+One&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Deebridge+and+Moene+Session+One",
+        "youtube_music": "https://music.youtube.com/watch?v=nWZM94xIwjg"
+      }
+    },
+    {
+      "index": 2,
+      "timestamp": "",
+      "artist": "DJ Sprinter",
+      "title": "Like This",
+      "label": "",
+      "remix": "",
+      "extra_info": "Available on Bandcamp",
+      "confidence": 1.0,
+      "links": {
+        "musicbrainz": "https://musicbrainz.org/recording/ea33c80b-75a0-47b4-9dcd-06c995c809ba",
+        "bandcamp": "https://bandcamp.com/search?q=DJ+Sprinter+Like+This&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=DJ+Sprinter+Like+This",
+        "youtube_music": "https://music.youtube.com/watch?v=Iz72zEcFpRs"
+      }
+    },
+    {
+      "index": 3,
+      "timestamp": "",
+      "artist": "Kelbin",
+      "title": "Squeezer",
+      "label": "",
+      "remix": "",
+      "extra_info": "From compilation album, also features Hilarity and Koido",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Kelbin+Squeezer&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Kelbin+Squeezer",
+        "youtube_music": "https://music.youtube.com/watch?v=hTprvi1trWE"
+      }
+    },
+    {
+      "index": 4,
+      "timestamp": "",
+      "artist": "Lewski",
+      "title": "Rotational Drift",
+      "label": "United Identities",
+      "remix": "",
+      "extra_info": "Forthcoming EP",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Lewski+Rotational+Drift&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Lewski+Rotational+Drift",
+        "youtube_music": "https://music.youtube.com/watch?v=AoUJHuWhYzM"
+      }
+    },
+    {
+      "index": 5,
+      "timestamp": "",
+      "artist": "Elvis 1990",
+      "title": "Mole Rats",
+      "label": "",
+      "remix": "",
+      "extra_info": "Brand new, forthcoming very soon",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Elvis+1990+Mole+Rats&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Elvis+1990+Mole+Rats",
+        "youtube_music": "https://music.youtube.com/watch?v=eTABp5dWQrg"
+      }
+    },
+    {
+      "index": 6,
+      "timestamp": "",
+      "artist": "Impurity and Tano",
+      "title": "All Static",
+      "label": "Of Paradise",
+      "remix": "",
+      "extra_info": "Forthcoming",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Impurity+and+Tano+All+Static&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Impurity+and+Tano+All+Static",
+        "youtube_music": "https://music.youtube.com/watch?v=e5DFRoEY9es"
+      }
+    },
+    {
+      "index": 7,
+      "timestamp": "",
+      "artist": "Mantra",
+      "title": "Muscle Head",
+      "label": "",
+      "remix": "",
+      "extra_info": "Forthcoming",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Mantra+Muscle+Head&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Mantra+Muscle+Head",
+        "youtube_music": "https://music.youtube.com/watch?v=XlDuGwXcjPU"
+      }
+    },
+    {
+      "index": 8,
+      "timestamp": "",
+      "artist": "Pugilist",
+      "title": "Marigold",
+      "label": "Shall Not Fade",
+      "remix": "",
+      "extra_info": "Forthcoming",
+      "confidence": 1.0,
+      "links": {
+        "musicbrainz": "https://musicbrainz.org/recording/f0e5c132-e7b8-4a65-8e33-e264fd4bf424",
+        "bandcamp": "https://bandcamp.com/search?q=Pugilist+Marigold&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Pugilist+Marigold",
+        "youtube_music": "https://music.youtube.com/watch?v=gCWGz9ZqH5Y"
+      }
+    },
+    {
+      "index": 9,
+      "timestamp": "",
+      "artist": "Law",
+      "title": "Waveform",
+      "label": "Waveforms",
+      "remix": "",
+      "extra_info": "Forthcoming",
+      "confidence": 1.0,
+      "links": {
+        "musicbrainz": "https://musicbrainz.org/recording/6b2a9fa0-ef92-48e8-840c-16b06ecb7668",
+        "bandcamp": "https://bandcamp.com/search?q=Law+Waveform&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Law+Waveform",
+        "youtube_music": "https://music.youtube.com/watch?v=1C2nVUSm7ew"
+      }
+    },
+    {
+      "index": 10,
+      "timestamp": "",
+      "artist": "Marcus Visionary",
+      "title": "Sentinel",
+      "label": "",
+      "remix": "",
+      "extra_info": "Available on Bandcamp",
+      "confidence": 1.0,
+      "links": {
+        "musicbrainz": "https://musicbrainz.org/recording/9b0ba026-c623-4b71-9069-f29f2afb261e",
+        "bandcamp": "https://bandcamp.com/search?q=Marcus+Visionary+Sentinel&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Marcus+Visionary+Sentinel",
+        "youtube_music": "https://music.youtube.com/watch?v=rhkFZD3PAWI"
+      }
+    },
+    {
+      "index": 11,
+      "timestamp": "",
+      "artist": "Pizza Hotline",
+      "title": "Demo Disc One",
+      "label": "",
+      "remix": "",
+      "extra_info": "Available on Bandcamp",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Pizza+Hotline+Demo+Disc+One&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Pizza+Hotline+Demo+Disc+One",
+        "youtube_music": "https://music.youtube.com/watch?v=kAqZaX4PA9g"
+      }
+    },
+    {
+      "index": 12,
+      "timestamp": "",
+      "artist": "Tim Reaper and Cloak",
+      "title": "It's You",
+      "label": "Mind Game",
+      "remix": "",
+      "extra_info": "Out now",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Tim+Reaper+and+Cloak+It%27s+You&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Tim+Reaper+and+Cloak+It%27s+You",
+        "youtube_music": "https://music.youtube.com/watch?v=PGhpc757MSI"
+      }
+    },
+    {
+      "index": 13,
+      "timestamp": "",
+      "artist": "Voyager",
+      "title": "Full of Stars",
+      "label": "Deep Jungle",
+      "remix": "",
+      "extra_info": "Forthcoming",
+      "confidence": 1.0,
+      "links": {
+        "musicbrainz": "https://musicbrainz.org/recording/1a15a1eb-43e2-46aa-9387-c95696c317b1",
+        "bandcamp": "https://bandcamp.com/search?q=Voyager+Full+of+Stars&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Voyager+Full+of+Stars",
+        "youtube_music": "https://music.youtube.com/watch?v=63GB4VgIQ4c"
+      }
+    },
+    {
+      "index": 14,
+      "timestamp": "",
+      "artist": "Double O",
+      "title": "",
+      "label": "",
+      "remix": "",
+      "extra_info": "EP",
+      "confidence": 1.0,
+      "links": {
+        "musicbrainz": "https://musicbrainz.org/recording/01e061e8-61fb-4945-87c1-0a37282ceef4",
+        "bandcamp": "https://bandcamp.com/search?q=Double+O+&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Double+O+",
+        "youtube_music": "https://music.youtube.com/watch?v=Td5m_6gFsu4"
+      }
+    },
+    {
+      "index": 15,
+      "timestamp": "",
+      "artist": "Echt",
+      "title": "Razor",
+      "label": "",
+      "remix": "Fracture",
+      "extra_info": "Available now or end of month",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Echt+Razor&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Echt+Razor",
+        "youtube_music": "https://music.youtube.com/watch?v=wxaSkrVWR1M"
+      }
+    },
+    {
+      "index": 16,
+      "timestamp": "",
+      "artist": "Kid Lib",
+      "title": "The Countdown",
+      "label": "",
+      "remix": "",
+      "extra_info": "From EP 'Learn to Fly', available on Bandcamp",
+      "confidence": 1.0,
+      "links": {
+        "musicbrainz": "https://musicbrainz.org/recording/b6793583-2d3b-4376-9977-d94651e188a7",
+        "bandcamp": "https://bandcamp.com/search?q=Kid+Lib+The+Countdown&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Kid+Lib+The+Countdown",
+        "youtube_music": "https://music.youtube.com/watch?v=bW3jF6WLaq8"
+      }
+    },
+    {
+      "index": 17,
+      "timestamp": "",
+      "artist": "Threshold",
+      "title": "Scandal",
+      "label": "",
+      "remix": "",
+      "extra_info": "From archives, quite old",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Threshold+Scandal&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Threshold+Scandal",
+        "youtube_music": "https://music.youtube.com/watch?v=NCalR76W1gk"
+      }
+    }
+  ]
+}

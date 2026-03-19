@@ -1,0 +1,141 @@
+{
+  "mix": {
+    "source": "fracture-202603.mp3",
+    "duration_seconds": 3609.216,
+    "transcription_provider": "whisper_api",
+    "analyzed_at": "2026-03-19T02:52:31.208170+00:00"
+  },
+  "tracks": [
+    {
+      "index": 1,
+      "timestamp": "",
+      "artist": "Mystic State",
+      "title": "Ancestor's Tongue",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=UACjsByXrA4"
+      }
+    },
+    {
+      "index": 2,
+      "timestamp": "",
+      "artist": "2un4",
+      "title": "Toad in the Pocket",
+      "label": "Cultivated Electronics",
+      "remix": "",
+      "extra_info": "forthcoming",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=7nFgJJVcBYU"
+      }
+    },
+    {
+      "index": 3,
+      "timestamp": "",
+      "artist": "Sounds of Breaker",
+      "title": "Desire Path",
+      "label": "fabric live",
+      "remix": "",
+      "extra_info": "forthcoming",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=3yC-aDp5-hE"
+      }
+    },
+    {
+      "index": 4,
+      "timestamp": "",
+      "artist": "Machine Drum",
+      "title": "",
+      "label": "",
+      "remix": "",
+      "extra_info": "brand new, no one knew",
+      "confidence": 1.0,
+      "links": {
+        "musicbrainz": "https://musicbrainz.org/recording/75e8244f-357d-4e74-84d7-35b474d9123b",
+        "youtube_music": "https://music.youtube.com/watch?v=WBY_V7N0GlI"
+      }
+    },
+    {
+      "index": 5,
+      "timestamp": "",
+      "artist": "Dr. Jeep",
+      "title": "Ohm",
+      "label": "Rinse",
+      "remix": "",
+      "extra_info": "forthcoming",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=yUjfF5d25RU"
+      }
+    },
+    {
+      "index": 6,
+      "timestamp": "",
+      "artist": "Nasty J",
+      "title": "Nerd",
+      "label": "Leftover Dubs",
+      "remix": "",
+      "extra_info": "forthcoming",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=aBmrSLzIh1k"
+      }
+    },
+    {
+      "index": 7,
+      "timestamp": "",
+      "artist": "Dr. Zigot",
+      "title": "Zygote",
+      "label": "",
+      "remix": "Boss Mix",
+      "extra_info": "160 BPM",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=CYVAateITak"
+      }
+    },
+    {
+      "index": 8,
+      "timestamp": "",
+      "artist": "Tim Reaper",
+      "title": "Late Night Runnings",
+      "label": "Fabric",
+      "remix": "Decibela",
+      "extra_info": "forthcoming",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=hYZaZHmq8Yc"
+      }
+    },
+    {
+      "index": 9,
+      "timestamp": "",
+      "artist": "",
+      "title": "Corsica Jungle",
+      "label": "Double O",
+      "remix": "",
+      "extra_info": "forthcoming",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=t1KD_syKiPg"
+      }
+    },
+    {
+      "index": 10,
+      "timestamp": "",
+      "artist": "Fez the Kid and Bruk",
+      "title": "Rum Runner",
+      "label": "",
+      "remix": "",
+      "extra_info": "forthcoming",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=NiH4zDnJm1M"
+      }
+    }
+  ]
+}

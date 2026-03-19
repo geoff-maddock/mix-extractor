@@ -1,0 +1,181 @@
+{
+  "mix": {
+    "source": "vision-radio-202603.mp3",
+    "duration_seconds": 3600.263990234375,
+    "transcription_provider": "whisper_api",
+    "analyzed_at": "2026-03-18T23:38:50.706261+00:00"
+  },
+  "tracks": [
+    {
+      "index": 1,
+      "timestamp": "",
+      "artist": "Monista",
+      "title": "Ye",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=JQ38h9lYQ38"
+      }
+    },
+    {
+      "index": 2,
+      "timestamp": "",
+      "artist": "Seven Headed",
+      "title": "Wormwood",
+      "label": "",
+      "remix": "",
+      "extra_info": "Mission 3 compilation, stems on Patreon",
+      "confidence": 1.0,
+      "links": {
+        "musicbrainz": "https://musicbrainz.org/recording/ba0d2539-d637-4952-91e1-e29f701c5b0d",
+        "youtube_music": "https://music.youtube.com/watch?v=Y0PnwU7mJ6o"
+      }
+    },
+    {
+      "index": 3,
+      "timestamp": "",
+      "artist": "Dicey",
+      "title": "Rain",
+      "label": "Saturate",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=13EL6Mgeocc"
+      }
+    },
+    {
+      "index": 4,
+      "timestamp": "",
+      "artist": "Task Horizon with Killer P",
+      "title": "",
+      "label": "",
+      "remix": "Screamor",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=iZZOO3PQIak"
+      }
+    },
+    {
+      "index": 5,
+      "timestamp": "",
+      "artist": "I Am Doomed",
+      "title": "Secret Agent",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=2ZUOth34B_M"
+      }
+    },
+    {
+      "index": 6,
+      "timestamp": "",
+      "artist": "Toffee",
+      "title": "Octane VIP",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=ncnEn3kcLbs"
+      }
+    },
+    {
+      "index": 7,
+      "timestamp": "",
+      "artist": "Dylan Francis and Space Laces",
+      "title": "",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=DjinHMii7bA"
+      }
+    },
+    {
+      "index": 8,
+      "timestamp": "",
+      "artist": "Vici",
+      "title": "Malfunction",
+      "label": "Eat Brain",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=gAXllNd02jM"
+      }
+    },
+    {
+      "index": 9,
+      "timestamp": "",
+      "artist": "Amos",
+      "title": "HLM",
+      "label": "Critical",
+      "remix": "",
+      "extra_info": "HLM also known as High Level Mindset",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=3YeSGAs4-f8"
+      }
+    },
+    {
+      "index": 10,
+      "timestamp": "",
+      "artist": "Go Chi",
+      "title": "Rewind the Tune",
+      "label": "London City Digital",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=2cvAXJUlGw4"
+      }
+    },
+    {
+      "index": 11,
+      "timestamp": "",
+      "artist": "Machinist",
+      "title": "",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "musicbrainz": "https://musicbrainz.org/recording/d8198a74-361f-459c-9124-666bec81a5e1",
+        "youtube_music": "https://music.youtube.com/watch?v=7-_uYOeSWqw"
+      }
+    },
+    {
+      "index": 12,
+      "timestamp": "",
+      "artist": "Dem",
+      "title": "Not Ready",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=x6cNtoaDYHM"
+      }
+    },
+    {
+      "index": 13,
+      "timestamp": "",
+      "artist": "Tipper",
+      "title": "Dispatch Yo",
+      "label": "Tipper Music",
+      "remix": "",
+      "extra_info": "from album Cloaked, voted replay track",
+      "confidence": 1.0,
+      "links": {
+        "youtube_music": "https://music.youtube.com/watch?v=AdZxbPJNvvg"
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "mix": {
+    "source": "scuffed-202603.mp3",
+    "duration_seconds": 3641.9279560546875,
+    "transcription_provider": "whisper_api",
+    "analyzed_at": "2026-03-19T04:10:52.362631+00:00"
+  },
+  "tracks": [
+    {
+      "index": 1,
+      "timestamp": "",
+      "artist": "Distrata",
+      "title": "Problem",
+      "label": "Scuff Recordings",
+      "remix": "",
+      "extra_info": "featuring Killer P, first single from EP, released March 27",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Distrata+Problem&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Distrata+Problem",
+        "youtube_music": "https://music.youtube.com/watch?v=25ki9b-8ojI"
+      }
+    }
+  ]
+}

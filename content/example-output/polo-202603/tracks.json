@@ -1,0 +1,302 @@
+{
+  "mix": {
+    "source": "polo-202603.mp3",
+    "duration_seconds": 3681.204048828125,
+    "transcription_provider": "whisper_api",
+    "analyzed_at": "2026-03-19T04:46:45.385862+00:00"
+  },
+  "tracks": [
+    {
+      "index": 1,
+      "timestamp": "00:00",
+      "artist": "Techx MT6",
+      "title": "NGL/64 Bars of Law (DJ Oblig RinseFM) [Mix]",
+      "label": "MT6 Records",
+      "remix": "",
+      "extra_info": "album: NGL/64 Bars of Law (DJ Oblig RinseFM) [Mix]",
+      "release_date": "2022-04-04",
+      "album": "NGL/64 Bars of Law (DJ Oblig RinseFM) [Mix]",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/5pafsg7UOA47KGtlOgVniv",
+        "apple_music": "https://music.apple.com/us/album/ngl-64-bars-of-law-dj-oblig-rinsefm-mix/1618137011?app=music&at=1000l33QU&i=1618137012&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Techx+MT6+NGL%2F64+Bars+of+Law+%28DJ+Oblig+RinseFM%29+%5BMix%5D&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Techx+MT6+NGL%2F64+Bars+of+Law+%28DJ+Oblig+RinseFM%29+%5BMix%5D",
+        "youtube_music": "https://music.youtube.com/watch?v=aDJcxT9Ngqc"
+      }
+    },
+    {
+      "index": 2,
+      "timestamp": "04:30",
+      "artist": "SpoonFed",
+      "title": "Reborn",
+      "label": "",
+      "remix": "",
+      "extra_info": "album: Home",
+      "release_date": "2020-09-04",
+      "album": "Home",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/2Zd14SCx6EkfMIaH3cY7qr",
+        "apple_music": "https://music.apple.com/us/album/reborn/1530696291?app=music&at=1000l33QU&i=1530696296&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=SpoonFed+Reborn&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=SpoonFed+Reborn",
+        "youtube_music": "https://music.youtube.com/watch?v=aluATVZONQk"
+      }
+    },
+    {
+      "index": 3,
+      "timestamp": "15:00",
+      "artist": "Morgenfish",
+      "title": "Pack of Gold",
+      "label": "Morgenfish",
+      "remix": "",
+      "extra_info": "album: Deep Sea Waves",
+      "release_date": "2008-01-01",
+      "album": "Deep Sea Waves",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/5PMkJRykHzvt3arJ3PTiWW",
+        "apple_music": "https://music.apple.com/us/album/pack-of-gold-feat-jap-jap/591024705?app=music&at=1000l33QU&i=591024794&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Morgenfish+Pack+of+Gold&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Morgenfish+Pack+of+Gold",
+        "youtube_music": "https://music.youtube.com/watch?v=WdEZOvsN6PA"
+      }
+    },
+    {
+      "index": 4,
+      "timestamp": "21:00",
+      "artist": "Dogg Dbn",
+      "title": "Gadisani Izingane Ogogo",
+      "label": "FameUS",
+      "remix": "",
+      "extra_info": "album: Gqom Party, Vol. 1",
+      "release_date": "2023-03-29",
+      "album": "Gqom Party, Vol. 1",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/5cuKOj0ZHLvjwPayP2Fz25",
+        "apple_music": "https://music.apple.com/us/album/gadisani-izingane-ogogo/1684176877?app=music&at=1000l33QU&i=1684177459&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Dogg+Dbn+Gadisani+Izingane+Ogogo&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Dogg+Dbn+Gadisani+Izingane+Ogogo",
+        "youtube_music": "https://music.youtube.com/watch?v=RJgvUdoh6es"
+      }
+    },
+    {
+      "index": 5,
+      "timestamp": "25:30",
+      "artist": "DJ Lag",
+      "title": "3 Step Culo",
+      "label": "",
+      "remix": "",
+      "extra_info": "album: Stampit EP",
+      "release_date": "2018-09-14",
+      "album": "Stampit EP",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "apple_music": "https://music.apple.com/us/album/3-step-culo/1538757501?app=music&at=1000l33QU&i=1538757502&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/5f187c46-93b8-441d-9c71-9f8b011963a1",
+        "bandcamp": "https://bandcamp.com/search?q=DJ+Lag+3+Step+Culo&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=DJ+Lag+3+Step+Culo",
+        "youtube_music": "https://music.youtube.com/watch?v=l-YhGEB5bW8"
+      }
+    },
+    {
+      "index": 6,
+      "timestamp": "28:30",
+      "artist": "Distruction Boyz",
+      "title": "Madness",
+      "label": "Distruction Boyz Records",
+      "remix": "",
+      "extra_info": "album: Gqom Is the Future",
+      "release_date": "2017-10-20",
+      "album": "Gqom Is the Future",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/5JEO9yiZZzSnxV7gaSb5Ox",
+        "apple_music": "https://music.apple.com/us/album/madness-feat-tipcee/1274077236?app=music&at=1000l33QU&i=1274077299&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/19d00e5c-b146-486c-9b59-a687675910be",
+        "bandcamp": "https://bandcamp.com/search?q=Distruction+Boyz+Madness&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Distruction+Boyz+Madness",
+        "youtube_music": "https://music.youtube.com/watch?v=i_TNBCpeFZg"
+      }
+    },
+    {
+      "index": 7,
+      "timestamp": "31:30",
+      "artist": "Greck B",
+      "title": "Time Is Gone - Original Mix",
+      "label": "",
+      "remix": "",
+      "extra_info": "album: Fired EP",
+      "release_date": "2016-06-15",
+      "album": "Fired EP",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/0pQCtvEr7lfEEjVHKtSsvC",
+        "apple_music": "https://music.apple.com/us/album/time-is-gone/1112818756?app=music&at=1000l33QU&i=1112818920&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Greck+B+Time+Is+Gone+-+Original+Mix&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Greck+B+Time+Is+Gone+-+Original+Mix",
+        "youtube_music": "https://music.youtube.com/watch?v=79W3rjBRLCg"
+      }
+    },
+    {
+      "index": 8,
+      "timestamp": "33:00",
+      "artist": "Kevin Kofii",
+      "title": "Deranged",
+      "label": "2133528 Records DK2",
+      "remix": "",
+      "extra_info": "album: Stampede",
+      "release_date": "2025-05-30",
+      "album": "Stampede",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/5QDiudqTiImJYBI7fHVaRz",
+        "apple_music": "https://music.apple.com/us/album/deranged/1808303114?app=music&at=1000l33QU&i=1808303118&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Kevin+Kofii+Deranged&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Kevin+Kofii+Deranged",
+        "youtube_music": "https://music.youtube.com/watch?v=cSoD8ii8QgQ"
+      }
+    },
+    {
+      "index": 9,
+      "timestamp": "36:00",
+      "artist": "Lobby",
+      "title": "Pyramid",
+      "label": "Club Djembe",
+      "remix": "",
+      "extra_info": "album: Lost Drum Dubs",
+      "release_date": "2022-11-25",
+      "album": "Lost Drum Dubs",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/3NB1JETSaOueheRcPlbpOM",
+        "apple_music": "https://music.apple.com/us/album/pyramid/1653161675?app=music&at=1000l33QU&i=1653161677&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Lobby+Pyramid&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Lobby+Pyramid",
+        "youtube_music": "https://music.youtube.com/watch?v=D2hHILjQyWA"
+      }
+    },
+    {
+      "index": 10,
+      "timestamp": "40:30",
+      "artist": "Dj Plead",
+      "title": "Crush and Burn",
+      "label": "",
+      "remix": "",
+      "extra_info": "album: Pleats Plead",
+      "release_date": "2019-03-01",
+      "album": "Pleats Plead",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/1OHd5zqicoQHPcUqX9w4jI",
+        "apple_music": "https://music.apple.com/us/album/crush-and-burn/1449847986?app=music&at=1000l33QU&i=1449847994&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/cf225d89-39c4-438a-9d96-35c8e3d1b0ed",
+        "bandcamp": "https://bandcamp.com/search?q=Dj+Plead+Crush+and+Burn&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Dj+Plead+Crush+and+Burn",
+        "youtube_music": "https://music.youtube.com/watch?v=bjMxt8g9HV8"
+      }
+    },
+    {
+      "index": 11,
+      "timestamp": "46:30",
+      "artist": "Alex Raider",
+      "title": "Tripping - Original Mix",
+      "label": "",
+      "remix": "",
+      "extra_info": "album: Trick Tripping EP",
+      "release_date": "2015-03-09",
+      "album": "Trick Tripping EP",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/5n6J02slxrrek6WCljsel4",
+        "apple_music": "https://music.apple.com/us/album/tripping/963635926?app=music&at=1000l33QU&i=963635928&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Alex+Raider+Tripping+-+Original+Mix&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Alex+Raider+Tripping+-+Original+Mix",
+        "youtube_music": "https://music.youtube.com/watch?v=IbTtDt6HPRM"
+      }
+    },
+    {
+      "index": 12,
+      "timestamp": "51:00",
+      "artist": "Abhishek Malwas",
+      "title": "Chhori Me Duty P Cho",
+      "label": "Lotan Brother's",
+      "remix": "",
+      "extra_info": "album: Chhori Me Duty P Cho",
+      "release_date": "2025-05-28",
+      "album": "Chhori Me Duty P Cho",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/6lYAxwmq4C0x6ALCqYmLhz",
+        "bandcamp": "https://bandcamp.com/search?q=Abhishek+Malwas+Chhori+Me+Duty+P+Cho&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Abhishek+Malwas+Chhori+Me+Duty+P+Cho",
+        "youtube_music": "https://music.youtube.com/watch?v=-OJhwh7HUY0"
+      }
+    },
+    {
+      "index": 13,
+      "timestamp": "54:00",
+      "artist": "DLC Official",
+      "title": "SKYLINES",
+      "label": "2777011 Records DK",
+      "remix": "",
+      "extra_info": "album: A Good Show",
+      "release_date": "2023-02-28",
+      "album": "A Good Show",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "apple_music": "https://music.apple.com/us/album/skylines/1675016561?app=music&at=1000l33QU&i=1675016992&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=DLC+Official+SKYLINES&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=DLC+Official+SKYLINES",
+        "youtube_music": "https://music.youtube.com/watch?v=-0vjLZtDkq0"
+      }
+    },
+    {
+      "index": 14,
+      "timestamp": "",
+      "artist": "Destruction Boys",
+      "title": "I Ain't Got No Other Choice",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "detection_source": "transcript",
+      "album": "",
+      "release_date": "",
+      "score": 0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Destruction+Boys+I+Ain%27t+Got+No+Other+Choice&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Destruction+Boys+I+Ain%27t+Got+No+Other+Choice",
+        "youtube_music": "https://music.youtube.com/watch?v=71gSJhH2uaM"
+      }
+    }
+  ]
+}

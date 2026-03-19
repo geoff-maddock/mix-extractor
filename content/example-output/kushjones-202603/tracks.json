@@ -1,0 +1,40 @@
+{
+  "mix": {
+    "source": "kushjones-202603.mp3",
+    "duration_seconds": 3611.1080244140626,
+    "transcription_provider": "whisper_api",
+    "analyzed_at": "2026-03-19T04:16:36.279849+00:00"
+  },
+  "tracks": [
+    {
+      "index": 1,
+      "timestamp": "",
+      "artist": "Princess Helm",
+      "title": "Betrayer",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Princess+Helm+Betrayer&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Princess+Helm+Betrayer",
+        "youtube_music": "https://music.youtube.com/watch?v=SMdj4iZoApg"
+      }
+    },
+    {
+      "index": 2,
+      "timestamp": "",
+      "artist": "DJ Shadow & D-Rock Combo",
+      "title": "Unreleased Python Theme",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=DJ+Shadow+%26+D-Rock+Combo+Unreleased+Python+Theme&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=DJ+Shadow+%26+D-Rock+Combo+Unreleased+Python+Theme",
+        "youtube_music": "https://music.youtube.com/watch?v=nuinX676JwA"
+      }
+    }
+  ]
+}

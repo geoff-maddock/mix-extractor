@@ -1,0 +1,146 @@
+{
+  "mix": {
+    "source": "plastician-202602.mp3",
+    "duration_seconds": 7237.5216,
+    "transcription_provider": "whisper_api",
+    "analyzed_at": "2026-03-19T03:19:48.404566+00:00"
+  },
+  "tracks": [
+    {
+      "index": 1,
+      "timestamp": "",
+      "artist": "COPS",
+      "title": "Slug",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=COPS+Slug&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=COPS+Slug",
+        "youtube_music": "https://music.youtube.com/watch?v=apV5WAQiWfA"
+      }
+    },
+    {
+      "index": 2,
+      "timestamp": "",
+      "artist": "Headland featuring Ev",
+      "title": "Ingot",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Headland+featuring+Ev+Ingot&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Headland+featuring+Ev+Ingot",
+        "youtube_music": "https://music.youtube.com/watch?v=L8RndGDPGZ8"
+      }
+    },
+    {
+      "index": 3,
+      "timestamp": "",
+      "artist": "KRIPT",
+      "title": "Loverboy",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=KRIPT+Loverboy&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=KRIPT+Loverboy",
+        "youtube_music": "https://music.youtube.com/watch?v=2G-ClppU6wI"
+      }
+    },
+    {
+      "index": 4,
+      "timestamp": "",
+      "artist": "Tom Ivasetti",
+      "title": "Screen Tear",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Tom+Ivasetti+Screen+Tear&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Tom+Ivasetti+Screen+Tear",
+        "youtube_music": "https://music.youtube.com/watch?v=iPVN1xVQMuk"
+      }
+    },
+    {
+      "index": 5,
+      "timestamp": "",
+      "artist": "MESATRON",
+      "title": "Nightclub Dub",
+      "label": "",
+      "remix": "",
+      "extra_info": "grime meets techno polyrhythm",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=MESATRON+Nightclub+Dub&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=MESATRON+Nightclub+Dub",
+        "youtube_music": "https://music.youtube.com/watch?v=iK-N9lhKv-A"
+      }
+    },
+    {
+      "index": 6,
+      "timestamp": "",
+      "artist": "Hukae",
+      "title": "Dashwear",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Hukae+Dashwear&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Hukae+Dashwear",
+        "youtube_music": "https://music.youtube.com/watch?v=6jM35xPzwoo"
+      }
+    },
+    {
+      "index": 7,
+      "timestamp": "",
+      "artist": "",
+      "title": "Maelstrom",
+      "label": "Capsize",
+      "remix": "",
+      "extra_info": "unreleased forthcoming",
+      "confidence": 1.0,
+      "links": {
+        "musicbrainz": "https://musicbrainz.org/recording/e445f24b-73ce-4186-9162-1a3dbb5eb1c1",
+        "bandcamp": "https://bandcamp.com/search?q=+Maelstrom&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=+Maelstrom",
+        "youtube_music": "https://music.youtube.com/watch?v=kfcZUvA54YM"
+      }
+    },
+    {
+      "index": 8,
+      "timestamp": "",
+      "artist": "Colt",
+      "title": "Textured Memories",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Colt+Textured+Memories&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Colt+Textured+Memories",
+        "youtube_music": "https://music.youtube.com/watch?v=M4WZqNVy7bY"
+      }
+    },
+    {
+      "index": 9,
+      "timestamp": "",
+      "artist": "Sentimento",
+      "title": "That That",
+      "label": "",
+      "remix": "",
+      "extra_info": "",
+      "confidence": 1.0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Sentimento+That+That&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Sentimento+That+That",
+        "youtube_music": "https://music.youtube.com/watch?v=bWdcxOgjw1A"
+      }
+    }
+  ]
+}

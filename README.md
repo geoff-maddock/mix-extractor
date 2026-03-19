@@ -37,13 +37,14 @@ mix-extractor analyze https://soundcloud.com/some-dj/set-title
 ## CLI commands
 
 ```
-mix-extractor list                              # list files in content/input/
-mix-extractor analyze <file-or-url>             # full pipeline
-mix-extractor analyze <file> --no-enrich        # skip music API lookups
-mix-extractor analyze <file> --no-fingerprint   # skip AudD audio fingerprinting
-mix-extractor analyze <file> --llm anthropic    # override LLM from .env
+mix-extractor list                                 # list files in content/input/
+mix-extractor analyze <file-or-url>                # full pipeline
+mix-extractor analyze <file> --no-enrich           # skip music API lookups
+mix-extractor analyze <file> --no-fingerprint      # skip AudD audio fingerprinting
+mix-extractor analyze <file> --fingerprint-only    # fingerprint only, no transcription
+mix-extractor analyze <file> --llm anthropic       # override LLM from .env
 mix-extractor analyze <file> --transcriber assemblyai
-mix-extractor config                            # interactive API key setup
+mix-extractor config                               # interactive API key setup
 ```
 
 ## Integrations
