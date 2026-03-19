@@ -1,0 +1,43 @@
+# Environment / secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Generated content (audio files and analysis output)
+content/input/*
+content/output/*
+
+# Keep the folders themselves
+!content/input/.gitkeep
+!content/output/.gitkeep
+
+# Transcription work chunks
+content/output/**/_work/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+*.swp

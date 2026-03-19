@@ -1,0 +1,27 @@
+# Core
+typer[all]>=0.12
+python-dotenv>=1.0
+rich>=13.0
+pydantic>=2.7
+httpx>=0.27
+
+# Audio download & processing
+yt-dlp>=2024.1
+ffmpeg-python>=0.2
+
+# Transcription
+openai>=1.30          # Whisper API + GPT-4o
+
+# LLM
+anthropic>=0.28       # Claude
+
+# Music metadata / lookup
+musicbrainzngs>=0.7
+spotipy>=2.23
+ytmusicapi>=1.7
+
+# Optional backends (install as needed):
+# assemblyai>=0.26
+# deepgram-sdk>=3.4
+# openai-whisper>=20231117   # local whisper
+# discogs-client>=2.4
