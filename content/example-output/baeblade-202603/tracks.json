@@ -1,0 +1,426 @@
+{
+  "mix": {
+    "source": "baeblade-202603.mp3",
+    "duration_seconds": 3604.332009765625,
+    "transcription_provider": "whisper_api",
+    "analyzed_at": "2026-03-19T14:27:18.993538+00:00"
+  },
+  "tracks": [
+    {
+      "index": 1,
+      "timestamp": "00:00",
+      "artist": "2 Unlimited",
+      "title": "Let the Beat Control Your Body",
+      "label": "Magic Records",
+      "remix": "",
+      "extra_info": "album: Unlimited Hits & Remixes",
+      "release_date": "2014-06-05",
+      "album": "Unlimited Hits & Remixes",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/5pcVE7ukWY3agoz5hOxX8d",
+        "apple_music": "https://music.apple.com/us/album/let-the-beat-control-your-body/1541733475?app=music&at=1000l33QU&i=1541733759&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/ce5e235a-fc3f-489a-bba6-3a92df2c143b",
+        "bandcamp": "https://bandcamp.com/search?q=2+Unlimited+Let+the+Beat+Control+Your+Body&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=2+Unlimited+Let+the+Beat+Control+Your+Body",
+        "youtube_music": "https://music.youtube.com/watch?v=nWD3IicGsHI"
+      }
+    },
+    {
+      "index": 2,
+      "timestamp": "03:00",
+      "artist": "Jay Wonder",
+      "title": "Merchant",
+      "label": "",
+      "remix": "",
+      "extra_info": "album: Merchant",
+      "release_date": "2024-04-11",
+      "album": "Merchant",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/5BQNh1tThk2Ox8AHmh9HZn",
+        "bandcamp": "https://bandcamp.com/search?q=Jay+Wonder+Merchant&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Jay+Wonder+Merchant",
+        "youtube_music": "https://music.youtube.com/watch?v=6jG0PkOfhyg"
+      }
+    },
+    {
+      "index": 3,
+      "timestamp": "09:00",
+      "artist": "Stockton",
+      "title": "Midnight Sleeper Trains",
+      "label": "",
+      "remix": "",
+      "extra_info": "album: Rebirth EP",
+      "release_date": "2024-04-05",
+      "album": "Rebirth EP",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/50YodejKMs4dgSf2QDblpv",
+        "apple_music": "https://music.apple.com/us/album/midnight-sleeper-trains/1737820040?app=music&at=1000l33QU&i=1737820041&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/16e22f79-f545-4355-8f2e-4237cd5b1f1d",
+        "bandcamp": "https://bandcamp.com/search?q=Stockton+Midnight+Sleeper+Trains&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Stockton+Midnight+Sleeper+Trains",
+        "youtube_music": "https://music.youtube.com/watch?v=o1sA5LhDYOw"
+      }
+    },
+    {
+      "index": 4,
+      "timestamp": "12:00",
+      "artist": "AveFreddy",
+      "title": "Tokio Drift",
+      "label": "AveFreddy",
+      "remix": "",
+      "extra_info": "album: Time for Freestyle",
+      "release_date": "2021-11-30",
+      "album": "Time for Freestyle",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=AveFreddy+Tokio+Drift&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=AveFreddy+Tokio+Drift",
+        "youtube_music": "https://music.youtube.com/watch?v=FtyKUl6sKJM"
+      }
+    },
+    {
+      "index": 5,
+      "timestamp": "13:30",
+      "artist": "t e s t p r e s s",
+      "title": "Daddy",
+      "label": "TELETECH",
+      "remix": "",
+      "extra_info": "album: Daddy",
+      "release_date": "2025-06-20",
+      "album": "Daddy",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=t+e+s+t+p+r+e+s+s+Daddy&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=t+e+s+t+p+r+e+s+s+Daddy",
+        "youtube_music": "https://music.youtube.com/watch?v=2iNRdqL6MOQ"
+      }
+    },
+    {
+      "index": 6,
+      "timestamp": "15:00",
+      "artist": "Boberheim",
+      "title": "Platform Wizards",
+      "label": "Boberheim",
+      "remix": "",
+      "extra_info": "album: Platform Wizards",
+      "release_date": "2024-05-10",
+      "album": "Platform Wizards",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/2mG1ebmQEGqNzuDMnxCtcg",
+        "apple_music": "https://music.apple.com/us/album/platform-wizards/1745769577?app=music&at=1000l33QU&i=1745769579&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Boberheim+Platform+Wizards&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Boberheim+Platform+Wizards",
+        "youtube_music": "https://music.youtube.com/watch?v=5UUbwOhURW8"
+      }
+    },
+    {
+      "index": 7,
+      "timestamp": "18:00",
+      "artist": "2HOT2PLAY",
+      "title": "20mm",
+      "label": "Suburban",
+      "remix": "",
+      "extra_info": "album: 20mm",
+      "release_date": "2025-08-01",
+      "album": "20mm",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/09qxaQ1RuF4F8BUqK0uemd",
+        "apple_music": "https://music.apple.com/us/album/20mm/1826846533?app=music&at=1000l33QU&i=1826846534&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=2HOT2PLAY+20mm&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=2HOT2PLAY+20mm",
+        "youtube_music": "https://music.youtube.com/watch?v=kns84SXpny8"
+      }
+    },
+    {
+      "index": 8,
+      "timestamp": "19:30",
+      "artist": "2HOT2PLAY/Glen West",
+      "title": "20mm(Extended Version)",
+      "label": "Suburban",
+      "remix": "",
+      "extra_info": "album: 20mm",
+      "release_date": "2025-08-01",
+      "album": "20mm",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/11kD9RMEZRvAbsp7kP8DS9",
+        "apple_music": "https://music.apple.com/us/album/20mm-extended-version/1826846533?app=music&at=1000l33QU&i=1826846535&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=2HOT2PLAY%2FGlen+West+20mm%28Extended+Version%29&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=2HOT2PLAY%2FGlen+West+20mm%28Extended+Version%29",
+        "youtube_music": "https://music.youtube.com/watch?v=2FdoFZ6ydvc"
+      }
+    },
+    {
+      "index": 9,
+      "timestamp": "25:30",
+      "artist": "Scrill White",
+      "title": "Drinking With My Guyz",
+      "label": "Major Million Music Group",
+      "remix": "",
+      "extra_info": "album: Drinking With My Guyz",
+      "release_date": "2021-12-17",
+      "album": "Drinking With My Guyz",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/2Wh5jNAQfj7CRflW0JFJdZ",
+        "apple_music": "https://music.apple.com/us/album/drinking-with-my-guyz/1600783107?app=music&at=1000l33QU&i=1600783109&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Scrill+White+Drinking+With+My+Guyz&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Scrill+White+Drinking+With+My+Guyz",
+        "youtube_music": "https://music.youtube.com/watch?v=M6DSw1IBILc"
+      }
+    },
+    {
+      "index": 10,
+      "timestamp": "27:00",
+      "artist": "kink",
+      "title": "You and Me",
+      "label": "Mutual Rytm",
+      "remix": "",
+      "extra_info": "album: You and Me",
+      "release_date": "2025-08-01",
+      "album": "You and Me",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/7Jvn2UfCNESDtAKob1gI3g",
+        "apple_music": "https://music.apple.com/us/album/you-and-me/1825594663?app=music&at=1000l33QU&i=1825594664&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/fbcc14c8-a22d-4a93-bf1a-0ca3f92392d8",
+        "bandcamp": "https://bandcamp.com/search?q=kink+You+and+Me&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=kink+You+and+Me",
+        "youtube_music": "https://music.youtube.com/watch?v=2AHV4pgTTsw"
+      }
+    },
+    {
+      "index": 11,
+      "timestamp": "30:00",
+      "artist": "t e s t p r e s s",
+      "title": "CROWD CONTROL",
+      "label": "Polyamor Berlin",
+      "remix": "",
+      "extra_info": "album: SOME DUNT",
+      "release_date": "2025-01-31",
+      "album": "SOME DUNT",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/0lv6d0icREZlc5nd4W02O5",
+        "apple_music": "https://music.apple.com/us/album/crowd-control/1791776292?app=music&at=1000l33QU&i=1791776879&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=t+e+s+t+p+r+e+s+s+CROWD+CONTROL&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=t+e+s+t+p+r+e+s+s+CROWD+CONTROL",
+        "youtube_music": "https://music.youtube.com/watch?v=kdmcXYK2NUY"
+      }
+    },
+    {
+      "index": 12,
+      "timestamp": "31:30",
+      "artist": "t e s t p r e s s/Mika Heggemann",
+      "title": "CROWD CONTROL",
+      "label": "Polyamor Berlin",
+      "remix": "",
+      "extra_info": "album: SOME DUNT",
+      "release_date": "2025-01-31",
+      "album": "SOME DUNT",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/0lv6d0icREZlc5nd4W02O5",
+        "apple_music": "https://music.apple.com/us/album/crowd-control/1791776292?app=music&at=1000l33QU&i=1791776879&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=t+e+s+t+p+r+e+s+s%2FMika+Heggemann+CROWD+CONTROL&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=t+e+s+t+p+r+e+s+s%2FMika+Heggemann+CROWD+CONTROL",
+        "youtube_music": "https://music.youtube.com/watch?v=kdmcXYK2NUY"
+      }
+    },
+    {
+      "index": 13,
+      "timestamp": "36:00",
+      "artist": "Bella Claxton",
+      "title": "Feel It",
+      "label": "Carouse",
+      "remix": "",
+      "extra_info": "album: Feel It",
+      "release_date": "2025-05-30",
+      "album": "Feel It",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/1SL9ORwDT8eaCm4WaGE5Fd",
+        "apple_music": "https://music.apple.com/us/album/feel-it/1808745751?app=music&at=1000l33QU&i=1808745753&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Bella+Claxton+Feel+It&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Bella+Claxton+Feel+It",
+        "youtube_music": "https://music.youtube.com/watch?v=QIumg7dlBeg"
+      }
+    },
+    {
+      "index": 14,
+      "timestamp": "39:00",
+      "artist": "Four to Eight",
+      "title": "Dilf",
+      "label": "Independent",
+      "remix": "",
+      "extra_info": "album: Dilf",
+      "release_date": "2024-08-03",
+      "album": "Dilf",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/7vhK0bijseTpQQQcydfVma",
+        "apple_music": "https://music.apple.com/us/album/dilf/1759528310?app=music&at=1000l33QU&i=1759528315&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Four+to+Eight+Dilf&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Four+to+Eight+Dilf",
+        "youtube_music": "https://music.youtube.com/watch?v=f0TEVm38dsM"
+      }
+    },
+    {
+      "index": 15,
+      "timestamp": "45:00",
+      "artist": "Eric Prydz",
+      "title": "Opus",
+      "label": "Ministry of Sound Recordings",
+      "remix": "",
+      "extra_info": "album: The Annual 2016 - Ministry of Sound",
+      "release_date": "2015-11-06",
+      "album": "The Annual 2016 - Ministry of Sound",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/3v2oAQomhOcYCPPHafS3KV",
+        "apple_music": "https://music.apple.com/us/album/opus/1692203466?app=music&at=1000l33QU&i=1692204897&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/fe94d799-38a6-4a2f-b9f0-da6cca8609dc",
+        "bandcamp": "https://bandcamp.com/search?q=Eric+Prydz+Opus&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Eric+Prydz+Opus",
+        "youtube_music": "https://music.youtube.com/watch?v=gt1pKrwxAJU"
+      }
+    },
+    {
+      "index": 16,
+      "timestamp": "48:00",
+      "artist": "t e s t p r e s s",
+      "title": "TAKE DIS",
+      "label": "Gomboc Records",
+      "remix": "",
+      "extra_info": "album: TAKE DIS",
+      "release_date": "2025-08-22",
+      "album": "TAKE DIS",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/51LZBGDKwIEoUB4rxu6Mqk",
+        "apple_music": "https://music.apple.com/us/album/take-dis/1831494396?app=music&at=1000l33QU&i=1831494398&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/62f37740-fb30-4682-bc6a-9f2e6ab993c1",
+        "bandcamp": "https://bandcamp.com/search?q=t+e+s+t+p+r+e+s+s+TAKE+DIS&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=t+e+s+t+p+r+e+s+s+TAKE+DIS",
+        "youtube_music": "https://music.youtube.com/watch?v=ZIWrcGJ67bI"
+      }
+    },
+    {
+      "index": 17,
+      "timestamp": "49:30",
+      "artist": "LEONLEON",
+      "title": "fastfasthighspeed",
+      "label": "",
+      "remix": "",
+      "extra_info": "album: HERO",
+      "release_date": "2024-01-26",
+      "album": "HERO",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=LEONLEON+fastfasthighspeed&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=LEONLEON+fastfasthighspeed",
+        "youtube_music": "https://music.youtube.com/watch?v=tVR6RdynUpw"
+      }
+    },
+    {
+      "index": 18,
+      "timestamp": "51:00",
+      "artist": "Denyl Brook",
+      "title": "Got This",
+      "label": "Powertrance",
+      "remix": "",
+      "extra_info": "album: One Shot",
+      "release_date": "2025-09-25",
+      "album": "One Shot",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/4njVWQdHewSwWWPpHu6UJJ",
+        "apple_music": "https://music.apple.com/us/album/got-this/1836205733?app=music&at=1000l33QU&i=1836206402&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Denyl+Brook+Got+This&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Denyl+Brook+Got+This",
+        "youtube_music": "https://music.youtube.com/watch?v=-xbhF8HxT64"
+      }
+    },
+    {
+      "index": 19,
+      "timestamp": "52:30",
+      "artist": "Scythe",
+      "title": "Uno, Dos, Tres",
+      "label": "GROSSO",
+      "remix": "",
+      "extra_info": "album: Uno, Dos, Tres",
+      "release_date": "2025-11-21",
+      "album": "Uno, Dos, Tres",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/3GaUobcGIKcuszgJcjoBXS",
+        "apple_music": "https://music.apple.com/us/album/uno-dos-tres/1851545294?app=music&at=1000l33QU&i=1851545295&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Scythe+Uno%2C+Dos%2C+Tres&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Scythe+Uno%2C+Dos%2C+Tres",
+        "youtube_music": "https://music.youtube.com/watch?v=VBx6zUxtr14"
+      }
+    },
+    {
+      "index": 20,
+      "timestamp": "58:30",
+      "artist": "Ryan Dwi Saputro",
+      "title": "Faint-hearted Phonetics' Fallout",
+      "label": "",
+      "remix": "",
+      "extra_info": "album: Faint-hearted Phonetics' Fallout",
+      "release_date": "2024-05-07",
+      "album": "Faint-hearted Phonetics' Fallout",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Ryan+Dwi+Saputro+Faint-hearted+Phonetics%27+Fallout&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Ryan+Dwi+Saputro+Faint-hearted+Phonetics%27+Fallout",
+        "youtube_music": "https://music.youtube.com/watch?v=pmXV9ZRf3G8"
+      }
+    }
+  ]
+}

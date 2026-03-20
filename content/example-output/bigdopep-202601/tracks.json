@@ -1,0 +1,109 @@
+{
+  "mix": {
+    "source": "bigdopep-202601.mp3",
+    "duration_seconds": 3637.1439853515626,
+    "transcription_provider": "whisper_api",
+    "analyzed_at": "2026-03-19T14:49:31.519549+00:00"
+  },
+  "tracks": [
+    {
+      "index": 1,
+      "timestamp": "03:00",
+      "artist": "CRAIC DAVID",
+      "title": "160UNITY",
+      "label": "",
+      "remix": "",
+      "extra_info": "album: 160UNITY",
+      "release_date": "2025-10-24",
+      "album": "160UNITY",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/5ytzEkm2GiL3yfOa2XBeTI",
+        "apple_music": "https://music.apple.com/us/album/160unity/1839442127?app=music&at=1000l33QU&i=1839442316&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=CRAIC+DAVID+160UNITY&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=CRAIC+DAVID+160UNITY",
+        "youtube_music": "https://music.youtube.com/watch?v=BDd0-WM5Pqo"
+      }
+    },
+    {
+      "index": 2,
+      "timestamp": "",
+      "artist": "Bastien Gold",
+      "title": "My Feet in the Floor",
+      "label": "",
+      "remix": "",
+      "extra_info": "BPM 160",
+      "confidence": 1.0,
+      "detection_source": "transcript",
+      "album": "",
+      "release_date": "",
+      "score": 0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Bastien+Gold+My+Feet+in+the+Floor&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Bastien+Gold+My+Feet+in+the+Floor",
+        "youtube_music": "https://music.youtube.com/watch?v=m_HAwxod6Vs"
+      }
+    },
+    {
+      "index": 3,
+      "timestamp": "",
+      "artist": "",
+      "title": "Yo te voy a dar con el estapón",
+      "label": "",
+      "remix": "",
+      "extra_info": "BPM 160",
+      "confidence": 1.0,
+      "detection_source": "transcript",
+      "album": "",
+      "release_date": "",
+      "score": 0,
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=+Yo+te+voy+a+dar+con+el+estap%C3%B3n&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=+Yo+te+voy+a+dar+con+el+estap%C3%B3n",
+        "youtube_music": "https://music.youtube.com/watch?v=GhU3mrOhv8o"
+      }
+    },
+    {
+      "index": 4,
+      "timestamp": "",
+      "artist": "",
+      "title": "Bring Us Back Together",
+      "label": "",
+      "remix": "",
+      "extra_info": "BPM 160",
+      "confidence": 1.0,
+      "detection_source": "transcript",
+      "album": "",
+      "release_date": "",
+      "score": 0,
+      "links": {
+        "musicbrainz": "https://musicbrainz.org/recording/0a29f6af-3916-4e98-8843-c78b81771494",
+        "bandcamp": "https://bandcamp.com/search?q=+Bring+Us+Back+Together&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=+Bring+Us+Back+Together",
+        "youtube_music": "https://music.youtube.com/watch?v=52N5nM1E0F8"
+      }
+    },
+    {
+      "index": 5,
+      "timestamp": "",
+      "artist": "",
+      "title": "Crazy People",
+      "label": "",
+      "remix": "",
+      "extra_info": "BPM 160",
+      "confidence": 1.0,
+      "detection_source": "transcript",
+      "album": "",
+      "release_date": "",
+      "score": 0,
+      "links": {
+        "musicbrainz": "https://musicbrainz.org/recording/2cff0936-9257-4fc9-a8c8-3e79a2feb04b",
+        "bandcamp": "https://bandcamp.com/search?q=+Crazy+People&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=+Crazy+People",
+        "youtube_music": "https://music.youtube.com/watch?v=F_AKJgnVuNw"
+      }
+    }
+  ]
+}

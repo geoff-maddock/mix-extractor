@@ -1,0 +1,391 @@
+{
+  "mix": {
+    "source": "ossx-202602.mp3",
+    "duration_seconds": 3752.50798046875,
+    "transcription_provider": "whisper_api",
+    "analyzed_at": "2026-03-19T14:42:34.884291+00:00"
+  },
+  "tracks": [
+    {
+      "index": 1,
+      "timestamp": "00:00",
+      "artist": "Techx MT6",
+      "title": "NGL/64 Bars of Law (DJ Oblig RinseFM) [Mix]",
+      "label": "MT6 Records",
+      "remix": "",
+      "extra_info": "album: NGL/64 Bars of Law (DJ Oblig RinseFM) [Mix]",
+      "release_date": "2022-04-04",
+      "album": "NGL/64 Bars of Law (DJ Oblig RinseFM) [Mix]",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/5pafsg7UOA47KGtlOgVniv",
+        "apple_music": "https://music.apple.com/us/album/ngl-64-bars-of-law-dj-oblig-rinsefm-mix/1618137011?app=music&at=1000l33QU&i=1618137012&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Techx+MT6+NGL%2F64+Bars+of+Law+%28DJ+Oblig+RinseFM%29+%5BMix%5D&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Techx+MT6+NGL%2F64+Bars+of+Law+%28DJ+Oblig+RinseFM%29+%5BMix%5D",
+        "youtube_music": "https://music.youtube.com/watch?v=aDJcxT9Ngqc"
+      }
+    },
+    {
+      "index": 2,
+      "timestamp": "03:00",
+      "artist": "DJ SoFa",
+      "title": "Panic at the Disco",
+      "label": "Future Retro London",
+      "remix": "",
+      "extra_info": "album: FR011",
+      "release_date": "2023-04-07",
+      "album": "FR011",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/3bntcVyDZtHEtbOxIyhnpB",
+        "apple_music": "https://music.apple.com/us/album/panic-at-the-disco/1681460022?app=music&at=1000l33QU&i=1681460024&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/cb4237a0-3cd5-4538-8e58-7f47a165008e",
+        "bandcamp": "https://bandcamp.com/search?q=DJ+SoFa+Panic+at+the+Disco&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=DJ+SoFa+Panic+at+the+Disco",
+        "youtube_music": "https://music.youtube.com/watch?v=Vy0mqXuBMY4"
+      }
+    },
+    {
+      "index": 3,
+      "timestamp": "07:30",
+      "artist": "Fatima",
+      "title": "Movie",
+      "label": "Eglo Records",
+      "remix": "",
+      "extra_info": "album: And Yet It's All Love",
+      "release_date": "2018-09-28",
+      "album": "And Yet It's All Love",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/4ym4d7V5cjR6ufcqxml9H9",
+        "apple_music": "https://music.apple.com/us/album/movie/1426036595?app=music&at=1000l33QU&i=1426037010&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/b89f93e2-6863-4da3-9928-2c9daa8afa99",
+        "bandcamp": "https://bandcamp.com/search?q=Fatima+Movie&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Fatima+Movie",
+        "youtube_music": "https://music.youtube.com/watch?v=3MLW3IVDFOk"
+      }
+    },
+    {
+      "index": 4,
+      "timestamp": "10:30",
+      "artist": "Tim Reaper",
+      "title": "Stand Up",
+      "label": "Blu Mar Ten Music",
+      "remix": "",
+      "extra_info": "album: Stand Up / The Tranquility Track",
+      "release_date": "2021-11-12",
+      "album": "Stand Up / The Tranquility Track",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/24aWARdvcLdDEx04kE45S9",
+        "apple_music": "https://music.apple.com/us/album/stand-up/1592491204?app=music&at=1000l33QU&i=1592491537&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/fc0c1ad5-efcb-427a-8351-ecd01a791211",
+        "bandcamp": "https://bandcamp.com/search?q=Tim+Reaper+Stand+Up&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Tim+Reaper+Stand+Up",
+        "youtube_music": "https://music.youtube.com/watch?v=2QcJNRdhpjg"
+      }
+    },
+    {
+      "index": 5,
+      "timestamp": "12:00",
+      "artist": "love.808",
+      "title": "Here the Leaves Sing, Falling from a Tree",
+      "label": "love.808",
+      "remix": "",
+      "extra_info": "album: Jiar World",
+      "release_date": "2023-05-20",
+      "album": "Jiar World",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/3S70e07W7SWFE947rftouU",
+        "apple_music": "https://music.apple.com/us/album/here-the-leaves-sing-falling-from-a-tree/1697679999?app=music&at=1000l33QU&i=1697680000&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=love.808+Here+the+Leaves+Sing%2C+Falling+from+a+Tree&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=love.808+Here+the+Leaves+Sing%2C+Falling+from+a+Tree",
+        "youtube_music": "https://music.youtube.com/watch?v=0Dm5MAnumO0"
+      }
+    },
+    {
+      "index": 6,
+      "timestamp": "18:00",
+      "artist": "INVT",
+      "title": "ESPUMA (feat. ETONE)",
+      "label": "INVT",
+      "remix": "",
+      "extra_info": "album: MUNDOS",
+      "release_date": "2020-10-07",
+      "album": "MUNDOS",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/74fXDyr3OFtGTJmg9mopf4",
+        "bandcamp": "https://bandcamp.com/search?q=INVT+ESPUMA+%28feat.+ETONE%29&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=INVT+ESPUMA+%28feat.+ETONE%29",
+        "youtube_music": "https://music.youtube.com/watch?v=WxhZcQKvQPM"
+      }
+    },
+    {
+      "index": 7,
+      "timestamp": "21:00",
+      "artist": "DJ Chad",
+      "title": "Get It Evryday",
+      "label": "Moveltraxx",
+      "remix": "",
+      "extra_info": "album: Get It Evryday",
+      "release_date": "2026-01-08",
+      "album": "Get It Evryday",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/1phR1EMlJ0rgQAqDoneqfs",
+        "apple_music": "https://music.apple.com/us/album/get-it-evryday/1864355242?app=music&at=1000l33QU&i=1864355243&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=DJ+Chad+Get+It+Evryday&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=DJ+Chad+Get+It+Evryday",
+        "youtube_music": "https://music.youtube.com/watch?v=tRPdJCetyiY"
+      }
+    },
+    {
+      "index": 8,
+      "timestamp": "22:30",
+      "artist": "Nora Zion",
+      "title": "Za Teb",
+      "label": "Third Degree",
+      "remix": "",
+      "extra_info": "album: Za Teb",
+      "release_date": "2025-10-22",
+      "album": "Za Teb",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/5Obqe6fORjglz8zZtvWq2M",
+        "apple_music": "https://music.apple.com/us/album/za-teb/1847992741?app=music&at=1000l33QU&i=1847992742&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Nora+Zion+Za+Teb&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Nora+Zion+Za+Teb",
+        "youtube_music": "https://music.youtube.com/watch?v=OLvv91Wcqws"
+      }
+    },
+    {
+      "index": 9,
+      "timestamp": "25:30",
+      "artist": "Flower B, Cardozo",
+      "title": "Photosynthesis",
+      "label": "",
+      "remix": "",
+      "extra_info": "album: Waveforms 004",
+      "release_date": "2025-09-12",
+      "album": "Waveforms 004",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/3EbJ40e8QvFymCACiX7MFJ",
+        "apple_music": "https://music.apple.com/us/album/photosynthesis/1836265308?app=music&at=1000l33QU&i=1836265311&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Flower+B%2C+Cardozo+Photosynthesis&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Flower+B%2C+Cardozo+Photosynthesis",
+        "youtube_music": "https://music.youtube.com/watch?v=-0vjLZtDkq0"
+      }
+    },
+    {
+      "index": 10,
+      "timestamp": "27:00",
+      "artist": "Cardozo",
+      "title": "Photosynthesis",
+      "label": "Cardozo",
+      "remix": "",
+      "extra_info": "album: Waveforms 004",
+      "release_date": "2025-09-12",
+      "album": "Waveforms 004",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/3EbJ40e8QvFymCACiX7MFJ",
+        "apple_music": "https://music.apple.com/us/album/photosynthesis/1836265308?app=music&at=1000l33QU&i=1836265311&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Cardozo+Photosynthesis&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Cardozo+Photosynthesis",
+        "youtube_music": "https://music.youtube.com/watch?v=hpzQS-RwypY"
+      }
+    },
+    {
+      "index": 11,
+      "timestamp": "28:30",
+      "artist": "Tim Reaper",
+      "title": "Dry Heat",
+      "label": "Rinse / KOOL",
+      "remix": "",
+      "extra_info": "album: Dry Heat",
+      "release_date": "2025-10-10",
+      "album": "Dry Heat",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/6NlZnqraPAjSWlPvFD6uLq",
+        "apple_music": "https://music.apple.com/us/album/dry-heat/1851419541?app=music&at=1000l33QU&i=1851419547&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/cbfb0b98-3dbd-4129-a420-178d45e67c68",
+        "bandcamp": "https://bandcamp.com/search?q=Tim+Reaper+Dry+Heat&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Tim+Reaper+Dry+Heat",
+        "youtube_music": "https://music.youtube.com/watch?v=li4DRd8w7t0"
+      }
+    },
+    {
+      "index": 12,
+      "timestamp": "31:30",
+      "artist": "Jeanne Mascarenhas",
+      "title": "Ousado Amor (Playback)",
+      "label": "Eleve Records",
+      "remix": "",
+      "extra_info": "album: Ousado Amor",
+      "release_date": "2023-04-04",
+      "album": "Ousado Amor",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/34KRaVtkb7CfLbkxIDxilz",
+        "apple_music": "https://music.apple.com/us/album/ousado-amor-playback/1677855383?app=music&at=1000l33QU&i=1677855386&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Jeanne+Mascarenhas+Ousado+Amor+%28Playback%29&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Jeanne+Mascarenhas+Ousado+Amor+%28Playback%29",
+        "youtube_music": "https://music.youtube.com/watch?v=EmW1psq_V7I"
+      }
+    },
+    {
+      "index": 13,
+      "timestamp": "33:00",
+      "artist": "Jonny L",
+      "title": "This Time (Jonny L & Roni Size Mix)",
+      "label": "Avex Trax",
+      "remix": "",
+      "extra_info": "album: This Time EP",
+      "release_date": "1996-02-20",
+      "album": "This Time EP",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "bandcamp": "https://bandcamp.com/search?q=Jonny+L+This+Time+%28Jonny+L+%26+Roni+Size+Mix%29&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Jonny+L+This+Time+%28Jonny+L+%26+Roni+Size+Mix%29",
+        "youtube_music": "https://music.youtube.com/watch?v=bu2_ZPfLnt4"
+      }
+    },
+    {
+      "index": 14,
+      "timestamp": "40:30",
+      "artist": "Trashiii",
+      "title": "METAL TEETH",
+      "label": "dreamstation",
+      "remix": "",
+      "extra_info": "album: DIGITAL SICKNESS",
+      "release_date": "2023-04-07",
+      "album": "DIGITAL SICKNESS",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/4bjjDkpRQcgRXOEmMP0Gqn",
+        "apple_music": "https://music.apple.com/us/album/metal-teeth/1726408964?app=music&at=1000l33QU&i=1726409237&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/a3b118bc-1994-4302-b0f5-bf3b35d428cf",
+        "bandcamp": "https://bandcamp.com/search?q=Trashiii+METAL+TEETH&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Trashiii+METAL+TEETH",
+        "youtube_music": "https://music.youtube.com/watch?v=uhwtQqGkepA"
+      }
+    },
+    {
+      "index": 15,
+      "timestamp": "42:00",
+      "artist": "Malisima",
+      "title": "Cold Knife",
+      "label": "Malísima Records",
+      "remix": "",
+      "extra_info": "album: Hungry Sluts Always Get Their Fix",
+      "release_date": "2022-10-29",
+      "album": "Hungry Sluts Always Get Their Fix",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/6ezuPqeVQVbS8YuEUdbA2o",
+        "apple_music": "https://music.apple.com/us/album/cold-knife/1652206874?app=music&at=1000l33QU&i=1652207117&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=Malisima+Cold+Knife&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=Malisima+Cold+Knife",
+        "youtube_music": "https://music.youtube.com/watch?v=xnvyBq6ZOh8"
+      }
+    },
+    {
+      "index": 16,
+      "timestamp": "43:30",
+      "artist": "RaptorHandz",
+      "title": "Threat Zone",
+      "label": "Samsara Beats",
+      "remix": "",
+      "extra_info": "album: Samsara Beats presents: Isolation",
+      "release_date": "2020-06-15",
+      "album": "Samsara Beats presents: Isolation",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "apple_music": "https://music.apple.com/us/album/threat-zone/1516063619?app=music&at=1000l33QU&i=1516063928&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/a41d8ea4-2d17-4c46-b659-e8309758d052",
+        "bandcamp": "https://bandcamp.com/search?q=RaptorHandz+Threat+Zone&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=RaptorHandz+Threat+Zone",
+        "youtube_music": "https://music.youtube.com/watch?v=A2-0WwM2rbI"
+      }
+    },
+    {
+      "index": 17,
+      "timestamp": "57:00",
+      "artist": "DJ Die",
+      "title": "Special Treat (Remastered)",
+      "label": "Gutterfunk",
+      "remix": "",
+      "extra_info": "album: Autumn (Remastered)",
+      "release_date": "2018-11-23",
+      "album": "Autumn (Remastered)",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/4RwtDbWSDzTX1JP04UxRSC",
+        "apple_music": "https://music.apple.com/us/album/special-treat-remastered/1483143540?app=music&at=1000l33QU&i=1483143549&mt=1",
+        "bandcamp": "https://bandcamp.com/search?q=DJ+Die+Special+Treat+%28Remastered%29&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=DJ+Die+Special+Treat+%28Remastered%29",
+        "youtube_music": "https://music.youtube.com/watch?v=Atx7GHmrLx0"
+      }
+    },
+    {
+      "index": 18,
+      "timestamp": "58:30",
+      "artist": "DJ Die",
+      "title": "Something Special",
+      "label": "V Recordings",
+      "remix": "",
+      "extra_info": "album: Retrospect, Vol. 1 (Compiled by Krust & Jumpin Jack Frost)",
+      "release_date": "2007-11-05",
+      "album": "Retrospect, Vol. 1 (Compiled by Krust & Jumpin Jack Frost)",
+      "score": 0,
+      "confidence": 1.0,
+      "detection_source": "fingerprint",
+      "links": {
+        "spotify": "https://open.spotify.com/track/5PMidQpTIOmpxcjayR0xL5",
+        "apple_music": "https://music.apple.com/us/album/something-special/1756153879?app=music&at=1000l33QU&i=1756156919&mt=1",
+        "musicbrainz": "https://musicbrainz.org/recording/6c103c56-f9d3-4136-b90e-76ea6e5c5a2e",
+        "bandcamp": "https://bandcamp.com/search?q=DJ+Die+Something+Special&item_type=t",
+        "soundcloud": "https://soundcloud.com/search/tracks?q=DJ+Die+Something+Special",
+        "youtube_music": "https://music.youtube.com/watch?v=6x9Q8B_ZyuA"
+      }
+    }
+  ]
+}
