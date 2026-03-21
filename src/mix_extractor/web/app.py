@@ -144,20 +144,29 @@ def _run_analyze_job(job_id: str, source: str, options: dict) -> None:
     if options.get("transcriber"):
         cmd += ["--transcriber", options["transcriber"]]
     try:
-        result = subprocess.run(
+        # Stream output line by line so the user sees progress
+        process = subprocess.Popen(
             cmd,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             text=True,
-            timeout=3600,
+            bufsize=1,  # Line buffered
+            universal_newlines=True,
         )
-        _JOBS[job_id]["log"] = (result.stdout + result.stderr).splitlines()
-        _JOBS[job_id]["status"] = "done" if result.returncode == 0 else "error"
-    except subprocess.TimeoutExpired:
-        _JOBS[job_id]["status"] = "error"
-        _JOBS[job_id]["log"] = ["Error: analysis timed out after 1 hour."]
+
+        _JOBS[job_id]["log"] = []
+        if process.stdout:
+            for line in process.stdout:
+                line = line.rstrip()
+                print(line)  # Also print to server console
+                _JOBS[job_id]["log"].append(line)
+
+        returncode = process.wait()
+        _JOBS[job_id]["status"] = "done" if returncode == 0 else "error"
+
     except Exception as exc:
         _JOBS[job_id]["status"] = "error"
-        _JOBS[job_id]["log"] = [f"Error: {exc}"]
+        _JOBS[job_id]["log"].append(f"Error: {exc}")
 
 
 # ── pages ──────────────────────────────────────────────────────────────────────

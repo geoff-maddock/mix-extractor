@@ -53,6 +53,11 @@ class FingerprintedTrack:
         return f"{h:02d}:{m:02d}:{s:02d}" if h else f"{m:02d}:{s:02d}"
 
 
+class AudDApiLimitError(Exception):
+    """Raised when the AudD API limit is reached."""
+    pass
+
+
 def fingerprint_mix(
     audio_path: Path,
     settings: "Settings",
@@ -95,33 +100,37 @@ def fingerprint_mix(
     results: list[FingerprintedTrack] = []
     last_title_artist: str | None = None
 
-    for i, start in enumerate(sample_points):
-        console.print(
-            f"  [{i + 1}/{len(sample_points)}] {_fmt_seconds(start)} …",
-            end=" ",
-        )
+    try:
+        for i, start in enumerate(sample_points):
+            console.print(
+                f"  [{i + 1}/{len(sample_points)}] {_fmt_seconds(start)} …",
+                end=" ",
+            )
 
-        snippet = _extract_snippet(audio_path, start, SAMPLE_DURATION)
-        if snippet is None:
-            console.print("[dim]skip[/dim]")
-            continue
+            snippet = _extract_snippet(audio_path, start, SAMPLE_DURATION)
+            if snippet is None:
+                console.print("[dim]skip[/dim]")
+                continue
 
-        track = _query_audd(snippet, start, settings.audd_api_key)
-        if track is None:
-            console.print("[dim]no match[/dim]")
-            continue
+            track = _query_audd(snippet, start, settings.audd_api_key)
+            if track is None:
+                console.print("[dim]no match[/dim]")
+                continue
 
-        key = f"{track.artist.lower()}|{track.title.lower()}"
-        if key == last_title_artist:
-            console.print(f"[dim](same as previous)[/dim]")
-            continue
+            key = f"{track.artist.lower()}|{track.title.lower()}"
+            if key == last_title_artist:
+                console.print(f"[dim](same as previous)[/dim]")
+                continue
 
-        last_title_artist = key
-        results.append(track)
-        console.print(f"[green]{track.artist} — {track.title}[/green]")
+            last_title_artist = key
+            results.append(track)
+            console.print(f"[green]{track.artist} — {track.title}[/green]")
 
-        # AudD rate limit: be polite
-        time.sleep(0.3)
+            # AudD rate limit: be polite
+            time.sleep(0.3)
+    except AudDApiLimitError as exc:
+        console.print(f"\n[bold yellow]Aborting fingerprinting:[/bold yellow] {exc}")
+        console.print("[yellow]Continuing with analysis using partial fingerprint results.[/yellow]")
 
     console.print(f"[green]Fingerprinting complete:[/green] {len(results)} unique track(s) identified")
     return results
@@ -164,7 +173,15 @@ def _query_audd(audio_bytes: bytes, timestamp: float, api_key: str) -> Fingerpri
         console.print(f"[dim]AudD request error: {exc}[/dim]")
         return None
 
-    if data.get("status") != "success" or not data.get("result"):
+    if data.get("status") != "success":
+        error_msg = data.get("error", {}).get("error_message", "Unknown error")
+        if "limit" in error_msg.lower():
+            raise AudDApiLimitError(error_msg)
+        console.print(f"[red]AudD error: {error_msg}[/red]")
+        return None
+
+    if not data.get("result"):
+        # No match found
         return None
 
     result = data["result"]

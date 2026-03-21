@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Optional
 
+from typing_extensions import Annotated
 import typer
 from rich.console import Console
 from rich.prompt import Prompt
@@ -138,7 +139,11 @@ def analyze(
         console.print("[bold blue]Merging transcript and fingerprint results[/bold blue] …")
         merged_dicts = merge_tracks(tracks, fingerprinted)
     else:
-        merged_dicts = [t.model_dump() | {"detection_source": "transcript", "links": {}} for t in tracks]
+        merged_dicts = []
+        for t in tracks:
+            d = t.model_dump()
+            d.update({"detection_source": "transcript", "links": {}})
+            merged_dicts.append(d)
 
     # 6. Enrich with music API links
     if no_enrich or not merged_dicts:
