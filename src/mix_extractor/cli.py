@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Optional
 
+from typing_extensions import Annotated
 import typer
 from rich.console import Console
 from rich.prompt import Prompt
@@ -138,7 +139,11 @@ def analyze(
         console.print("[bold blue]Merging transcript and fingerprint results[/bold blue] …")
         merged_dicts = merge_tracks(tracks, fingerprinted)
     else:
-        merged_dicts = [t.model_dump() | {"detection_source": "transcript", "links": {}} for t in tracks]
+        merged_dicts = []
+        for t in tracks:
+            d = t.model_dump()
+            d.update({"detection_source": "transcript", "links": {}})
+            merged_dicts.append(d)
 
     # 6. Enrich with music API links
     if no_enrich or not merged_dicts:
@@ -265,6 +270,34 @@ def config() -> None:
 
     env_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
     console.print(f"\n[green]Saved:[/green] {env_path}")
+
+
+# ── serve ─────────────────────────────────────────────────────────────────────
+
+@app.command()
+def serve(
+    host: Annotated[str, typer.Option("--host", help="Bind address")] = "127.0.0.1",
+    port: Annotated[int, typer.Option("--port", help="Port number")] = 8000,
+    reload: Annotated[bool, typer.Option("--reload", help="Auto-reload on code changes (development)")] = False,
+) -> None:
+    """Start the web GUI server."""
+    try:
+        import uvicorn  # noqa: PLC0415
+    except ImportError:
+        console.print(
+            "[red]uvicorn is not installed.[/red] "
+            "Run: [bold]pip install 'mix-extractor[web]'[/bold]"
+        )
+        raise typer.Exit(1)
+
+    console.print(f"\n[bold green]mix-extractor web UI[/bold green]")
+    console.print(f"  Open [link=http://{host}:{port}]http://{host}:{port}[/link] in your browser\n")
+    uvicorn.run(
+        "mix_extractor.web.app:app",
+        host=host,
+        port=port,
+        reload=reload,
+    )
 
 
 if __name__ == "__main__":

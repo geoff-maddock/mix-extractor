@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "mix-extractor"
 version = "0.1.0"
 description = "Extract tracklists from DJ mix audio files using speech-to-text and LLMs"
-requires-python = ">=3.10"
+requires-python = ">=3.8"
 dependencies = [
     "typer[all]>=0.12",
     "python-dotenv>=1.0",
@@ -27,6 +27,12 @@ assemblyai = ["assemblyai>=0.26"]
 deepgram = ["deepgram-sdk>=3.4"]
 local-whisper = ["openai-whisper>=20231117"]
 discogs = ["discogs-client>=2.4"]
+web = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "python-multipart>=0.0.9",
+    "jinja2>=3.1.4",
+]
 
 [project.scripts]
 mix-extractor = "mix_extractor.cli:app"
