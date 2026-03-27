@@ -51,12 +51,16 @@ def _load_all_mixes() -> list[dict]:
         user_data = _load_user_data(mix_dir.name)
         mix_info = data.get("mix", {})
         tracks = data.get("tracks", [])
-        # Merge user data (keep flags, genres) into tracks
+        # Merge user data (keep flags, genres, field overrides) into tracks
         for track in tracks:
             tid = _track_id(mix_dir.name, track)
             td = user_data.get("tracks", {}).get(tid, {})
             track["keep"] = td.get("keep", False)
             track["genre"] = td.get("genre", track.get("genre", ""))
+            for field, user_val in td.get("overrides", {}).items():
+                if field in ("artist", "title", "label", "remix") and user_val:
+                    track[f"_original_{field}"] = track.get(field, "")
+                    track[field] = user_val
         mixes.append(
             {
                 "name": mix_dir.name,
@@ -86,6 +90,10 @@ def _load_mix(mix_name: str) -> dict | None:
         td = user_data.get("tracks", {}).get(tid, {})
         track["keep"] = td.get("keep", False)
         track["genre"] = td.get("genre", track.get("genre", ""))
+        for field, user_val in td.get("overrides", {}).items():
+            if field in ("artist", "title", "label", "remix") and user_val:
+                track[f"_original_{field}"] = track.get(field, "")
+                track[field] = user_val
     return data
 
 
@@ -111,8 +119,8 @@ def _save_user_data(mix_name: str, data: dict) -> None:
 
 
 def _track_id(mix_name: str, track: dict) -> str:
-    """Stable identifier for a track within a mix."""
-    return f"{track.get('index', 0)}_{track.get('artist', '')}_{track.get('title', '')}"
+    """Stable identifier for a track within a mix (index-based)."""
+    return str(track.get('index', 0))
 
 
 def _list_input_files() -> list[dict]:
@@ -341,6 +349,37 @@ async def set_genre(mix_name: str, request: Request):
     user_data["tracks"][tid]["genre"] = genre
     _save_user_data(mix_name, user_data)
     return JSONResponse({"ok": True, "genre": genre})
+
+
+@app.post("/api/track/{mix_name}/edit")
+async def edit_track_field(mix_name: str, request: Request):
+    """Save a user override for an editable field. Original scraped data stays in tracks.json."""
+    body = await request.json()
+    track_index = body.get("index")
+    field = body.get("field")
+    value = body.get("value", "")
+    _EDITABLE_FIELDS = {"artist", "title", "label", "remix"}
+    if field not in _EDITABLE_FIELDS:
+        raise HTTPException(status_code=400, detail=f"Field '{field}' is not editable")
+    data = _load_mix(mix_name)
+    if data is None:
+        raise HTTPException(status_code=404, detail="Mix not found")
+    track = next((t for t in data.get("tracks", []) if t.get("index") == track_index), None)
+    if track is None:
+        raise HTTPException(status_code=404, detail="Track not found")
+    # _original_<field> is set by _load_mix when an override exists; otherwise field itself is scraped
+    original = track.get(f"_original_{field}", track.get(field, ""))
+    tid = _track_id(mix_name, track)
+    user_data = _load_user_data(mix_name)
+    user_data.setdefault("tracks", {})
+    user_data["tracks"].setdefault(tid, {})
+    user_data["tracks"][tid].setdefault("overrides", {})
+    if value:
+        user_data["tracks"][tid]["overrides"][field] = value
+    else:
+        user_data["tracks"][tid]["overrides"].pop(field, None)
+    _save_user_data(mix_name, user_data)
+    return JSONResponse({"ok": True, "field": field, "value": value, "original": original})
 
 
 @app.get("/api/mixes")

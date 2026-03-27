@@ -14,17 +14,52 @@ th.sortable {
   user-select: none;
   white-space: nowrap;
 }
+
 th.sortable:hover {
   background-color: rgba(255, 255, 255, 0.05);
 }
-th.sort-asc .sort-icon::before { content: "\F235"; }   /* bi-chevron-up */
-th.sort-desc .sort-icon::before { content: "\F229"; }  /* bi-chevron-down */
+
+th.sort-asc .sort-icon::before {
+  content: "\F235";
+}
+
+/* bi-chevron-up */
+th.sort-desc .sort-icon::before {
+  content: "\F229";
+}
+
+/* bi-chevron-down */
 
 /* Genre display inline edit */
-.genre-display { cursor: pointer; }
+.genre-display {
+  cursor: pointer;
+}
+
+/* Editable field cells (artist, title, label, remix) */
+.editable-cell {
+  cursor: pointer;
+}
+
+.editable-cell:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.editable-cell:hover::after {
+  content: "\F4CA";
+  font-family: "bootstrap-icons";
+  font-size: 0.65rem;
+  opacity: 0.35;
+  margin-left: 4px;
+  vertical-align: middle;
+}
 
 /* Log pre */
-pre.text-body { background: var(--bs-body-bg); color: var(--bs-body-color); }
+pre.text-body {
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
+}
 
 /* Navbar brand icon */
-.navbar-brand .bi-vinyl { font-size: 1.2rem; }
+.navbar-brand .bi-vinyl {
+  font-size: 1.2rem;
+}

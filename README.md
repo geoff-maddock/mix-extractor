@@ -34,6 +34,73 @@ mix-extractor analyze content/input/my_mix.mp3
 mix-extractor analyze https://soundcloud.com/some-dj/set-title
 ```
 
+## Web GUI
+
+mix-extractor ships with a browser-based interface built on FastAPI. It exposes all the
+same functionality as the CLI plus interactive track management features.
+
+### Install web dependencies
+
+```bash
+pip install -e ".[web]"
+```
+
+### Start the server
+
+```bash
+mix-extractor serve                        # http://127.0.0.1:8000 (default)
+mix-extractor serve --port 9000            # custom port
+mix-extractor serve --host 0.0.0.0        # listen on all interfaces (LAN access)
+mix-extractor serve --reload               # auto-reload on code changes (development)
+```
+
+Open `http://127.0.0.1:8000` in your browser.
+
+### Pages
+
+| Page | URL | Description |
+|---|---|---|
+| **Dashboard** | `/` | Submit analysis jobs, upload files, view active jobs and recent mixes |
+| **Mix detail** | `/mix/<mix_name>` | Full tracklist with timestamps, links, keep flags, and inline editing |
+| **Library** | `/library` | Cross-mix track search; filter to kept tracks only |
+| **Job status** | `/job/<job_id>` | Live streaming log output for an in-progress analysis |
+
+### Features
+
+**Analyze a mix** — Paste a URL (SoundCloud, YouTube, Mixcloud, Bandcamp) or enter a
+local filename from `content/input/`. Expand *Advanced options* to choose a different LLM
+provider/model, transcription backend, or enable/disable fingerprinting and enrichment.
+The job runs in the background and the browser auto-refreshes the log until it completes.
+
+**Upload audio** — Drag-and-drop or select a file from the Dashboard to upload it
+directly to the `content/input/` folder, ready for analysis.
+
+**Track management** (on the Mix detail page):
+- **Bookmark** tracks with the heart icon to build a keep list
+- **Edit** artist, title, label, or remix fields inline by clicking any cell — edits are
+  stored separately in `user_data.json` and the original scraped data is preserved
+- **Tag a genre** via the dropdown on each row
+- **Preview** — click stream links (Spotify/Bandcamp/SoundCloud embeds) without leaving
+  the page
+
+**Library** — search across all mixes simultaneously by artist, title, label, or genre.
+Toggle *Kept tracks only* to see your curated selections.
+
+### REST API
+
+The server also exposes a small JSON API for programmatic access:
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/api/mixes` | List all mixes with metadata and tracks |
+| `GET` | `/api/library?q=<query>&keep_only=true` | Search tracks across all mixes |
+| `GET` | `/api/job/<job_id>` | Poll job status and log lines |
+| `POST` | `/api/track/<mix_name>/keep` | Set/unset a track's keep flag |
+| `POST` | `/api/track/<mix_name>/genre` | Set a track's genre tag |
+| `POST` | `/api/track/<mix_name>/edit` | Save a field override (artist/title/label/remix) |
+
+---
+
 ## CLI commands
 
 ```

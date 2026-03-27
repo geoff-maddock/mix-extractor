@@ -67,6 +67,19 @@ def enrich(tracks: "list[Track] | list[dict]", settings: "Settings") -> list[dic
 
         entry = base
         entry["links"] = dict(links)
+        # Collect genre hints stored by lookup functions; strip temp keys
+        genre_hints = []
+        for key in list(entry["links"].keys()):
+            if key.startswith("_genre_hints_"):
+                genre_hints.extend(entry["links"].pop(key))
+        if genre_hints and not entry.get("genre"):
+            seen: set = set()
+            unique = []
+            for g in genre_hints:
+                if g.lower() not in seen:
+                    seen.add(g.lower())
+                    unique.append(g)
+            entry["genre_suggestion"] = ", ".join(unique[:3])
         results.append(entry)
 
     return results
@@ -156,6 +169,15 @@ def _lookup_spotify(track: "Track", links: TrackLinks, settings: "Settings") -> 
         items = results["tracks"]["items"]
         if items:
             links["spotify"] = items[0]["external_urls"]["spotify"]
+            # Fetch artist genres for auto-suggestion
+            try:
+                artist_id = items[0]["artists"][0]["id"]
+                artist_obj = sp.artist(artist_id)
+                genres = artist_obj.get("genres", [])
+                if genres:
+                    links["_genre_hints_spotify"] = genres[:4]
+            except Exception:
+                pass
     except Exception as exc:  # noqa: BLE001
         console.print(f"    [dim]Spotify error: {exc}[/dim]")
 
@@ -177,5 +199,15 @@ def _lookup_discogs(track: "Track", links: TrackLinks, settings: "Settings") -> 
         page = results.page(1)
         if page:
             links["discogs"] = page[0].url
+            # Extract genres/styles for auto-suggestion
+            try:
+                rel = page[0]
+                genres = list(getattr(rel, "genres", None) or [])
+                styles = list(getattr(rel, "styles", None) or [])
+                hints = genres + styles
+                if hints:
+                    links["_genre_hints_discogs"] = hints[:4]
+            except Exception:
+                pass
     except Exception as exc:  # noqa: BLE001
         console.print(f"    [dim]Discogs error: {exc}[/dim]")
