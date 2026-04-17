@@ -9,6 +9,7 @@ import sys
 import uuid
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote_plus
 
 from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
@@ -34,6 +35,44 @@ def _settings():
     return get_settings()
 
 
+def _regenerate_search_links(track: dict) -> None:
+    """Regenerate Bandcamp and SoundCloud search URLs using the track's current artist/title."""
+    query = f"{track.get('artist', '')} {track.get('title', '')}"
+    track.setdefault("links", {})
+    track["links"]["bandcamp"] = f"https://bandcamp.com/search?q={quote_plus(query)}&item_type=t"
+    track["links"]["soundcloud"] = f"https://soundcloud.com/search/tracks?q={quote_plus(query)}"
+
+
+def _apply_user_data_to_track(track: dict, td: dict) -> None:
+    """Mutate *track* in-place, merging user_data entry *td*.
+
+    Applies keep flag, genre, field overrides (artist/title/label/remix),
+    regenerates search links when artist or title changed, then applies
+    manual link overrides on top (highest priority).
+    """
+    track["keep"] = td.get("keep", False)
+    track["genre"] = td.get("genre", track.get("genre", ""))
+
+    has_search_field_override = False
+    for field, user_val in td.get("overrides", {}).items():
+        if field in ("artist", "title", "label", "remix") and user_val:
+            track[f"_original_{field}"] = track.get(field, "")
+            track[field] = user_val
+            if field in ("artist", "title"):
+                has_search_field_override = True
+
+    # Regenerate search-based links when artist/title were overridden
+    if has_search_field_override:
+        _regenerate_search_links(track)
+
+    # Apply manual link overrides last — these always win
+    for service, url in td.get("link_overrides", {}).items():
+        if url:
+            track.setdefault("links", {})
+            track["links"][service] = url
+            track[f"_link_override_{service}"] = True
+
+
 def _load_all_mixes() -> list[dict]:
     """Return a list of mix metadata dicts loaded from all tracks.json files."""
     settings = _settings()
@@ -55,12 +94,7 @@ def _load_all_mixes() -> list[dict]:
         for track in tracks:
             tid = _track_id(mix_dir.name, track)
             td = user_data.get("tracks", {}).get(tid, {})
-            track["keep"] = td.get("keep", False)
-            track["genre"] = td.get("genre", track.get("genre", ""))
-            for field, user_val in td.get("overrides", {}).items():
-                if field in ("artist", "title", "label", "remix") and user_val:
-                    track[f"_original_{field}"] = track.get(field, "")
-                    track[field] = user_val
+            _apply_user_data_to_track(track, td)
         mixes.append(
             {
                 "name": mix_dir.name,
@@ -88,12 +122,7 @@ def _load_mix(mix_name: str) -> dict | None:
     for track in data.get("tracks", []):
         tid = _track_id(mix_name, track)
         td = user_data.get("tracks", {}).get(tid, {})
-        track["keep"] = td.get("keep", False)
-        track["genre"] = td.get("genre", track.get("genre", ""))
-        for field, user_val in td.get("overrides", {}).items():
-            if field in ("artist", "title", "label", "remix") and user_val:
-                track[f"_original_{field}"] = track.get(field, "")
-                track[field] = user_val
+        _apply_user_data_to_track(track, td)
     return data
 
 
@@ -380,6 +409,40 @@ async def edit_track_field(mix_name: str, request: Request):
         user_data["tracks"][tid]["overrides"].pop(field, None)
     _save_user_data(mix_name, user_data)
     return JSONResponse({"ok": True, "field": field, "value": value, "original": original})
+
+
+@app.post("/api/track/{mix_name}/link")
+async def set_link_override(mix_name: str, request: Request):
+    """Save (or clear) a manual URL override for a specific link service."""
+    body = await request.json()
+    track_index = body.get("index")
+    service = body.get("service")
+    url = (body.get("url") or "").strip()
+
+    _LINK_SERVICES = {"bandcamp", "soundcloud", "spotify", "youtube_music", "musicbrainz", "discogs"}
+    if service not in _LINK_SERVICES:
+        raise HTTPException(status_code=400, detail=f"Service '{service}' is not supported")
+    if url and not (url.startswith("https://") or url.startswith("http://")):
+        raise HTTPException(status_code=400, detail="URL must start with http:// or https://")
+
+    data = _load_mix(mix_name)
+    if data is None:
+        raise HTTPException(status_code=404, detail="Mix not found")
+    track = next((t for t in data.get("tracks", []) if t.get("index") == track_index), None)
+    if track is None:
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    tid = _track_id(mix_name, track)
+    user_data = _load_user_data(mix_name)
+    user_data.setdefault("tracks", {})
+    user_data["tracks"].setdefault(tid, {})
+    user_data["tracks"][tid].setdefault("link_overrides", {})
+    if url:
+        user_data["tracks"][tid]["link_overrides"][service] = url
+    else:
+        user_data["tracks"][tid]["link_overrides"].pop(service, None)
+    _save_user_data(mix_name, user_data)
+    return JSONResponse({"ok": True, "service": service, "url": url})
 
 
 @app.get("/api/mixes")

@@ -114,7 +114,7 @@
         </td>
         <td><small class="text-body-secondary">{{ track.timestamp or '—' }}</small></td>
         <td>
-          {{ _render_links(track.links, track.artist, track.title) }}
+          {{ _render_links(track.links, track.mix_name, track.index) }}
         </td>
       </tr>
       {% endfor %}
@@ -124,31 +124,83 @@
 {% endif %}
 {% endblock %}
 
-{% macro _render_links(links, artist, title) %}
+{% macro _render_links(links, mix_name, track_index) %}
 <div class="d-flex gap-1 flex-wrap">
   {% if links.get('spotify') %}
-  <a href="{{ links.spotify }}" target="_blank" class="btn btn-xs btn-outline-success py-0 px-1" title="Spotify"><i
-      class="bi bi-spotify"></i></a>
+  <span class="link-wrap d-inline-flex align-items-center" data-service="spotify">
+    <a href="{{ links.spotify }}" target="_blank"
+      class="btn btn-xs {% if links.get('_override_spotify') %}btn-success{% else %}btn-outline-success{% endif %} py-0 px-1"
+      title="Spotify"><i class="bi bi-spotify"></i></a>
+    <button class="btn btn-xs btn-link p-0 ms-1 link-edit-btn text-body-secondary"
+      data-mix="{{ mix_name }}" data-index="{{ track_index }}" data-service="spotify"
+      data-url="{{ links.spotify | e }}"
+      onclick="editLink(this)" title="Set custom URL">
+      <i class="bi bi-pencil link-edit-icon" style="font-size:0.6rem"></i>
+    </button>
+  </span>
   {% endif %}
   {% if links.get('youtube_music') %}
-  <a href="{{ links.youtube_music }}" target="_blank" class="btn btn-xs btn-outline-danger py-0 px-1"
-    title="YouTube Music"><i class="bi bi-youtube"></i></a>
+  <span class="link-wrap d-inline-flex align-items-center" data-service="youtube_music">
+    <a href="{{ links.youtube_music }}" target="_blank"
+      class="btn btn-xs {% if links.get('_override_youtube_music') %}btn-danger{% else %}btn-outline-danger{% endif %} py-0 px-1"
+      title="YouTube Music"><i class="bi bi-youtube"></i></a>
+    <button class="btn btn-xs btn-link p-0 ms-1 link-edit-btn text-body-secondary"
+      data-mix="{{ mix_name }}" data-index="{{ track_index }}" data-service="youtube_music"
+      data-url="{{ links.youtube_music | e }}"
+      onclick="editLink(this)" title="Set custom URL">
+      <i class="bi bi-pencil link-edit-icon" style="font-size:0.6rem"></i>
+    </button>
+  </span>
   {% endif %}
   {% if links.get('soundcloud') %}
-  <a href="{{ links.soundcloud }}" target="_blank" class="btn btn-xs btn-outline-warning py-0 px-1"
-    title="SoundCloud"><i class="bi bi-headphones"></i></a>
+  <span class="link-wrap d-inline-flex align-items-center" data-service="soundcloud">
+    <a href="{{ links.soundcloud }}" target="_blank"
+      class="btn btn-xs {% if links.get('_override_soundcloud') %}btn-warning text-dark{% else %}btn-outline-warning{% endif %} py-0 px-1"
+      title="SoundCloud"><i class="bi bi-headphones"></i></a>
+    <button class="btn btn-xs btn-link p-0 ms-1 link-edit-btn text-body-secondary"
+      data-mix="{{ mix_name }}" data-index="{{ track_index }}" data-service="soundcloud"
+      data-url="{{ links.soundcloud | e }}"
+      onclick="editLink(this)" title="Set custom URL">
+      <i class="bi bi-pencil link-edit-icon" style="font-size:0.6rem"></i>
+    </button>
+  </span>
   {% endif %}
   {% if links.get('bandcamp') %}
-  <a href="{{ links.bandcamp }}" target="_blank" class="btn btn-xs btn-outline-primary py-0 px-1" title="Bandcamp"><i
-      class="bi bi-bag"></i></a>
+  <span class="link-wrap d-inline-flex align-items-center" data-service="bandcamp">
+    <a href="{{ links.bandcamp }}" target="_blank"
+      class="btn btn-xs {% if links.get('_override_bandcamp') %}btn-primary{% else %}btn-outline-primary{% endif %} py-0 px-1"
+      title="Bandcamp"><i class="bi bi-bag"></i></a>
+    <button class="btn btn-xs btn-link p-0 ms-1 link-edit-btn text-body-secondary"
+      data-mix="{{ mix_name }}" data-index="{{ track_index }}" data-service="bandcamp"
+      data-url="{{ links.bandcamp | e }}"
+      onclick="editLink(this)" title="Set custom URL">
+      <i class="bi bi-pencil link-edit-icon" style="font-size:0.6rem"></i>
+    </button>
+  </span>
   {% endif %}
   {% if links.get('musicbrainz') %}
-  <a href="{{ links.musicbrainz }}" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-1"
-    title="MusicBrainz"><i class="bi bi-database"></i></a>
+  <span class="link-wrap d-inline-flex align-items-center" data-service="musicbrainz">
+    <a href="{{ links.musicbrainz }}" target="_blank"
+      class="btn btn-xs btn-outline-secondary py-0 px-1" title="MusicBrainz"><i class="bi bi-database"></i></a>
+    <button class="btn btn-xs btn-link p-0 ms-1 link-edit-btn text-body-secondary"
+      data-mix="{{ mix_name }}" data-index="{{ track_index }}" data-service="musicbrainz"
+      data-url="{{ links.musicbrainz | e }}"
+      onclick="editLink(this)" title="Set custom URL">
+      <i class="bi bi-pencil link-edit-icon" style="font-size:0.6rem"></i>
+    </button>
+  </span>
   {% endif %}
   {% if links.get('discogs') %}
-  <a href="{{ links.discogs }}" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-1" title="Discogs"><i
-      class="bi bi-vinyl"></i></a>
+  <span class="link-wrap d-inline-flex align-items-center" data-service="discogs">
+    <a href="{{ links.discogs }}" target="_blank"
+      class="btn btn-xs btn-outline-secondary py-0 px-1" title="Discogs"><i class="bi bi-vinyl"></i></a>
+    <button class="btn btn-xs btn-link p-0 ms-1 link-edit-btn text-body-secondary"
+      data-mix="{{ mix_name }}" data-index="{{ track_index }}" data-service="discogs"
+      data-url="{{ links.discogs | e }}"
+      onclick="editLink(this)" title="Set custom URL">
+      <i class="bi bi-pencil link-edit-icon" style="font-size:0.6rem"></i>
+    </button>
+  </span>
   {% endif %}
 </div>
 {% endmacro %}
@@ -272,6 +324,57 @@
       const genreDisplay = td.querySelector('.genre-display');
       genreDisplay.innerHTML = `<span class="badge bg-info text-dark">${genre}</span>`;
       btn.remove();
+    });
+  }
+
+  function editLink(btn) {
+    const mixName = btn.dataset.mix;
+    const trackIndex = parseInt(btn.dataset.index);
+    const service = btn.dataset.service;
+    const currentUrl = btn.dataset.url || '';
+    const wrapper = btn.closest('.link-wrap');
+    const originalHTML = wrapper.innerHTML;
+
+    wrapper.innerHTML = '';
+    const input = document.createElement('input');
+    input.type = 'url';
+    input.value = currentUrl;
+    input.placeholder = 'Paste URL, or leave blank to clear override';
+    input.className = 'form-control form-control-sm d-inline-block';
+    input.style.cssText = 'width:220px;font-size:0.75rem';
+
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'btn btn-xs btn-success py-0 px-1 ms-1';
+    saveBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+    saveBtn.title = 'Save';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn btn-xs btn-outline-secondary py-0 px-1 ms-1';
+    cancelBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
+    cancelBtn.title = 'Cancel';
+
+    wrapper.appendChild(input);
+    wrapper.appendChild(saveBtn);
+    wrapper.appendChild(cancelBtn);
+    input.focus();
+    input.select();
+
+    function save() {
+      const url = input.value.trim();
+      fetch(`/api/track/${mixName}/link`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index: trackIndex, service, url })
+      }).then(r => r.json()).then(data => {
+        if (data.ok) location.reload();
+      }).catch(() => { wrapper.innerHTML = originalHTML; });
+    }
+
+    saveBtn.addEventListener('click', save);
+    cancelBtn.addEventListener('click', () => { wrapper.innerHTML = originalHTML; });
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') save();
+      if (e.key === 'Escape') wrapper.innerHTML = originalHTML;
     });
   }
 </script>

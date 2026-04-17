@@ -164,17 +164,35 @@
           <div class="d-flex gap-1 flex-wrap align-items-center">
 
             {% if track.links.get('spotify') %}
-            <a href="{{ track.links.spotify }}" target="_blank" class="btn btn-xs btn-outline-success py-0 px-2"
-              title="Spotify">
-              <i class="bi bi-spotify me-1"></i>Spotify
-            </a>
+            <span class="link-wrap d-inline-flex align-items-center" data-service="spotify">
+              <a href="{{ track.links.spotify }}" target="_blank"
+                class="btn btn-xs {% if track.get('_link_override_spotify') %}btn-success{% else %}btn-outline-success{% endif %} py-0 px-2"
+                title="Spotify">
+                <i class="bi bi-spotify me-1"></i>Spotify
+              </a>
+              <button class="btn btn-xs btn-link p-0 ms-1 link-edit-btn text-body-secondary"
+                data-mix="{{ mix_name }}" data-index="{{ track.index }}" data-service="spotify"
+                data-url="{{ track.links.spotify | e }}"
+                onclick="editLink(this)" title="Set custom URL">
+                <i class="bi bi-pencil{% if track.get('_link_override_spotify') %}-fill{% endif %} link-edit-icon" style="font-size:0.65rem"></i>
+              </button>
+            </span>
             {% endif %}
 
             {% if track.links.get('youtube_music') %}
-            <a href="{{ track.links.youtube_music }}" target="_blank" class="btn btn-xs btn-outline-danger py-0 px-2"
-              title="YouTube Music">
-              <i class="bi bi-youtube me-1"></i>YT
-            </a>
+            <span class="link-wrap d-inline-flex align-items-center" data-service="youtube_music">
+              <a href="{{ track.links.youtube_music }}" target="_blank"
+                class="btn btn-xs {% if track.get('_link_override_youtube_music') %}btn-danger{% else %}btn-outline-danger{% endif %} py-0 px-2"
+                title="YouTube Music">
+                <i class="bi bi-youtube me-1"></i>YT
+              </a>
+              <button class="btn btn-xs btn-link p-0 ms-1 link-edit-btn text-body-secondary"
+                data-mix="{{ mix_name }}" data-index="{{ track.index }}" data-service="youtube_music"
+                data-url="{{ track.links.youtube_music | e }}"
+                onclick="editLink(this)" title="Set custom URL">
+                <i class="bi bi-pencil{% if track.get('_link_override_youtube_music') %}-fill{% endif %} link-edit-icon" style="font-size:0.65rem"></i>
+              </button>
+            </span>
             <button class="btn btn-xs btn-outline-danger py-0 px-1"
               onclick="previewYouTube('{{ track.links.youtube_music }}', '{{ track.artist|e }} – {{ track.title|e }}')"
               title="Preview">
@@ -183,31 +201,67 @@
             {% endif %}
 
             {% if track.links.get('soundcloud') %}
-            <a href="{{ track.links.soundcloud }}" target="_blank" class="btn btn-xs btn-outline-warning py-0 px-2"
-              title="SoundCloud">
-              <i class="bi bi-headphones me-1"></i>SC
-            </a>
+            <span class="link-wrap d-inline-flex align-items-center" data-service="soundcloud">
+              <a href="{{ track.links.soundcloud }}" target="_blank"
+                class="btn btn-xs {% if track.get('_link_override_soundcloud') %}btn-warning text-dark{% else %}btn-outline-warning{% endif %} py-0 px-2"
+                title="SoundCloud">
+                <i class="bi bi-headphones me-1"></i>SC
+              </a>
+              <button class="btn btn-xs btn-link p-0 ms-1 link-edit-btn text-body-secondary"
+                data-mix="{{ mix_name }}" data-index="{{ track.index }}" data-service="soundcloud"
+                data-url="{{ track.links.soundcloud | e }}"
+                onclick="editLink(this)" title="Set custom URL">
+                <i class="bi bi-pencil{% if track.get('_link_override_soundcloud') %}-fill{% endif %} link-edit-icon" style="font-size:0.65rem"></i>
+              </button>
+            </span>
             {% endif %}
 
             {% if track.links.get('bandcamp') %}
-            <a href="{{ track.links.bandcamp }}" target="_blank" class="btn btn-xs btn-outline-primary py-0 px-2"
-              title="Search on Bandcamp">
-              <i class="bi bi-bag me-1"></i>BC
-            </a>
+            <span class="link-wrap d-inline-flex align-items-center" data-service="bandcamp">
+              <a href="{{ track.links.bandcamp }}" target="_blank"
+                class="btn btn-xs {% if track.get('_link_override_bandcamp') %}btn-primary{% else %}btn-outline-primary{% endif %} py-0 px-2"
+                title="{% if track.get('_link_override_bandcamp') %}Bandcamp{% else %}Search on Bandcamp{% endif %}">
+                <i class="bi bi-bag me-1"></i>BC
+              </a>
+              <button class="btn btn-xs btn-link p-0 ms-1 link-edit-btn text-body-secondary"
+                data-mix="{{ mix_name }}" data-index="{{ track.index }}" data-service="bandcamp"
+                data-url="{{ track.links.bandcamp | e }}"
+                onclick="editLink(this)" title="Set custom URL">
+                <i class="bi bi-pencil{% if track.get('_link_override_bandcamp') %}-fill{% endif %} link-edit-icon" style="font-size:0.65rem"></i>
+              </button>
+            </span>
             {% endif %}
 
             {% if track.links.get('musicbrainz') %}
-            <a href="{{ track.links.musicbrainz }}" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-1"
-              title="MusicBrainz">
-              <i class="bi bi-database"></i>
-            </a>
+            <span class="link-wrap d-inline-flex align-items-center" data-service="musicbrainz">
+              <a href="{{ track.links.musicbrainz }}" target="_blank"
+                class="btn btn-xs btn-outline-secondary py-0 px-1"
+                title="MusicBrainz">
+                <i class="bi bi-database"></i>
+              </a>
+              <button class="btn btn-xs btn-link p-0 ms-1 link-edit-btn text-body-secondary"
+                data-mix="{{ mix_name }}" data-index="{{ track.index }}" data-service="musicbrainz"
+                data-url="{{ track.links.musicbrainz | e }}"
+                onclick="editLink(this)" title="Set custom URL">
+                <i class="bi bi-pencil{% if track.get('_link_override_musicbrainz') %}-fill{% endif %} link-edit-icon" style="font-size:0.65rem"></i>
+              </button>
+            </span>
             {% endif %}
 
             {% if track.links.get('discogs') %}
-            <a href="{{ track.links.discogs }}" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-1"
-              title="Discogs">
-              <i class="bi bi-vinyl"></i>
-            </a>
+            <span class="link-wrap d-inline-flex align-items-center" data-service="discogs">
+              <a href="{{ track.links.discogs }}" target="_blank"
+                class="btn btn-xs btn-outline-secondary py-0 px-1"
+                title="Discogs">
+                <i class="bi bi-vinyl"></i>
+              </a>
+              <button class="btn btn-xs btn-link p-0 ms-1 link-edit-btn text-body-secondary"
+                data-mix="{{ mix_name }}" data-index="{{ track.index }}" data-service="discogs"
+                data-url="{{ track.links.discogs | e }}"
+                onclick="editLink(this)" title="Set custom URL">
+                <i class="bi bi-pencil{% if track.get('_link_override_discogs') %}-fill{% endif %} link-edit-icon" style="font-size:0.65rem"></i>
+              </button>
+            </span>
             {% endif %}
 
           </div>
@@ -345,6 +399,17 @@
           orig.textContent = 'was: ' + data.original;
           cell.appendChild(orig);
         }
+        // Update Bandcamp/SoundCloud search URLs when artist or title changes
+        if (fieldName === 'artist' || fieldName === 'title') {
+          const row = cell.closest('tr');
+          const otherField = fieldName === 'artist' ? 'title' : 'artist';
+          const otherCell = row.querySelector(`.editable-cell[onclick*="'${otherField}'"]`);
+          const otherValue = otherCell?.querySelector('.field-value')?.textContent.trim() || '';
+          const thisValue = data.value || data.original || '';
+          const artist = fieldName === 'artist' ? thisValue : otherValue;
+          const title = fieldName === 'title' ? thisValue : otherValue;
+          _updateSearchLinks(row, artist, title);
+        }
       }).catch(() => { cell.innerHTML = originalContent; });
     }
     input.addEventListener('blur', save);
@@ -367,6 +432,81 @@
       const genreDisplay = td.querySelector('.genre-display');
       genreDisplay.innerHTML = `<span class="badge bg-info text-dark">${genre}</span>`;
       btn.remove();
+    });
+  }
+
+  // ── Link editing ────────────────────────────────────────────────────────────
+
+  function editLink(btn) {
+    const mixName = btn.dataset.mix;
+    const trackIndex = parseInt(btn.dataset.index);
+    const service = btn.dataset.service;
+    const currentUrl = btn.dataset.url || '';
+    const wrapper = btn.closest('.link-wrap');
+    const originalHTML = wrapper.innerHTML;
+
+    wrapper.innerHTML = '';
+    const input = document.createElement('input');
+    input.type = 'url';
+    input.value = currentUrl;
+    input.placeholder = 'Paste URL, or leave blank to clear override';
+    input.className = 'form-control form-control-sm d-inline-block';
+    input.style.cssText = 'width:220px;font-size:0.75rem';
+
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'btn btn-xs btn-success py-0 px-1 ms-1';
+    saveBtn.innerHTML = '<i class="bi bi-check-lg"></i>';
+    saveBtn.title = 'Save';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn btn-xs btn-outline-secondary py-0 px-1 ms-1';
+    cancelBtn.innerHTML = '<i class="bi bi-x-lg"></i>';
+    cancelBtn.title = 'Cancel';
+
+    wrapper.appendChild(input);
+    wrapper.appendChild(saveBtn);
+    wrapper.appendChild(cancelBtn);
+    input.focus();
+    input.select();
+
+    function save() {
+      const url = input.value.trim();
+      fetch(`/api/track/${mixName}/link`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index: trackIndex, service, url })
+      }).then(r => r.json()).then(data => {
+        if (data.ok) location.reload();
+      }).catch(() => { wrapper.innerHTML = originalHTML; });
+    }
+
+    saveBtn.addEventListener('click', save);
+    cancelBtn.addEventListener('click', () => { wrapper.innerHTML = originalHTML; });
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') save();
+      if (e.key === 'Escape') wrapper.innerHTML = originalHTML;
+    });
+  }
+
+  // Update Bandcamp/SoundCloud search URLs in a row when artist/title changes
+  function _updateSearchLinks(row, artist, title) {
+    const q = encodeURIComponent(artist + ' ' + title);
+    row.querySelectorAll('.link-wrap').forEach(wrap => {
+      const service = wrap.dataset.service;
+      const editBtn = wrap.querySelector('.link-edit-btn');
+      // Don't overwrite manually-overridden links (pencil-fill icon indicates override)
+      if (editBtn && editBtn.querySelector('.bi-pencil-fill')) return;
+      const anchor = wrap.querySelector('a');
+      if (!anchor) return;
+      if (service === 'bandcamp') {
+        const url = `https://bandcamp.com/search?q=${q}&item_type=t`;
+        anchor.href = url;
+        if (editBtn) editBtn.dataset.url = url;
+      } else if (service === 'soundcloud') {
+        const url = `https://soundcloud.com/search/tracks?q=${q}`;
+        anchor.href = url;
+        if (editBtn) editBtn.dataset.url = url;
+      }
     });
   }
 </script>
