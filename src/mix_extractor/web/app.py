@@ -266,6 +266,8 @@ async def mix_detail(request: Request, mix_name: str):
     data = _load_mix(mix_name)
     if data is None:
         raise HTTPException(status_code=404, detail="Mix not found")
+    settings = _settings()
+    user_data = _load_user_data(mix_name)
     return templates.TemplateResponse(
         "mix.html",
         {
@@ -273,6 +275,10 @@ async def mix_detail(request: Request, mix_name: str):
             "mix_name": mix_name,
             "mix": data.get("mix", {}),
             "tracks": data.get("tracks", []),
+            "buymusic_club_configured": bool(
+                settings.buymusic_club_username and settings.buymusic_club_password
+            ),
+            "buymusic_club_url": user_data.get("buymusic_club_url", ""),
         },
     )
 
@@ -473,3 +479,37 @@ async def api_library(q: str = "", keep_only: bool = False):
     if keep_only:
         all_tracks = [t for t in all_tracks if t.get("keep")]
     return JSONResponse(all_tracks)
+
+
+# ── buymusic.club publish ──────────────────────────────────────────────────────
+
+@app.post("/api/mix/{mix_name}/publish")
+async def publish_to_buymusic_club(mix_name: str, request: Request):
+    """Publish a mix tracklist to buymusic.club and return the list URL."""
+    body = await request.json()
+    list_title = (body.get("title") or "").strip() or mix_name
+    include_all = bool(body.get("include_all", False))
+
+    settings = _settings()
+    if not settings.buymusic_club_username or not settings.buymusic_club_password:
+        raise HTTPException(
+            status_code=400,
+            detail="BUYMUSIC_CLUB_USERNAME and BUYMUSIC_CLUB_PASSWORD are not configured.",
+        )
+
+    data = _load_mix(mix_name)
+    if data is None:
+        raise HTTPException(status_code=404, detail="Mix not found")
+
+    try:
+        from mix_extractor.buymusic_club import publish_mix, BuymusicClubError  # noqa: PLC0415
+        url = publish_mix(
+            mix_name=mix_name,
+            settings=settings,
+            list_title=list_title,
+            include_all=include_all,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc))
+
+    return JSONResponse({"ok": True, "url": url})

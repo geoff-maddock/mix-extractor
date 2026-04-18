@@ -56,7 +56,7 @@ def analyze(
     """Run the full extraction pipeline on a mix file or URL."""
     from mix_extractor.config import get_settings  # noqa: PLC0415
     from mix_extractor.normalizer import normalize  # noqa: PLC0415
-    from mix_extractor.transcriber import transcribe, segments_to_text  # noqa: PLC0415
+    from mix_extractor.transcriber import transcribe, segments_to_text, segments_to_timestamped_text  # noqa: PLC0415
     from mix_extractor.parser import parse_tracks  # noqa: PLC0415
     from mix_extractor.enricher import enrich  # noqa: PLC0415
     from mix_extractor.reporter import write_report  # noqa: PLC0415
@@ -130,8 +130,9 @@ def analyze(
         console.print("[yellow]Transcription produced no text. Is there speech in the mix?[/yellow]")
         raise typer.Exit(1)
 
-    # 4. Parse tracklist via LLM
-    tracks = parse_tracks(transcript, segments, settings)
+    # 4. Parse tracklist via LLM (use timestamped text so the LLM can assign times)
+    timestamped_transcript = segments_to_timestamped_text(segments)
+    tracks = parse_tracks(timestamped_transcript, segments, settings)
 
     # 5. Merge transcript tracks with fingerprinted tracks
     if fingerprinted:
@@ -270,6 +271,217 @@ def config() -> None:
 
     env_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
     console.print(f"\n[green]Saved:[/green] {env_path}")
+
+
+# ── publish ───────────────────────────────────────────────────────────────────
+
+@app.command()
+def publish(
+    mix_name: Annotated[str, typer.Argument(help="Name of the mix output directory (e.g. 'Fracture - 14 January 2026').")],
+    title: Annotated[Optional[str], typer.Option("--title", help="Title for the buymusic.club list (defaults to mix name).")] = None,
+    all_tracks: Annotated[bool, typer.Option("--all", help="Include all tracks, not just bookmarked ones.")] = False,
+) -> None:
+    """Publish a mix tracklist to buymusic.club."""
+    from mix_extractor.config import get_settings  # noqa: PLC0415
+    from mix_extractor.buymusic_club import publish_mix, BuymusicClubError  # noqa: PLC0415
+
+    settings = get_settings()
+
+    if not settings.buymusic_club_username or not settings.buymusic_club_password:
+        console.print(
+            "[red]Missing buymusic.club credentials.[/red]\n"
+            "Add [bold]BUYMUSIC_CLUB_USERNAME[/bold] and [bold]BUYMUSIC_CLUB_PASSWORD[/bold] "
+            "to your .env file, then run [bold]mix-extractor config[/bold]."
+        )
+        raise typer.Exit(1)
+
+    console.print(f"\n[bold blue]Publishing[/bold blue] {mix_name} → buymusic.club …\n")
+    try:
+        url = publish_mix(
+            mix_name=mix_name,
+            settings=settings,
+            list_title=title,
+            include_all=all_tracks,
+        )
+        console.print(f"\n[bold green]Done![/bold green] {url}\n")
+    except BuymusicClubError as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1)
+
+
+# ── reprocess ─────────────────────────────────────────────────────────────────
+
+_AUDIO_EXTS = {".mp3", ".flac", ".wav", ".m4a", ".ogg", ".opus", ".aac", ".webm", ".mp4"}
+
+
+def _find_source_audio(mix_dir: Path, source_name: str, input_dir: Path) -> Path | None:
+    """Locate the original audio for a previously analyzed mix.
+
+    Search order:
+      1. Original file in content/input/ (from tracks.json ``mix.source``)
+      2. Any audio file in content/input/ whose stem matches the output folder name
+      3. The cached normalized file in _work/
+    """
+    # 1. Exact source name in input dir
+    candidate = input_dir / source_name
+    if candidate.exists():
+        return candidate
+
+    # 2. Stem match (handles renamed extensions)
+    mix_stem = mix_dir.name
+    for f in input_dir.iterdir():
+        if f.suffix.lower() in _AUDIO_EXTS and f.stem == mix_stem:
+            return f
+
+    # 3. Fall back to normalized cache in _work/
+    work_dir = mix_dir / "_work"
+    if work_dir.is_dir():
+        for f in sorted(work_dir.iterdir()):
+            if f.suffix.lower() in _AUDIO_EXTS and "normalized" in f.name:
+                return f
+
+    return None
+
+
+@app.command()
+def reprocess(
+    mix_name: Annotated[Optional[str], typer.Argument(help="Name of a previously analyzed mix folder (tab-complete friendly). Omit to choose interactively.")] = None,
+    llm: Annotated[Optional[str], typer.Option("--llm", help="LLM provider: openai | anthropic")] = None,
+    model: Annotated[Optional[str], typer.Option("--model", help="LLM model name override")] = None,
+    transcriber: Annotated[Optional[str], typer.Option("--transcriber", help="Transcription backend: whisper_api | whisper_local | assemblyai | deepgram")] = None,
+    no_enrich: Annotated[bool, typer.Option("--no-enrich", help="Skip music API lookups")] = False,
+    no_fingerprint: Annotated[bool, typer.Option("--no-fingerprint", help="Skip audio fingerprinting via AudD")] = False,
+    fingerprint_only: Annotated[bool, typer.Option("--fingerprint-only", help="Run audio fingerprinting only")] = False,
+    no_transcribe: Annotated[bool, typer.Option("--no-transcribe", help="Skip transcription — re-enrich using existing tracks.json")] = False,
+) -> None:
+    """Re-run the extraction pipeline on a previously analyzed mix."""
+    import json as _json  # noqa: PLC0415
+    from mix_extractor.config import get_settings  # noqa: PLC0415
+
+    settings = get_settings()
+    output_dir = settings.output_dir
+
+    # ── discover available mixes ──────────────────────────────────────────────
+    if not output_dir.is_dir():
+        console.print("[red]No output directory found.[/red] Run [bold]analyze[/bold] first.")
+        raise typer.Exit(1)
+
+    available = sorted(
+        d.name for d in output_dir.iterdir()
+        if d.is_dir() and (d / "tracks.json").exists()
+    )
+    if not available:
+        console.print("[yellow]No previously analyzed mixes found.[/yellow]")
+        raise typer.Exit(1)
+
+    # ── interactive picker when no name given ────────────────────────────────
+    if mix_name is None:
+        console.print("\n[bold]Previously analyzed mixes:[/bold]\n")
+        for i, name in enumerate(available, 1):
+            console.print(f"  [dim]{i:3d}.[/dim] {name}")
+        console.print()
+        choice = Prompt.ask(
+            "Enter number or name",
+            default="1",
+        )
+        if choice.isdigit():
+            idx = int(choice) - 1
+            if idx < 0 or idx >= len(available):
+                console.print("[red]Invalid selection.[/red]")
+                raise typer.Exit(1)
+            mix_name = available[idx]
+        else:
+            mix_name = choice
+
+    mix_dir = output_dir / mix_name
+    if not mix_dir.is_dir():
+        # Try fuzzy match
+        matches = [n for n in available if mix_name.lower() in n.lower()]
+        if len(matches) == 1:
+            mix_name = matches[0]
+            mix_dir = output_dir / mix_name
+        elif len(matches) > 1:
+            console.print(f"[yellow]Ambiguous name '{mix_name}'. Matches:[/yellow]")
+            for m in matches:
+                console.print(f"  {m}")
+            raise typer.Exit(1)
+        else:
+            console.print(f"[red]Mix not found:[/red] {mix_name}")
+            raise typer.Exit(1)
+
+    console.print(f"\n[bold blue]Re-processing[/bold blue] {mix_name}\n")
+
+    # ── no-transcribe shortcut: just re-enrich existing tracks ────────────────
+    if no_transcribe:
+        tracks_path = mix_dir / "tracks.json"
+        if not tracks_path.exists():
+            console.print("[red]No tracks.json found — cannot skip transcription.[/red]")
+            raise typer.Exit(1)
+
+        data = _json.loads(tracks_path.read_text(encoding="utf-8"))
+        existing_tracks = data.get("tracks", [])
+        if not existing_tracks:
+            console.print("[yellow]tracks.json has no tracks.[/yellow]")
+            raise typer.Exit(1)
+
+        console.print(f"  [dim]Loaded {len(existing_tracks)} existing track(s) from tracks.json[/dim]")
+
+        if not no_enrich:
+            from mix_extractor.enricher import enrich  # noqa: PLC0415
+
+            overrides = {}
+            if llm:
+                overrides["llm_provider"] = llm
+            if model:
+                overrides["llm_model"] = model
+            enrichment_settings = get_settings(**overrides)
+            console.print("[bold blue]Enriching tracks[/bold blue] …")
+            existing_tracks = enrich(existing_tracks, enrichment_settings)
+
+        from mix_extractor.reporter import write_report  # noqa: PLC0415
+
+        source_name = data.get("mix", {}).get("source", f"{mix_name}.mp3")
+        duration = data.get("mix", {}).get("duration_seconds")
+        provider = data.get("mix", {}).get("transcription_provider", "unknown")
+
+        write_report(
+            source_name=source_name,
+            segments=[],
+            enriched_tracks=existing_tracks,
+            settings=settings,
+            transcription_provider=provider,
+            duration_seconds=duration,
+        )
+        return
+
+    # ── full re-run: locate source audio ──────────────────────────────────────
+    tracks_path = mix_dir / "tracks.json"
+    source_name = ""
+    if tracks_path.exists():
+        data = _json.loads(tracks_path.read_text(encoding="utf-8"))
+        source_name = data.get("mix", {}).get("source", "")
+
+    audio_path = _find_source_audio(mix_dir, source_name, settings.input_dir)
+    if audio_path is None:
+        console.print(
+            f"[red]Cannot find source audio for '{mix_name}'.[/red]\n"
+            f"Looked in: {settings.input_dir} and {mix_dir / '_work'}\n"
+            f"Use [bold]--no-transcribe[/bold] to re-enrich without re-transcribing."
+        )
+        raise typer.Exit(1)
+
+    console.print(f"  [dim]Source audio:[/dim] {audio_path}")
+
+    # Delegate to the analyze pipeline with the resolved path
+    analyze(
+        source=str(audio_path),
+        llm=llm,
+        model=model,
+        transcriber=transcriber,
+        no_enrich=no_enrich,
+        no_fingerprint=no_fingerprint,
+        fingerprint_only=fingerprint_only,
+    )
 
 
 # ── serve ─────────────────────────────────────────────────────────────────────

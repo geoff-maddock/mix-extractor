@@ -17,18 +17,17 @@
           <div class="mb-3">
             <label class="form-label">Audio file or URL</label>
             <input type="text" name="source" class="form-control"
-                   placeholder="content/input/mymix.mp3  or  https://soundcloud.com/…"
-                   required />
-            <div class="form-text">Paste a SoundCloud, YouTube, Mixcloud, or Bandcamp URL, or enter a local filename from the input folder.</div>
+              placeholder="content/input/mymix.mp3  or  https://soundcloud.com/…" required />
+            <div class="form-text">Paste a SoundCloud, YouTube, Mixcloud, or Bandcamp URL, or enter a local filename
+              from the input folder.</div>
           </div>
 
           <!-- Advanced options (collapsed by default) -->
           <div class="accordion accordion-flush mb-3" id="advancedOptions">
             <div class="accordion-item bg-transparent border rounded">
               <h2 class="accordion-header">
-                <button class="accordion-button collapsed bg-transparent text-body py-2 px-3"
-                        type="button" data-bs-toggle="collapse"
-                        data-bs-target="#advancedBody">
+                <button class="accordion-button collapsed bg-transparent text-body py-2 px-3" type="button"
+                  data-bs-toggle="collapse" data-bs-target="#advancedBody">
                   Advanced options
                 </button>
               </h2>
@@ -45,8 +44,7 @@
                     </div>
                     <div class="col-6">
                       <label class="form-label small">LLM model</label>
-                      <input type="text" name="model" class="form-control form-control-sm"
-                             placeholder="gpt-4o" />
+                      <input type="text" name="model" class="form-control form-control-sm" placeholder="gpt-4o" />
                     </div>
                   </div>
                   <div class="mb-2">
@@ -69,7 +67,8 @@
                       <label class="form-check-label small" for="no_fp">Skip fingerprinting</label>
                     </div>
                     <div class="form-check form-check-inline">
-                      <input class="form-check-input" type="checkbox" name="fingerprint_only" id="fp_only" value="true" />
+                      <input class="form-check-input" type="checkbox" name="fingerprint_only" id="fp_only"
+                        value="true" />
                       <label class="form-check-label small" for="fp_only">Fingerprint only</label>
                     </div>
                   </div>
@@ -93,8 +92,8 @@
       <div class="card-body">
         <form action="/upload" method="post" enctype="multipart/form-data">
           <div class="mb-3">
-            <input type="file" name="file" class="form-control"
-                   accept=".mp3,.flac,.wav,.m4a,.ogg,.opus,.aac,.webm,.mp4" required />
+            <input type="file" name="file" class="form-control" accept=".mp3,.flac,.wav,.m4a,.ogg,.opus,.aac,.webm,.mp4"
+              required />
           </div>
           <button type="submit" class="btn btn-success w-100">
             <i class="bi bi-cloud-upload me-2"></i>Upload to Input Folder
@@ -117,7 +116,7 @@
           <div class="d-flex align-items-center gap-2">
             <span class="badge bg-body-secondary text-body-secondary">{{ f.size_mb }} MB</span>
             <button class="btn btn-sm btn-outline-primary py-0 px-2"
-                    onclick="document.querySelector('[name=source]').value='{{ f.name }}'">
+              onclick="document.querySelector('[name=source]').value='{{ f.name }}'">
               <i class="bi bi-play-fill"></i>
             </button>
           </div>
@@ -193,10 +192,16 @@
                   {{ mix.analyzed_at[:10] if mix.analyzed_at else '—' }}
                 </small>
               </td>
-              <td class="text-end">
+              <td class="text-end text-nowrap">
                 <a href="/mix/{{ mix.name }}" class="btn btn-sm btn-outline-primary">
                   <i class="bi bi-list-ul me-1"></i>Tracklist
                 </a>
+                <form action="/analyze" method="post" class="d-inline ms-1">
+                  <input type="hidden" name="source" value="{{ mix.source }}" />
+                  <button type="submit" class="btn btn-sm btn-outline-secondary" title="Re-analyze this mix">
+                    <i class="bi bi-arrow-repeat me-1"></i>Re-analyze
+                  </button>
+                </form>
               </td>
             </tr>
             {% endfor %}

@@ -25,6 +25,7 @@ if TYPE_CHECKING:
 console = Console()
 
 _MB_DELAY = 1.1  # MusicBrainz rate limit: 1 request per second
+_BC_DELAY = 0.4  # Be polite to Bandcamp search
 
 
 class TrackLinks(dict):
@@ -60,6 +61,7 @@ def enrich(tracks: "list[Track] | list[dict]", settings: "Settings") -> list[dic
         _lookup_bandcamp(track, links)
         _lookup_soundcloud(track, links, settings)
         _lookup_youtube_music(track, links)
+        _lookup_deezer(track, links)
         if settings.spotify_client_id and settings.spotify_client_secret:
             _lookup_spotify(track, links, settings)
         if settings.discogs_token:
@@ -111,11 +113,44 @@ def _lookup_musicbrainz(track: "Track", links: TrackLinks) -> None:
 # ── Bandcamp ─────────────────────────────────────────────────────────────────
 
 def _lookup_bandcamp(track: "Track", links: TrackLinks) -> None:
-    """Construct a Bandcamp track search URL (no API key required)."""
+    """Search Bandcamp and resolve a direct track link when possible.
+
+    Falls back to the search URL if no matching track is found or the
+    request fails.
+    """
+    import re  # noqa: PLC0415
     from urllib.parse import quote_plus  # noqa: PLC0415
 
+    import httpx  # noqa: PLC0415
+
     query = f"{track.artist} {track.title}"
-    links["bandcamp"] = f"https://bandcamp.com/search?q={quote_plus(query)}&item_type=t"
+    search_url = f"https://bandcamp.com/search?q={quote_plus(query)}&item_type=t"
+
+    try:
+        resp = httpx.get(
+            search_url,
+            timeout=10,
+            follow_redirects=True,
+            headers={"User-Agent": "mix-extractor/0.1.0 (track enrichment)"},
+        )
+        resp.raise_for_status()
+        # First track result in the search page contains a direct link
+        match = re.search(
+            r'class="searchresult\s+track".*?'
+            r'href="(https://[^"]*\.bandcamp\.com/track/[^?"]*)',
+            resp.text,
+            re.DOTALL,
+        )
+        if match:
+            links["bandcamp"] = match.group(1)
+            console.print("    [green]✓ Bandcamp direct link[/green]")
+        else:
+            links["bandcamp"] = search_url
+    except Exception as exc:  # noqa: BLE001
+        console.print(f"    [dim]Bandcamp search error: {exc}[/dim]")
+        links["bandcamp"] = search_url
+    finally:
+        time.sleep(_BC_DELAY)
 
 
 # ── SoundCloud ────────────────────────────────────────────────────────────────
@@ -146,6 +181,28 @@ def _lookup_youtube_music(track: "Track", links: TrackLinks) -> None:
                 links["youtube_music"] = f"https://music.youtube.com/watch?v={video_id}"
     except Exception as exc:  # noqa: BLE001
         console.print(f"    [dim]YouTube Music error: {exc}[/dim]")
+
+
+# ── Deezer ────────────────────────────────────────────────────────────────
+
+def _lookup_deezer(track: "Track", links: TrackLinks) -> None:
+    """Search Deezer for a direct track link (free API, no key needed)."""
+    from urllib.parse import quote_plus  # noqa: PLC0415
+
+    import httpx  # noqa: PLC0415
+
+    query = f"{track.artist} {track.title}"
+    try:
+        resp = httpx.get(
+            f"https://api.deezer.com/search?q={quote_plus(query)}&limit=1",
+            timeout=10,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        if data.get("data"):
+            links["deezer"] = data["data"][0]["link"]
+    except Exception as exc:  # noqa: BLE001
+        console.print(f"    [dim]Deezer error: {exc}[/dim]")
 
 
 # ── Spotify ───────────────────────────────────────────────────────────────────

@@ -2,7 +2,7 @@
 {% block title %}{{ mix_name }} — mix-extractor{% endblock %}
 
 {% block content %}
-<div class="mb-4">
+<div class="mb-4" data-mix-name="{{ mix_name }}">
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
@@ -39,9 +39,28 @@
           <i class="bi bi-clipboard-plus me-1"></i>Enhanced
         </button>
       </div>
+      {% if buymusic_club_configured %}
+      <button class="btn btn-sm btn-outline-primary" id="bmcPublishBtn" onclick="publishToBMC()"
+        title="Publish tracklist to buymusic.club">
+        <i class="bi bi-bag-heart me-1"></i>Publish to BMC
+      </button>
+      {% endif %}
     </div>
   </div>
 </div>
+
+{% if buymusic_club_configured %}
+<!-- buymusic.club publish result banner -->
+<div id="bmcResultBanner" class="alert alert-success d-flex align-items-center gap-2 mb-3
+  {% if not buymusic_club_url %}d-none{% endif %}" role="alert">
+  <i class="bi bi-bag-heart-fill flex-shrink-0"></i>
+  <div>
+    Published on buymusic.club:
+    <a id="bmcListUrl" href="{{ buymusic_club_url }}" target="_blank" rel="noopener" class="alert-link fw-semibold">{{
+      buymusic_club_url }}</a>
+  </div>
+</div>
+{% endif %}
 
 <!-- Export modal -->
 <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
@@ -307,10 +326,14 @@
 
 {% block scripts %}
 <script>
+  const _e = encodeURIComponent;  // short alias for URL path encoding
+  // Read the mix name from a data attribute so the browser decodes HTML entities
+  const _MIX_NAME = document.querySelector('[data-mix-name]').dataset.mixName;
+
   function toggleKeep(mixName, trackIndex, btn) {
     const isKeep = btn.querySelector('i').classList.contains('bi-bookmark-heart-fill');
     const newKeep = !isKeep;
-    fetch(`/api/track/${mixName}/keep`, {
+    fetch(`/api/track/${_e(mixName)}/keep`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ index: trackIndex, keep: newKeep })
@@ -341,7 +364,7 @@
     input.focus();
     function save() {
       const genre = input.value.trim();
-      fetch(`/api/track/${mixName}/genre`, {
+      fetch(`/api/track/${_e(mixName)}/genre`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ index: trackIndex, genre })
@@ -412,7 +435,7 @@
       if (saved) return;
       saved = true;
       const value = input.value.trim();
-      fetch(`/api/track/${mixName}/edit`, {
+      fetch(`/api/track/${_e(mixName)}/edit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ index: trackIndex, field: fieldName, value })
@@ -453,7 +476,7 @@
     const mixName = btn.dataset.mix;
     const trackIndex = parseInt(btn.dataset.index);
     const genre = btn.dataset.suggestion;
-    fetch(`/api/track/${mixName}/genre`, {
+    fetch(`/api/track/${_e(mixName)}/genre`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ index: trackIndex, genre })
@@ -501,7 +524,7 @@
 
     function save() {
       const url = input.value.trim();
-      fetch(`/api/track/${mixName}/link`, {
+      fetch(`/api/track/${_e(mixName)}/link`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ index: trackIndex, service, url })
@@ -566,6 +589,47 @@
       btn.classList.replace('btn-primary', 'btn-success');
       setTimeout(() => { btn.innerHTML = orig; btn.classList.replace('btn-success', 'btn-primary'); }, 1800);
     });
+  }
+
+  // ── buymusic.club publish ───────────────────────────────────────────────────
+
+  function publishToBMC() {
+    const btn = document.getElementById('bmcPublishBtn');
+    const keepCount = document.querySelectorAll('.bi-bookmark-heart-fill').length;
+    const includeAll = keepCount === 0;
+    const msg = keepCount > 0
+      ? `Publish ${keepCount} bookmarked track(s) to buymusic.club?\n\nOnly tracks with direct Bandcamp links will be included.`
+      : `No tracks are bookmarked. Publish all tracks?\n\nOnly tracks with direct Bandcamp links will be included.`;
+    if (!confirm(msg)) return;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Publishing…';
+
+    fetch(`/api/mix/${_e(_MIX_NAME)}/publish`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: _MIX_NAME, include_all: includeAll })
+    })
+      .then(r => r.json())
+      .then(data => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-bag-heart me-1"></i>Publish to BMC';
+        if (data.ok && data.url) {
+          const banner = document.getElementById('bmcResultBanner');
+          const link = document.getElementById('bmcListUrl');
+          link.href = data.url;
+          link.textContent = data.url;
+          banner.classList.remove('d-none');
+          banner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+          alert('Publish failed: ' + (data.detail || JSON.stringify(data)));
+        }
+      })
+      .catch(err => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="bi bi-bag-heart me-1"></i>Publish to BMC';
+        alert('Publish error: ' + err);
+      });
   }
 
   // Update Bandcamp/SoundCloud search URLs in a row when artist/title changes
