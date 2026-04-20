@@ -279,6 +279,7 @@ async def mix_detail(request: Request, mix_name: str):
                 settings.buymusic_club_username and settings.buymusic_club_password
             ),
             "buymusic_club_url": user_data.get("buymusic_club_url", ""),
+            "embed_players": getattr(settings, "embed_players", False),
         },
     )
 
@@ -293,6 +294,85 @@ async def upload_file(file: UploadFile = File(...)):
     with dest.open("wb") as f:
         shutil.copyfileobj(file.file, f)
     return RedirectResponse(url="/", status_code=303)
+
+
+# ── import text tracklist ─────────────────────────────────────────────────────
+
+@app.post("/import-text")
+async def import_text_submit(
+    background_tasks: BackgroundTasks,
+    text: str = Form(...),
+    mix_name: str = Form(""),
+    enrich: bool = Form(False),
+    llm: str = Form(""),
+    model: str = Form(""),
+):
+    """Parse a pasted text tracklist via LLM, optionally enrich in background."""
+    from mix_extractor.text_import import import_tracklist  # noqa: PLC0415
+
+    settings = _settings()
+    overrides: dict = {}
+    if llm:
+        overrides["llm_provider"] = llm
+    if model:
+        overrides["llm_model"] = model
+    if overrides:
+        from mix_extractor.config import get_settings  # noqa: PLC0415
+        settings = get_settings(**overrides)
+
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Tracklist text is empty.")
+
+    # Parse synchronously (fast — single LLM call)
+    tracks, out_dir = import_tracklist(
+        text=text,
+        mix_name=mix_name.strip(),
+        settings=settings,
+        run_enrich=False,  # enrichment handled separately if requested
+    )
+
+    if not tracks:
+        raise HTTPException(
+            status_code=400,
+            detail="No tracks could be extracted from the text. Check the format and try again.",
+        )
+
+    final_mix_name = out_dir.name
+
+    if enrich:
+        job_id = str(uuid.uuid4())
+        _JOBS[job_id] = {"status": "pending", "log": [], "source": f"enrich: {final_mix_name}"}
+        background_tasks.add_task(_run_enrich_job, job_id, final_mix_name)
+        return RedirectResponse(url=f"/job/{job_id}", status_code=303)
+
+    return RedirectResponse(url=f"/mix/{final_mix_name}", status_code=303)
+
+
+def _run_enrich_job(job_id: str, mix_name: str) -> None:
+    """Background task: enrich an existing tracks.json with music API links."""
+    _JOBS[job_id]["status"] = "running"
+    _JOBS[job_id]["log"] = [f"Enriching tracks for {mix_name} …"]
+    try:
+        from mix_extractor.config import get_settings  # noqa: PLC0415
+        from mix_extractor.enricher import enrich  # noqa: PLC0415
+
+        settings = get_settings()
+        tracks_file = settings.output_dir / mix_name / "tracks.json"
+        data = json.loads(tracks_file.read_text(encoding="utf-8"))
+        tracks = data.get("tracks", [])
+
+        enriched = enrich(tracks, settings)
+        data["tracks"] = enriched
+        tracks_file.write_text(
+            json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+
+        _JOBS[job_id]["log"].append(f"Done — enriched {len(enriched)} tracks.")
+        _JOBS[job_id]["status"] = "done"
+        _JOBS[job_id]["mix_name"] = mix_name
+    except Exception as exc:
+        _JOBS[job_id]["status"] = "error"
+        _JOBS[job_id]["log"].append(f"Error: {exc}")
 
 
 # ── analyze ────────────────────────────────────────────────────────────────────
@@ -417,6 +497,48 @@ async def edit_track_field(mix_name: str, request: Request):
     return JSONResponse({"ok": True, "field": field, "value": value, "original": original})
 
 
+@app.post("/api/track/{mix_name}/lookup-bandcamp")
+async def lookup_bandcamp_single(mix_name: str, request: Request):
+    """Re-run Bandcamp direct-link lookup for a single track."""
+    from types import SimpleNamespace  # noqa: PLC0415
+
+    from mix_extractor.enricher import TrackLinks, _lookup_bandcamp  # noqa: PLC0415
+
+    body = await request.json()
+    track_index = body.get("index")
+
+    settings = _settings()
+    tracks_file = settings.output_dir / mix_name / "tracks.json"
+    if not tracks_file.exists():
+        raise HTTPException(status_code=404, detail="Mix not found")
+
+    data = json.loads(tracks_file.read_text(encoding="utf-8"))
+    raw_track = next((t for t in data.get("tracks", []) if t.get("index") == track_index), None)
+    if raw_track is None:
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    # Apply user overrides for artist/title so the search uses corrected values
+    user_data = _load_user_data(mix_name)
+    tid = _track_id(mix_name, raw_track)
+    td = user_data.get("tracks", {}).get(tid, {})
+    artist = td.get("overrides", {}).get("artist") or raw_track.get("artist", "")
+    title = td.get("overrides", {}).get("title") or raw_track.get("title", "")
+
+    track_ns = SimpleNamespace(artist=artist, title=title)
+    links = TrackLinks()
+    _lookup_bandcamp(track_ns, links)
+
+    new_url = links.get("bandcamp", "")
+    if new_url:
+        raw_track.setdefault("links", {})["bandcamp"] = new_url
+        tracks_file.write_text(
+            json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+
+    is_direct = new_url and "/search?" not in new_url
+    return JSONResponse({"ok": True, "url": new_url, "direct": is_direct})
+
+
 @app.post("/api/track/{mix_name}/link")
 async def set_link_override(mix_name: str, request: Request):
     """Save (or clear) a manual URL override for a specific link service."""
@@ -479,6 +601,115 @@ async def api_library(q: str = "", keep_only: bool = False):
     if keep_only:
         all_tracks = [t for t in all_tracks if t.get("keep")]
     return JSONResponse(all_tracks)
+
+
+# ── Embed player URL resolver ─────────────────────────────────────────────────
+
+@app.get("/api/embed-url")
+async def resolve_embed_url(url: str = ""):
+    """Return an embeddable player URL for a given music service URL.
+
+    Supports Bandcamp (fetches page to extract track ID), YouTube, and Spotify.
+    """
+    import re as _re  # noqa: PLC0415
+
+    if not url:
+        raise HTTPException(status_code=400, detail="url parameter is required")
+
+    # Bandcamp direct track link → embedded player
+    if "bandcamp.com/track/" in url and "/search?" not in url:
+        try:
+            import httpx  # noqa: PLC0415
+
+            resp = httpx.get(
+                url,
+                timeout=10,
+                follow_redirects=True,
+                headers={"User-Agent": "mix-extractor/0.1.0 (embed resolver)"},
+            )
+            resp.raise_for_status()
+            # Extract track ID from JSON-LD structured data
+            match = _re.search(r'"track_id"\s*,\s*"value"\s*:\s*(\d+)', resp.text)
+            if not match:
+                match = _re.search(r'"item_id"\s*,\s*"value"\s*:\s*(\d+)', resp.text)
+            if match:
+                track_id = match.group(1)
+                embed_url = (
+                    f"https://bandcamp.com/EmbeddedPlayer/track={track_id}"
+                    f"/size=small/bgcol=333333/linkcol=0f91ff/transparent=true/"
+                )
+                return JSONResponse({"ok": True, "embed_url": embed_url, "service": "bandcamp"})
+        except Exception:
+            pass
+        return JSONResponse({"ok": False, "detail": "Could not resolve Bandcamp embed"})
+
+    # YouTube / YouTube Music → embed
+    yt_match = _re.search(r"[?&]v=([^&]+)", url)
+    if yt_match:
+        vid = yt_match.group(1)
+        embed_url = f"https://www.youtube.com/embed/{vid}"
+        return JSONResponse({"ok": True, "embed_url": embed_url, "service": "youtube"})
+
+    # Spotify track → embed
+    sp_match = _re.search(r"open\.spotify\.com/track/([a-zA-Z0-9]+)", url)
+    if sp_match:
+        track_id = sp_match.group(1)
+        embed_url = f"https://open.spotify.com/embed/track/{track_id}?theme=0"
+        return JSONResponse({"ok": True, "embed_url": embed_url, "service": "spotify"})
+
+    return JSONResponse({"ok": False, "detail": "Unsupported URL for embedding"})
+
+
+# ── Bandcamp bulk re-lookup ────────────────────────────────────────────────────
+
+@app.post("/api/mix/{mix_name}/lookup-bandcamp")
+async def lookup_bandcamp_bulk(mix_name: str):
+    """Re-run Bandcamp direct-link lookup for every track in a mix."""
+    from types import SimpleNamespace  # noqa: PLC0415
+
+    from mix_extractor.enricher import TrackLinks, _lookup_bandcamp  # noqa: PLC0415
+
+    settings = _settings()
+    tracks_file = settings.output_dir / mix_name / "tracks.json"
+    if not tracks_file.exists():
+        raise HTTPException(status_code=404, detail="Mix not found")
+
+    data = json.loads(tracks_file.read_text(encoding="utf-8"))
+    user_data = _load_user_data(mix_name)
+    results = []
+
+    for raw_track in data.get("tracks", []):
+        tid = _track_id(mix_name, raw_track)
+        td = user_data.get("tracks", {}).get(tid, {})
+        artist = td.get("overrides", {}).get("artist") or raw_track.get("artist", "")
+        title = td.get("overrides", {}).get("title") or raw_track.get("title", "")
+
+        track_ns = SimpleNamespace(artist=artist, title=title)
+        links = TrackLinks()
+        _lookup_bandcamp(track_ns, links)
+
+        new_url = links.get("bandcamp", "")
+        if new_url:
+            raw_track.setdefault("links", {})["bandcamp"] = new_url
+
+        is_direct = new_url and "/search?" not in new_url
+        results.append({
+            "index": raw_track.get("index"),
+            "url": new_url,
+            "direct": is_direct,
+        })
+
+    tracks_file.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+
+    direct_count = sum(1 for r in results if r["direct"])
+    return JSONResponse({
+        "ok": True,
+        "total": len(results),
+        "direct": direct_count,
+        "results": results,
+    })
 
 
 # ── buymusic.club publish ──────────────────────────────────────────────────────

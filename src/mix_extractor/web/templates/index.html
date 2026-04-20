@@ -84,6 +84,69 @@
       </div>
     </div>
 
+    <!-- Import text tracklist -->
+    <div class="card mb-4">
+      <div class="card-header fw-semibold">
+        <i class="bi bi-card-text me-2 text-info"></i>Import Text Tracklist
+      </div>
+      <div class="card-body">
+        <form action="/import-text" method="post">
+          <div class="mb-3">
+            <label class="form-label">Tracklist text</label>
+            <textarea name="text" class="form-control font-monospace" rows="8"
+              placeholder="1. Artist - Track Title [Label]&#10;2. Another Artist - Another Track (Remix) [Label]&#10;3. Someone - Song Name https://someone.bandcamp.com/track/song-name"
+              required></textarea>
+            <div class="form-text">Paste a tracklist in any common format. Embedded URLs will be extracted
+              automatically.</div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Mix name</label>
+            <input type="text" name="mix_name" class="form-control"
+              placeholder="Leave blank to auto-generate from first line" />
+          </div>
+
+          <!-- Advanced options (collapsed by default) -->
+          <div class="accordion accordion-flush mb-3" id="importAdvanced">
+            <div class="accordion-item bg-transparent border rounded">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed bg-transparent text-body py-2 px-3" type="button"
+                  data-bs-toggle="collapse" data-bs-target="#importAdvBody">
+                  Advanced options
+                </button>
+              </h2>
+              <div id="importAdvBody" class="accordion-collapse collapse">
+                <div class="accordion-body pt-2">
+                  <div class="row g-2 mb-2">
+                    <div class="col-6">
+                      <label class="form-label small">LLM provider</label>
+                      <select name="llm" class="form-select form-select-sm">
+                        <option value="">default</option>
+                        <option value="openai">openai</option>
+                        <option value="anthropic">anthropic</option>
+                      </select>
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label small">LLM model</label>
+                      <input type="text" name="model" class="form-control form-control-sm" placeholder="gpt-4o" />
+                    </div>
+                  </div>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="enrich" id="import_enrich" value="true" />
+                    <label class="form-check-label small" for="import_enrich">Run enrichment (add links from music
+                      APIs)</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-info w-100">
+            <i class="bi bi-card-text me-2"></i>Import Tracklist
+          </button>
+        </form>
+      </div>
+    </div>
+
     <!-- Upload file -->
     <div class="card mb-4">
       <div class="card-header fw-semibold">

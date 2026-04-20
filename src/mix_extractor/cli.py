@@ -484,6 +484,58 @@ def reprocess(
     )
 
 
+# ── import-text ──────────────────────────────────────────────────────────────
+
+@app.command(name="import-text")
+def import_text(
+    source: Annotated[str, typer.Argument(help="Path to a text file containing a tracklist, or '-' for stdin.")],
+    name: Annotated[Optional[str], typer.Option("--name", help="Mix name for the output folder (auto-generated if omitted).")] = None,
+    llm: Annotated[Optional[str], typer.Option("--llm", help="LLM provider: openai | anthropic")] = None,
+    model: Annotated[Optional[str], typer.Option("--model", help="LLM model name override")] = None,
+    no_enrich: Annotated[bool, typer.Option("--no-enrich", help="Skip link enrichment.")] = False,
+) -> None:
+    """Import a tracklist from a text file (or stdin) and optionally enrich with links."""
+    import sys  # noqa: PLC0415
+
+    from mix_extractor.config import get_settings  # noqa: PLC0415
+    from mix_extractor.text_import import import_tracklist  # noqa: PLC0415
+    from mix_extractor.reporter import _print_summary  # noqa: PLC0415
+
+    overrides: dict = {}
+    if llm:
+        overrides["llm_provider"] = llm
+    if model:
+        overrides["llm_model"] = model
+    settings = get_settings(**overrides)
+
+    # Read text from stdin or file
+    if source == "-":
+        text = sys.stdin.read()
+    else:
+        p = Path(source)
+        if not p.exists():
+            console.print(f"[red]File not found:[/red] {p}")
+            raise typer.Exit(1)
+        text = p.read_text(encoding="utf-8")
+
+    if not text.strip():
+        console.print("[red]Input text is empty.[/red]")
+        raise typer.Exit(1)
+
+    tracks, out_dir = import_tracklist(
+        text=text,
+        mix_name=name or "",
+        settings=settings,
+        run_enrich=not no_enrich,
+    )
+
+    if not tracks:
+        console.print("[yellow]No tracks were extracted. Nothing written.[/yellow]")
+        raise typer.Exit(1)
+
+    _print_summary(tracks)
+
+
 # ── serve ─────────────────────────────────────────────────────────────────────
 
 @app.command()

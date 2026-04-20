@@ -91,40 +91,45 @@ def parse_tracks(
     return tracks
 
 
-def _call_llm(transcript: str, settings: "Settings") -> str:
+def call_llm(system_prompt: str, user_message: str, settings: "Settings") -> str:
+    """Send a system + user message pair to the configured LLM. Returns raw text."""
     if settings.llm_provider == "openai":
-        return _call_openai(transcript, settings)
+        return _call_openai(system_prompt, user_message, settings)
     elif settings.llm_provider == "anthropic":
-        return _call_anthropic(transcript, settings)
+        return _call_anthropic(system_prompt, user_message, settings)
     else:
         raise ValueError(f"Unknown LLM provider: {settings.llm_provider!r}")
 
 
-def _call_openai(transcript: str, settings: "Settings") -> str:
+def _call_llm(transcript: str, settings: "Settings") -> str:
+    return call_llm(_SYSTEM_PROMPT, f"Transcript:\n\n{transcript}", settings)
+
+
+def _call_openai(system_prompt: str, user_message: str, settings: "Settings") -> str:
     from openai import OpenAI  # noqa: PLC0415
 
     client = OpenAI(api_key=settings.require_key("openai_api_key"))
     response = client.chat.completions.create(
         model=settings.llm_model,
         messages=[
-            {"role": "system", "content": _SYSTEM_PROMPT},
-            {"role": "user", "content": f"Transcript:\n\n{transcript}"},
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_message},
         ],
         temperature=0.0,
     )
     return response.choices[0].message.content or "[]"
 
 
-def _call_anthropic(transcript: str, settings: "Settings") -> str:
+def _call_anthropic(system_prompt: str, user_message: str, settings: "Settings") -> str:
     import anthropic  # noqa: PLC0415
 
     client = anthropic.Anthropic(api_key=settings.require_key("anthropic_api_key"))
     message = client.messages.create(
         model=settings.llm_model,
         max_tokens=4096,
-        system=_SYSTEM_PROMPT,
+        system=system_prompt,
         messages=[
-            {"role": "user", "content": f"Transcript:\n\n{transcript}"},
+            {"role": "user", "content": user_message},
         ],
     )
     return message.content[0].text if message.content else "[]"

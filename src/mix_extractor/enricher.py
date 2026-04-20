@@ -136,7 +136,7 @@ def _lookup_bandcamp(track: "Track", links: TrackLinks) -> None:
         resp.raise_for_status()
         # First track result in the search page contains a direct link
         match = re.search(
-            r'class="searchresult\s+track".*?'
+            r'class="searchresult[^"]*".*?'
             r'href="(https://[^"]*\.bandcamp\.com/track/[^?"]*)',
             resp.text,
             re.DOTALL,
