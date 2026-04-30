@@ -70,6 +70,8 @@ def analyze(
         overrides["transcription_provider"] = transcriber
 
     settings = get_settings(**overrides)
+    from mix_extractor.downloader import is_url  # noqa: PLC0415
+    source_url = source if is_url(source) else None
     local_path, display_name = _resolve_input(source, settings.input_dir)
 
     # 1. Normalize audio
@@ -118,6 +120,7 @@ def analyze(
             settings=settings,
             transcription_provider="fingerprint_only",
             duration_seconds=None,
+            source_url=source_url,
         )
         return
     # ── end fingerprint-only ──────────────────────────────────────────────────
@@ -166,6 +169,7 @@ def analyze(
         settings=settings,
         transcription_provider=settings.transcription_provider,
         duration_seconds=duration,
+        source_url=source_url,
     )
 
 
@@ -534,6 +538,173 @@ def import_text(
         raise typer.Exit(1)
 
     _print_summary(tracks)
+
+
+# ── cache ─────────────────────────────────────────────────────────────────────
+
+cache_app = typer.Typer(name="cache", help="Inspect and manage the enrichment cache.")
+app.add_typer(cache_app)
+
+
+@cache_app.command("info")
+def cache_info() -> None:
+    """Show enrichment-cache stats: entry count, file size, oldest entry."""
+    import json as _json  # noqa: PLC0415
+    from datetime import datetime as _dt, timezone as _tz  # noqa: PLC0415
+    from mix_extractor.config import get_settings  # noqa: PLC0415
+    from mix_extractor.enricher import _cache_path  # noqa: PLC0415
+
+    settings = get_settings()
+    path = _cache_path(settings)
+    if not path.exists():
+        console.print(f"[yellow]No cache file at[/yellow] {path}")
+        raise typer.Exit(0)
+
+    try:
+        data = _json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        console.print(f"[red]Could not read cache:[/red] {exc}")
+        raise typer.Exit(1)
+
+    size_kb = path.stat().st_size / 1024
+    timestamps: list[str] = [
+        v.get("cached_at", "") for v in data.values() if isinstance(v, dict) and v.get("cached_at")
+    ]
+    oldest = min(timestamps) if timestamps else None
+
+    console.print(f"\n[bold]Enrichment cache[/bold] — {path}\n")
+    console.print(f"  Entries:         {len(data)}")
+    console.print(f"  File size:       {size_kb:.1f} KB")
+    if oldest:
+        try:
+            age_days = (_dt.now(_tz.utc) - _dt.fromisoformat(oldest)).days
+            console.print(f"  Oldest entry:    {oldest[:19]}  ({age_days} days ago)")
+        except ValueError:
+            console.print(f"  Oldest entry:    {oldest}")
+    untimed = len(data) - len(timestamps)
+    if untimed:
+        console.print(f"  Without timestamp: {untimed} (pre-TTL entries)")
+    console.print()
+
+
+@cache_app.command("clear")
+def cache_clear(
+    max_age_days: Annotated[
+        Optional[int],
+        typer.Option("--max-age-days", help="Only drop entries older than this. Default: drop all."),
+    ] = None,
+    yes: Annotated[bool, typer.Option("--yes", "-y", help="Skip confirmation.")] = False,
+) -> None:
+    """Drop entries from the enrichment cache.  Without --max-age-days, removes everything."""
+    import json as _json  # noqa: PLC0415
+    from datetime import datetime as _dt, timezone as _tz, timedelta  # noqa: PLC0415
+    from mix_extractor.config import get_settings  # noqa: PLC0415
+    from mix_extractor.enricher import _cache_path  # noqa: PLC0415
+
+    settings = get_settings()
+    path = _cache_path(settings)
+    if not path.exists():
+        console.print(f"[yellow]No cache file at[/yellow] {path}")
+        raise typer.Exit(0)
+
+    try:
+        data = _json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        console.print(f"[red]Could not read cache:[/red] {exc}")
+        raise typer.Exit(1)
+
+    before = len(data)
+    if max_age_days is None:
+        if not yes and not typer.confirm(f"Clear all {before} cache entries?"):
+            raise typer.Exit(0)
+        data = {}
+    else:
+        cutoff = _dt.now(_tz.utc) - timedelta(days=max_age_days)
+        kept = {}
+        for k, v in data.items():
+            ts = v.get("cached_at") if isinstance(v, dict) else None
+            if not ts:
+                continue  # drop entries with no timestamp (legacy entries)
+            try:
+                cached = _dt.fromisoformat(ts)
+            except ValueError:
+                continue
+            if cached >= cutoff:
+                kept[k] = v
+        data = kept
+
+    removed = before - len(data)
+    path.write_text(_json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    console.print(f"[green]Cleared {removed} entries.[/green] {len(data)} remain.")
+
+
+# ── backfill-source-urls ──────────────────────────────────────────────────────
+
+@app.command(name="backfill-source-urls")
+def backfill_source_urls(
+    dry_run: Annotated[bool, typer.Option("--dry-run", help="Preview without writing.")] = False,
+) -> None:
+    """Populate `mix.source_url` in tracks.json using yt-dlp `.info.json` sidecars.
+
+    Looks for ``content/input/<mix-name>.info.json`` next to each mix folder
+    and copies its ``webpage_url`` (or ``original_url``) into the mix metadata.
+    """
+    import json as _json  # noqa: PLC0415
+    from mix_extractor.config import get_settings  # noqa: PLC0415
+
+    settings = get_settings()
+    if not settings.output_dir.is_dir():
+        console.print("[yellow]No output directory found.[/yellow]")
+        raise typer.Exit(0)
+
+    updated = 0
+    skipped = 0
+    missing = 0
+
+    for mix_dir in sorted(settings.output_dir.iterdir()):
+        if not mix_dir.is_dir():
+            continue
+        tracks_file = mix_dir / "tracks.json"
+        if not tracks_file.exists():
+            continue
+        try:
+            data = _json.loads(tracks_file.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        mix_meta = data.get("mix", {})
+        if mix_meta.get("source_url"):
+            skipped += 1
+            continue
+
+        info_path = settings.input_dir / f"{mix_dir.name}.info.json"
+        if not info_path.exists():
+            missing += 1
+            continue
+        try:
+            info = _json.loads(info_path.read_text(encoding="utf-8"))
+        except Exception:
+            missing += 1
+            continue
+        webpage_url = info.get("webpage_url") or info.get("original_url")
+        if not webpage_url:
+            missing += 1
+            continue
+
+        mix_meta["source_url"] = webpage_url
+        data["mix"] = mix_meta
+        if not dry_run:
+            tracks_file.write_text(
+                _json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
+            )
+        console.print(f"  [green]✓[/green] {mix_dir.name} → {webpage_url}")
+        updated += 1
+
+    console.print(
+        f"\n[bold]Summary:[/bold] {updated} updated, "
+        f"{skipped} already had URL, {missing} without sidecar"
+    )
+    if dry_run:
+        console.print("[dim](dry run — no files written)[/dim]")
 
 
 # ── serve ─────────────────────────────────────────────────────────────────────

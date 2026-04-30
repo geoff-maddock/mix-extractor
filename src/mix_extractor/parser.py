@@ -33,7 +33,7 @@ class Track(BaseModel):
 _SYSTEM_PROMPT = """\
 You are an expert in electronic music and DJ culture. You will receive the transcript of a DJ mix.
 The transcript contains [HH:MM:SS] timestamp markers showing when each section was spoken.
-Your task is to extract every track the DJ mentions or announces. 
+Your task is to extract every track the DJ mentions or announces.
 Return ONLY a valid JSON array — no markdown, no commentary.
 Each element must follow this schema exactly:
 {
@@ -54,6 +54,36 @@ Rules:
 - Clean up transcription artefacts (stutters, filler words) from names.
 - Do not invent information not present in the transcript.
 - If no tracks can be extracted, return an empty array [].
+
+EXAMPLES
+
+Example 1 — canonical announcement with remixer and label
+Transcript:
+[00:04:15] Coming up next we have, uh, Bicep with their track "Glue" — the original mix on Feel My Bicep records.
+Expected:
+[{"index": 1, "timestamp": "00:04:15", "artist": "Bicep", "title": "Glue", "label": "Feel My Bicep", "remix": "", "extra_info": ""}]
+
+Example 2 — "title by artist" word order, plus a remix
+Transcript:
+[00:18:42] You're listening to "Be Mine" by Lone, the Floating Points remix, fresh out on R&S.
+Expected:
+[{"index": 1, "timestamp": "00:18:42", "artist": "Lone", "title": "Be Mine", "label": "R&S", "remix": "Floating Points", "extra_info": ""}]
+
+Example 3 — multiple tracks in a row, including filler words and a partial mention
+Transcript:
+[00:32:00] Right, this one's a heater, Skee Mask "Rio Dub", Ilian Tape.
+[00:36:10] And then we go into, um, Pessimist's "Ekkomesa" — 140 BPM banger.
+Expected:
+[
+  {"index": 1, "timestamp": "00:32:00", "artist": "Skee Mask", "title": "Rio Dub", "label": "Ilian Tape", "remix": "", "extra_info": ""},
+  {"index": 2, "timestamp": "00:36:10", "artist": "Pessimist", "title": "Ekkomesa", "label": "", "remix": "", "extra_info": "140 BPM"}
+]
+
+Example 4 — vague/incomplete mention, skip if both artist and title are unknown
+Transcript:
+[00:02:00] Big shouts to my man on the next one, you know who you are.
+Expected:
+[]
 """
 
 _MAX_TRANSCRIPT_CHARS = 28_000  # stay well within 32k context window

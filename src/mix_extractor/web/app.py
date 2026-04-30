@@ -11,6 +11,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import quote_plus
 
+from contextlib import asynccontextmanager
+
 from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -20,19 +22,71 @@ from mix_extractor.config import get_settings
 
 _HERE = Path(__file__).resolve().parent
 
-app = FastAPI(title="mix-extractor", docs_url=None, redoc_url=None)
+
+@asynccontextmanager
+async def _lifespan(_app: "FastAPI"):
+    _load_persisted_jobs()
+    yield
+
+
+app = FastAPI(
+    title="mix-extractor", docs_url=None, redoc_url=None, lifespan=_lifespan
+)
 app.mount("/static", StaticFiles(directory=str(_HERE / "static")), name="static")
 templates = Jinja2Templates(directory=str(_HERE / "templates"))
 
-# ── in-memory job state ────────────────────────────────────────────────────────
-# Keyed by job_id (str).  Values: {"status": "pending|running|done|error", "log": [...], "mix_name": str}
+# ── job state (persisted to disk) ─────────────────────────────────────────────
+# Keyed by job_id (str).  Values: {"status": "pending|running|done|error|interrupted",
+#                                  "log": [...], "source": str, "mix_name": str?}
 _JOBS: dict[str, dict[str, Any]] = {}
+_JOBS_DIR_NAME = "_jobs"
+_JOBS_LOADED = False
 
 
 # ── helpers ────────────────────────────────────────────────────────────────────
 
 def _settings():
     return get_settings()
+
+
+def _jobs_dir() -> Path:
+    d = _settings().output_dir / _JOBS_DIR_NAME
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
+def _save_job(job_id: str) -> None:
+    job = _JOBS.get(job_id)
+    if not job:
+        return
+    try:
+        path = _jobs_dir() / f"{job_id}.json"
+        path.write_text(
+            json.dumps(job, indent=2, ensure_ascii=False, default=str),
+            encoding="utf-8",
+        )
+    except Exception:
+        pass
+
+
+def _load_persisted_jobs() -> None:
+    """Restore jobs from disk on first access. In-progress jobs become 'interrupted'."""
+    global _JOBS_LOADED
+    if _JOBS_LOADED:
+        return
+    _JOBS_LOADED = True
+    d = _jobs_dir()
+    for p in d.glob("*.json"):
+        try:
+            data = json.loads(p.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        if data.get("status") in ("pending", "running"):
+            data["status"] = "interrupted"
+            data.setdefault("log", []).append(
+                "[server restart — job state was interrupted]"
+            )
+        _JOBS[p.stem] = data
 
 
 def _regenerate_search_links(track: dict) -> None:
@@ -152,6 +206,25 @@ def _track_id(mix_name: str, track: dict) -> str:
     return str(track.get('index', 0))
 
 
+def _regenerate_markdown(mix_name: str) -> None:
+    """Rewrite report.md to reflect current tracks.json + user_data overlay."""
+    from mix_extractor.reporter import regenerate_report_md  # noqa: PLC0415
+
+    data = _load_mix(mix_name)
+    if data is None:
+        return
+    settings = _settings()
+    out_dir = settings.output_dir / mix_name
+    if not out_dir.exists():
+        return
+    source_name = data.get("mix", {}).get("source", mix_name)
+    try:
+        regenerate_report_md(out_dir, source_name, data.get("tracks", []))
+    except Exception:
+        # Markdown regen is best-effort; don't fail the request because of it.
+        pass
+
+
 def _list_input_files() -> list[dict]:
     settings = _settings()
     audio_exts = {".mp3", ".flac", ".wav", ".m4a", ".ogg", ".opus", ".aac", ".webm", ".mp4"}
@@ -167,6 +240,7 @@ def _list_input_files() -> list[dict]:
 def _run_analyze_job(job_id: str, source: str, options: dict) -> None:
     """Background task: run mix-extractor analyze in a subprocess."""
     _JOBS[job_id]["status"] = "running"
+    _save_job(job_id)
     cmd = [sys.executable, "-m", "mix_extractor.cli", "analyze", source]
     if options.get("no_enrich"):
         cmd.append("--no-enrich")
@@ -193,10 +267,13 @@ def _run_analyze_job(job_id: str, source: str, options: dict) -> None:
 
         _JOBS[job_id]["log"] = []
         if process.stdout:
-            for line in process.stdout:
+            for i, line in enumerate(process.stdout):
                 line = line.rstrip()
                 print(line)  # Also print to server console
                 _JOBS[job_id]["log"].append(line)
+                # Persist every few lines to keep disk write volume reasonable
+                if i % 5 == 0:
+                    _save_job(job_id)
 
         returncode = process.wait()
         _JOBS[job_id]["status"] = "done" if returncode == 0 else "error"
@@ -204,12 +281,15 @@ def _run_analyze_job(job_id: str, source: str, options: dict) -> None:
     except Exception as exc:
         _JOBS[job_id]["status"] = "error"
         _JOBS[job_id]["log"].append(f"Error: {exc}")
+    finally:
+        _save_job(job_id)
 
 
 # ── pages ──────────────────────────────────────────────────────────────────────
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
+    _load_persisted_jobs()
     mixes = _load_all_mixes()
     input_files = _list_input_files()
     jobs = {jid: j for jid, j in _JOBS.items() if j["status"] in ("pending", "running")}
@@ -342,6 +422,7 @@ async def import_text_submit(
     if enrich:
         job_id = str(uuid.uuid4())
         _JOBS[job_id] = {"status": "pending", "log": [], "source": f"enrich: {final_mix_name}"}
+        _save_job(job_id)
         background_tasks.add_task(_run_enrich_job, job_id, final_mix_name)
         return RedirectResponse(url=f"/job/{job_id}", status_code=303)
 
@@ -352,6 +433,7 @@ def _run_enrich_job(job_id: str, mix_name: str) -> None:
     """Background task: enrich an existing tracks.json with music API links."""
     _JOBS[job_id]["status"] = "running"
     _JOBS[job_id]["log"] = [f"Enriching tracks for {mix_name} …"]
+    _save_job(job_id)
     try:
         from mix_extractor.config import get_settings  # noqa: PLC0415
         from mix_extractor.enricher import enrich  # noqa: PLC0415
@@ -373,6 +455,8 @@ def _run_enrich_job(job_id: str, mix_name: str) -> None:
     except Exception as exc:
         _JOBS[job_id]["status"] = "error"
         _JOBS[job_id]["log"].append(f"Error: {exc}")
+    finally:
+        _save_job(job_id)
 
 
 # ── analyze ────────────────────────────────────────────────────────────────────
@@ -390,6 +474,7 @@ async def start_analyze(
 ):
     job_id = str(uuid.uuid4())
     _JOBS[job_id] = {"status": "pending", "log": [], "source": source}
+    _save_job(job_id)
     options = {
         "no_enrich": no_enrich,
         "no_fingerprint": no_fingerprint,
@@ -443,6 +528,7 @@ async def toggle_keep(mix_name: str, request: Request):
     user_data["tracks"].setdefault(tid, {})
     user_data["tracks"][tid]["keep"] = keep
     _save_user_data(mix_name, user_data)
+    _regenerate_markdown(mix_name)
     return JSONResponse({"ok": True, "keep": keep})
 
 
@@ -463,6 +549,7 @@ async def set_genre(mix_name: str, request: Request):
     user_data["tracks"].setdefault(tid, {})
     user_data["tracks"][tid]["genre"] = genre
     _save_user_data(mix_name, user_data)
+    _regenerate_markdown(mix_name)
     return JSONResponse({"ok": True, "genre": genre})
 
 
@@ -494,6 +581,7 @@ async def edit_track_field(mix_name: str, request: Request):
     else:
         user_data["tracks"][tid]["overrides"].pop(field, None)
     _save_user_data(mix_name, user_data)
+    _regenerate_markdown(mix_name)
     return JSONResponse({"ok": True, "field": field, "value": value, "original": original})
 
 
@@ -547,7 +635,7 @@ async def set_link_override(mix_name: str, request: Request):
     service = body.get("service")
     url = (body.get("url") or "").strip()
 
-    _LINK_SERVICES = {"bandcamp", "soundcloud", "spotify", "youtube_music", "musicbrainz", "discogs"}
+    _LINK_SERVICES = {"bandcamp", "soundcloud", "spotify", "youtube_music", "musicbrainz", "discogs", "beatport"}
     if service not in _LINK_SERVICES:
         raise HTTPException(status_code=400, detail=f"Service '{service}' is not supported")
     if url and not (url.startswith("https://") or url.startswith("http://")):
@@ -570,7 +658,128 @@ async def set_link_override(mix_name: str, request: Request):
     else:
         user_data["tracks"][tid]["link_overrides"].pop(service, None)
     _save_user_data(mix_name, user_data)
+    _regenerate_markdown(mix_name)
     return JSONResponse({"ok": True, "service": service, "url": url})
+
+
+@app.post("/api/mix/{mix_name}/source-url")
+async def set_mix_source_url(mix_name: str, request: Request):
+    """Set or clear the mix-level source URL (used for the embedded player)."""
+    body = await request.json()
+    url = (body.get("url") or "").strip()
+
+    if url and not (url.startswith("http://") or url.startswith("https://")):
+        raise HTTPException(status_code=400, detail="URL must start with http:// or https://")
+
+    settings = _settings()
+    tracks_file = settings.output_dir / mix_name / "tracks.json"
+    if not tracks_file.exists():
+        raise HTTPException(status_code=404, detail="Mix not found")
+
+    data = json.loads(tracks_file.read_text(encoding="utf-8"))
+    mix_meta = data.setdefault("mix", {})
+    if url:
+        mix_meta["source_url"] = url
+    else:
+        mix_meta.pop("source_url", None)
+
+    tracks_file.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    return JSONResponse({"ok": True, "url": url})
+
+
+@app.post("/api/mix/{mix_name}/track/delete")
+async def delete_track(mix_name: str, request: Request):
+    """Remove a track from a mix (and clear its user_data overrides)."""
+    body = await request.json()
+    track_index = body.get("index")
+    if track_index is None:
+        raise HTTPException(status_code=400, detail="index is required")
+
+    settings = _settings()
+    tracks_file = settings.output_dir / mix_name / "tracks.json"
+    if not tracks_file.exists():
+        raise HTTPException(status_code=404, detail="Mix not found")
+
+    data = json.loads(tracks_file.read_text(encoding="utf-8"))
+    before = len(data.get("tracks", []))
+    data["tracks"] = [t for t in data.get("tracks", []) if t.get("index") != track_index]
+    if len(data["tracks"]) == before:
+        raise HTTPException(status_code=404, detail="Track not found")
+
+    tracks_file.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+
+    user_data = _load_user_data(mix_name)
+    if user_data.get("tracks", {}).pop(str(track_index), None) is not None:
+        _save_user_data(mix_name, user_data)
+
+    _regenerate_markdown(mix_name)
+    return JSONResponse({"ok": True, "remaining": len(data["tracks"])})
+
+
+@app.post("/api/mix/{mix_name}/track/add")
+async def add_blank_track(mix_name: str):
+    """Append a blank placeholder track (manual detection_source) to a mix."""
+    settings = _settings()
+    tracks_file = settings.output_dir / mix_name / "tracks.json"
+    if not tracks_file.exists():
+        raise HTTPException(status_code=404, detail="Mix not found")
+
+    data = json.loads(tracks_file.read_text(encoding="utf-8"))
+    tracks = data.setdefault("tracks", [])
+    next_index = max((t.get("index", 0) for t in tracks), default=0) + 1
+    new_track = {
+        "index": next_index,
+        "timestamp": "",
+        "artist": "",
+        "title": "",
+        "label": "",
+        "remix": "",
+        "extra_info": "",
+        "confidence": 1.0,
+        "detection_source": "manual",
+        "links": {},
+    }
+    tracks.append(new_track)
+    tracks_file.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    _regenerate_markdown(mix_name)
+    return JSONResponse({"ok": True, "track": new_track})
+
+
+@app.post("/api/mix/{mix_name}/tracks/reorder")
+async def reorder_tracks(mix_name: str, request: Request):
+    """Rearrange the tracks array. Body: {order: [stable_index, …]}."""
+    body = await request.json()
+    new_order = body.get("order")
+    if not isinstance(new_order, list):
+        raise HTTPException(status_code=400, detail="order must be a list")
+
+    settings = _settings()
+    tracks_file = settings.output_dir / mix_name / "tracks.json"
+    if not tracks_file.exists():
+        raise HTTPException(status_code=404, detail="Mix not found")
+
+    data = json.loads(tracks_file.read_text(encoding="utf-8"))
+    by_index: dict = {}
+    for t in data.get("tracks", []):
+        by_index[t.get("index")] = t
+    if set(new_order) != set(by_index.keys()) or len(new_order) != len(by_index):
+        raise HTTPException(
+            status_code=400,
+            detail="order must contain every existing track index exactly once",
+        )
+
+    data["tracks"] = [by_index[i] for i in new_order]
+    tracks_file.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    _regenerate_markdown(mix_name)
+    return JSONResponse({"ok": True})
 
 
 @app.get("/api/mixes")

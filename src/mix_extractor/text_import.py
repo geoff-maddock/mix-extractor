@@ -52,6 +52,29 @@ _URL_CLASSIFIERS = [
 
 _URL_RE = re.compile(r"https?://[^\s,<>\"']+")
 
+_HEADER_URL_DOMAINS = ("soundcloud.com", "mixcloud.com", "youtube.com/watch", "youtu.be/")
+
+
+def _detect_source_url(text: str) -> str | None:
+    """Return the first SoundCloud / Mixcloud / YouTube URL near the top of *text*.
+
+    Scans the first few non-blank lines so per-track YouTube / SoundCloud links
+    appearing later in the body are not mistaken for the mix-level source.
+    """
+    line_count = 0
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        line_count += 1
+        if line_count > 5:
+            break
+        for url in _URL_RE.findall(stripped):
+            for domain in _HEADER_URL_DOMAINS:
+                if domain in url:
+                    return url
+    return None
+
 
 def _extract_embedded_urls(text: str) -> dict[int, dict[str, str]]:
     """Scan each line for URLs and classify them by music service.
@@ -159,15 +182,17 @@ def import_tracklist(
     mix_name, out_dir = _unique_mix_dir(settings.output_dir, mix_name)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    payload = {
-        "mix": {
-            "source": mix_name,
-            "duration_seconds": None,
-            "transcription_provider": "text_import",
-            "analyzed_at": datetime.now(timezone.utc).isoformat(),
-        },
-        "tracks": track_dicts,
+    mix_meta: dict = {
+        "source": mix_name,
+        "duration_seconds": None,
+        "transcription_provider": "text_import",
+        "analyzed_at": datetime.now(timezone.utc).isoformat(),
     }
+    source_url = _detect_source_url(text)
+    if source_url:
+        mix_meta["source_url"] = source_url
+
+    payload = {"mix": mix_meta, "tracks": track_dicts}
     tracks_path = out_dir / "tracks.json"
     tracks_path.write_text(
         json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8"

@@ -43,6 +43,16 @@
         title="Toggle inline music players">
         <i class="bi bi-music-note-beamed me-1"></i><span id="embedToggleLabel">Players</span>
       </button>
+      <button class="btn btn-sm btn-outline-success" onclick="addBlankTrack()"
+        title="Append a blank placeholder track">
+        <i class="bi bi-plus-lg me-1"></i>Add Track
+      </button>
+      <button class="btn btn-sm {% if mix.source_url %}btn-outline-secondary{% else %}btn-outline-warning{% endif %}"
+        data-current-url="{{ mix.source_url or '' }}"
+        onclick="editMixSourceUrl(this)"
+        title="{% if mix.source_url %}Edit{% else %}Add{% endif %} the source URL used for the embedded mix player">
+        <i class="bi bi-link-45deg me-1"></i>{% if mix.source_url %}Mix URL{% else %}Set Mix URL{% endif %}
+      </button>
       <button class="btn btn-sm btn-outline-primary" id="bcBulkLookupBtn" onclick="bulkResolveBandcamp()"
         title="Re-lookup Bandcamp direct links for all tracks">
         <i class="bi bi-arrow-repeat me-1"></i>Resolve BC Links
@@ -56,6 +66,42 @@
     </div>
   </div>
 </div>
+
+{% if mix.source_url %}
+<!-- Original mix player (SoundCloud / Mixcloud / YouTube) -->
+{% set src_url = mix.source_url %}
+{% if 'soundcloud.com' in src_url %}
+  {% set src_kind = 'soundcloud' %}
+{% elif 'mixcloud.com' in src_url %}
+  {% set src_kind = 'mixcloud' %}
+{% elif 'youtube.com/watch' in src_url or 'youtu.be/' in src_url %}
+  {% set src_kind = 'youtube' %}
+{% else %}
+  {% set src_kind = 'other' %}
+{% endif %}
+<div class="mb-3 mix-source-player" data-source-kind="{{ src_kind }}">
+  {% if src_kind == 'soundcloud' %}
+  <iframe id="mixSourceIframe" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay"
+    src="https://w.soundcloud.com/player/?url={{ src_url | urlencode }}&color=%23ff5500&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&show_teaser=false"></iframe>
+  <script src="https://w.soundcloud.com/player/api.js"></script>
+  {% elif src_kind == 'mixcloud' %}
+  <iframe id="mixSourceIframe" width="100%" height="120" frameborder="0"
+    src="https://www.mixcloud.com/widget/iframe/?hide_cover=1&light=1&feed={{ src_url | urlencode }}"></iframe>
+  <script src="https://widget.mixcloud.com/media/js/widgetApi.js"></script>
+  {% elif src_kind == 'youtube' %}
+  {% set yt_id = src_url.split('v=')[-1].split('&')[0] if 'v=' in src_url else src_url.rsplit('/', 1)[-1].split('?')[0] %}
+  <div class="ratio ratio-16x9">
+    <iframe id="mixSourceIframe" src="https://www.youtube.com/embed/{{ yt_id }}?enablejsapi=1" frameborder="0"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen></iframe>
+  </div>
+  {% else %}
+  <a href="{{ src_url }}" target="_blank" rel="noopener" class="small text-body-secondary">
+    <i class="bi bi-link-45deg me-1"></i>{{ src_url }}
+  </a>
+  {% endif %}
+</div>
+{% endif %}
 
 {% if buymusic_club_configured %}
 <!-- buymusic.club publish result banner -->
@@ -114,6 +160,7 @@
   <table class="table table-hover align-middle sortable-table" id="mixTable">
     <thead class="table-group-divider">
       <tr>
+        <th style="width:28px" class="text-center" title="Drag to reorder"></th>
         <th style="width:44px" class="text-center">#</th>
         <th style="width:44px" class="text-center">
           <i class="bi bi-bookmark-heart" title="Keep"></i>
@@ -125,14 +172,21 @@
         <th>Genre</th>
         <th>Source</th>
         <th>Links &amp; Preview</th>
+        <th style="width:36px"></th>
       </tr>
     </thead>
     <tbody>
       {% for track in tracks %}
       <tr class="track-row" data-mix="{{ mix_name }}" data-index="{{ track.index }}">
 
-        <!-- Index -->
-        <td class="text-center text-body-secondary small">{{ track.index }}</td>
+        <!-- Drag handle -->
+        <td class="text-center drag-handle text-body-secondary"
+            style="cursor:grab;user-select:none" title="Drag to reorder">
+          <i class="bi bi-grip-vertical"></i>
+        </td>
+
+        <!-- Position -->
+        <td class="text-center text-body-secondary small position-cell">{{ loop.index }}</td>
 
         <!-- Keep toggle -->
         <td class="text-center">
@@ -145,7 +199,15 @@
         </td>
 
         <!-- Timestamp -->
-        <td><small class="text-body-secondary font-monospace">{{ track.timestamp or '—' }}</small></td>
+        <td>
+          {% if track.timestamp and mix.source_url %}
+          <small class="text-body-secondary font-monospace timestamp-link"
+            style="cursor:pointer;text-decoration:underline dotted"
+            onclick="jumpToTimestamp(this)" title="Jump to {{ track.timestamp }} in mix player">{{ track.timestamp }}</small>
+          {% else %}
+          <small class="text-body-secondary font-monospace">{{ track.timestamp or '—' }}</small>
+          {% endif %}
+        </td>
 
         <!-- Artist -->
         <td class="fw-semibold editable-cell" onclick="editField(this, '{{ mix_name }}', {{ track.index }}, 'artist')"
@@ -311,6 +373,22 @@
             </span>
             {% endif %}
 
+            {% if track.links.get('beatport') %}
+            <span class="link-wrap d-inline-flex align-items-center" data-service="beatport">
+              <a href="{{ track.links.beatport }}" target="_blank"
+                class="btn btn-xs {% if track.get('_link_override_beatport') %}btn-info{% else %}btn-outline-info{% endif %} py-0 px-2"
+                title="{% if track.get('_link_override_beatport') %}Beatport{% else %}Search on Beatport{% endif %}">
+                <i class="bi bi-disc me-1"></i>BP
+              </a>
+              <button class="btn btn-xs btn-link p-0 ms-1 link-edit-btn text-body-secondary" data-mix="{{ mix_name }}"
+                data-index="{{ track.index }}" data-service="beatport" data-url="{{ track.links.beatport | e }}"
+                onclick="editLink(this)" title="Set custom URL">
+                <i class="bi bi-pencil{% if track.get('_link_override_beatport') %}-fill{% endif %} link-edit-icon"
+                  style="font-size:0.65rem"></i>
+              </button>
+            </span>
+            {% endif %}
+
             {% if track.links.get('musicbrainz') %}
             <span class="link-wrap d-inline-flex align-items-center" data-service="musicbrainz">
               <a href="{{ track.links.musicbrainz }}" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-1"
@@ -344,10 +422,18 @@
           </div>
         </td>
 
+        <!-- Delete -->
+        <td class="text-center">
+          <button class="btn btn-sm btn-link p-0 text-body-secondary delete-track-btn"
+            data-index="{{ track.index }}" onclick="deleteTrack(this)" title="Delete track">
+            <i class="bi bi-trash"></i>
+          </button>
+        </td>
+
       </tr>
       <!-- Inline player row (hidden by default, toggled by play button) -->
       <tr class="embed-player-row d-none" data-player-for="{{ track.index }}">
-        <td colspan="9" class="p-0">
+        <td colspan="11" class="p-0">
           <div class="embed-player-container" style="background:#1a1a2e;"></div>
         </td>
       </tr>
@@ -829,6 +915,194 @@
 
   // Apply initial state on page load
   _applyEmbedState();
+
+  // ── Mix source URL editor ──────────────────────────────────────────────────
+
+  function editMixSourceUrl(btn) {
+    const current = btn.dataset.currentUrl || '';
+    const msg = current
+      ? 'Edit mix source URL (clear the field and OK to remove):'
+      : 'Paste the SoundCloud / Mixcloud / YouTube URL for this mix:';
+    const next = window.prompt(msg, current);
+    if (next === null) return;  // user cancelled
+    const trimmed = next.trim();
+    if (trimmed && !/^https?:\/\//i.test(trimmed)) {
+      alert('URL must start with http:// or https://');
+      return;
+    }
+    fetch(`/api/mix/${_e(_MIX_NAME)}/source-url`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: trimmed })
+    })
+      .then(r => r.json())
+      .then(d => { if (d.ok) location.reload(); else alert('Save failed: ' + JSON.stringify(d)); })
+      .catch(err => alert('Save error: ' + err));
+  }
+
+  // ── Source-player seek (SoundCloud / YouTube / Mixcloud) ───────────────────
+
+  const _MIX_PLAYER_KIND = document.querySelector('.mix-source-player')?.dataset.sourceKind || '';
+  let _mixWidget = null;
+
+  function _parseTimestamp(ts) {
+    const parts = ts.split(':').map(p => parseInt(p, 10));
+    if (parts.some(isNaN)) return null;
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
+    if (parts.length === 1) return parts[0];
+    return null;
+  }
+
+  function _whenWidgetReady(check, cb, attempts = 50) {
+    if (check()) { cb(); return; }
+    if (attempts <= 0) return;
+    setTimeout(() => _whenWidgetReady(check, cb, attempts - 1), 100);
+  }
+
+  function _initMixPlayer() {
+    const iframe = document.getElementById('mixSourceIframe');
+    if (!iframe) return;
+    if (_MIX_PLAYER_KIND === 'soundcloud') {
+      _whenWidgetReady(() => window.SC && window.SC.Widget, () => {
+        _mixWidget = window.SC.Widget(iframe);
+      });
+    } else if (_MIX_PLAYER_KIND === 'mixcloud') {
+      _whenWidgetReady(() => window.Mixcloud && window.Mixcloud.PlayerWidget, () => {
+        const w = window.Mixcloud.PlayerWidget(iframe);
+        if (w && w.ready) w.ready.then(() => { _mixWidget = w; });
+      });
+    }
+  }
+
+  function seekMixPlayer(seconds) {
+    const iframe = document.getElementById('mixSourceIframe');
+    if (!iframe) return;
+    if (_MIX_PLAYER_KIND === 'soundcloud') {
+      if (!_mixWidget && window.SC) _mixWidget = window.SC.Widget(iframe);
+      if (_mixWidget) {
+        _mixWidget.seekTo(seconds * 1000);
+        _mixWidget.play();
+      }
+    } else if (_MIX_PLAYER_KIND === 'youtube') {
+      const send = (func, args) => iframe.contentWindow.postMessage(
+        JSON.stringify({ event: 'command', func, args }), '*');
+      send('seekTo', [seconds, true]);
+      send('playVideo', []);
+    } else if (_MIX_PLAYER_KIND === 'mixcloud') {
+      if (_mixWidget) { _mixWidget.seek(seconds); _mixWidget.play(); }
+    }
+  }
+
+  function jumpToTimestamp(el) {
+    const seconds = _parseTimestamp(el.textContent.trim());
+    if (seconds == null) return;
+    seekMixPlayer(seconds);
+    // Visual feedback
+    el.classList.add('text-info', 'fw-bold');
+    setTimeout(() => el.classList.remove('text-info', 'fw-bold'), 600);
+  }
+
+  _initMixPlayer();
+
+  // ── Add / delete / reorder tracks ──────────────────────────────────────────
+
+  function addBlankTrack() {
+    fetch(`/api/mix/${_e(_MIX_NAME)}/track/add`, { method: 'POST' })
+      .then(r => r.json())
+      .then(d => { if (d.ok) location.reload(); else alert('Add failed: ' + JSON.stringify(d)); })
+      .catch(err => alert('Add error: ' + err));
+  }
+
+  function deleteTrack(btn) {
+    const trackIndex = parseInt(btn.dataset.index);
+    if (!confirm('Delete this track? This cannot be undone.')) return;
+    fetch(`/api/mix/${_e(_MIX_NAME)}/track/delete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ index: trackIndex })
+    })
+      .then(r => r.json())
+      .then(d => { if (d.ok) location.reload(); else alert('Delete failed: ' + JSON.stringify(d)); })
+      .catch(err => alert('Delete error: ' + err));
+  }
+
+  let _draggedRow = null;
+
+  function _initRowDrag() {
+    document.querySelectorAll('#mixTable tbody tr.track-row').forEach(row => {
+      const handle = row.querySelector('.drag-handle');
+      if (!handle) return;
+
+      handle.addEventListener('mousedown', () => { row.draggable = true; });
+
+      row.addEventListener('dragstart', e => {
+        _draggedRow = row;
+        row.classList.add('opacity-50');
+        e.dataTransfer.effectAllowed = 'move';
+        // Close any open inline embed players so they don't end up out of sync
+        document.querySelectorAll('.embed-player-row:not(.d-none)').forEach(r => {
+          r.classList.add('d-none');
+          r.querySelector('.embed-player-container').innerHTML = '';
+        });
+        document.querySelectorAll('.embed-play-btn').forEach(b => {
+          b.querySelector('i').className = 'bi bi-play-fill';
+        });
+      });
+
+      row.addEventListener('dragend', () => {
+        row.classList.remove('opacity-50');
+        row.draggable = false;
+        const moved = _draggedRow;
+        _draggedRow = null;
+        if (moved) _afterReorder();
+      });
+
+      row.addEventListener('dragover', e => {
+        if (!_draggedRow || _draggedRow === row) return;
+        e.preventDefault();
+        const rect = row.getBoundingClientRect();
+        const halfway = rect.top + rect.height / 2;
+        const tbody = row.parentNode;
+        if (e.clientY < halfway) tbody.insertBefore(_draggedRow, row);
+        else tbody.insertBefore(_draggedRow, row.nextElementSibling);
+      });
+    });
+
+    // Safety net: clear stuck draggable=true if the user mouses up without dragging
+    document.addEventListener('mouseup', () => {
+      if (_draggedRow) return;
+      document.querySelectorAll('#mixTable tbody tr.track-row[draggable="true"]')
+        .forEach(r => { r.draggable = false; });
+    });
+  }
+
+  function _afterReorder() {
+    const tbody = document.querySelector('#mixTable tbody');
+    if (!tbody) return;
+
+    // Re-pair each track-row with its embed-player-row and refresh position numbers
+    const rows = tbody.querySelectorAll('tr.track-row');
+    rows.forEach((row, i) => {
+      const idx = row.dataset.index;
+      const embed = document.querySelector(`.embed-player-row[data-player-for="${idx}"]`);
+      if (embed) tbody.insertBefore(embed, row.nextElementSibling);
+      const posCell = row.querySelector('.position-cell');
+      if (posCell) posCell.textContent = i + 1;
+    });
+
+    const order = Array.from(rows).map(r => parseInt(r.dataset.index));
+    fetch(`/api/mix/${_e(_MIX_NAME)}/tracks/reorder`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order })
+    })
+      .then(r => r.json())
+      .then(d => { if (!d.ok) alert('Reorder failed: ' + JSON.stringify(d)); })
+      .catch(err => alert('Reorder error: ' + err));
+  }
+
+  _initRowDrag();
 
   // Update Bandcamp/SoundCloud search URLs in a row when artist/title changes
   function _updateSearchLinks(row, artist, title) {
