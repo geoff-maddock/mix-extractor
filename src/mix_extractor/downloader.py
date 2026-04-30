@@ -37,6 +37,9 @@ def download(url: str, dest_dir: Path) -> Path:
                 "preferredquality": "192",
             }
         ],
+        # Keep the yt-dlp metadata sidecar so the original webpage_url
+        # remains recoverable later (used by `mix-extractor backfill-source-urls`).
+        "writeinfojson": True,
         "quiet": True,
         "no_warnings": True,
     }

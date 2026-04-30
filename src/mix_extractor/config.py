@@ -35,6 +35,11 @@ class Settings(BaseModel):
     spotify_client_secret: str = Field(default="")
     discogs_token: str = Field(default="")
     audd_api_key: str = Field(default="")
+    buymusic_club_username: str = Field(default="")
+    buymusic_club_password: str = Field(default="")
+
+    # ── Web UI ────────────────────────────────────────────────────────────────
+    embed_players: bool = Field(default=False)
 
     # ── Paths ─────────────────────────────────────────────────────────────────
     input_dir: Path = Field(default=_PROJECT_ROOT / "content" / "input")
@@ -55,6 +60,9 @@ class Settings(BaseModel):
             "spotify_client_secret": "SPOTIFY_CLIENT_SECRET",
             "discogs_token": "DISCOGS_TOKEN",
             "audd_api_key": "AUDD_API_KEY",
+            "buymusic_club_username": "BUYMUSIC_CLUB_USERNAME",
+            "buymusic_club_password": "BUYMUSIC_CLUB_PASSWORD",
+            "embed_players": "EMBED_PLAYERS",
         }
         for field, env_var in mapping.items():
             if env_val := os.getenv(env_var):

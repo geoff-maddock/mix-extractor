@@ -235,10 +235,12 @@
 
 {% block scripts %}
 <script>
+  const _e = encodeURIComponent;  // short alias for URL path encoding
+
   function toggleKeep(mixName, trackIndex, btn) {
     const isKeep = btn.querySelector('i').classList.contains('bi-bookmark-heart-fill');
     const newKeep = !isKeep;
-    fetch(`/api/track/${mixName}/keep`, {
+    fetch(`/api/track/${_e(mixName)}/keep`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ index: trackIndex, keep: newKeep })
@@ -269,7 +271,7 @@
     input.focus();
     function save() {
       const genre = input.value.trim();
-      fetch(`/api/track/${mixName}/genre`, {
+      fetch(`/api/track/${_e(mixName)}/genre`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ index: trackIndex, genre })
@@ -313,7 +315,7 @@
       if (saved) return;
       saved = true;
       const value = input.value.trim();
-      fetch(`/api/track/${mixName}/edit`, {
+      fetch(`/api/track/${_e(mixName)}/edit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ index: trackIndex, field: fieldName, value })
@@ -343,7 +345,7 @@
     const mixName = btn.dataset.mix;
     const trackIndex = parseInt(btn.dataset.index);
     const genre = btn.dataset.suggestion;
-    fetch(`/api/track/${mixName}/genre`, {
+    fetch(`/api/track/${_e(mixName)}/genre`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ index: trackIndex, genre })
@@ -389,7 +391,7 @@
 
     function save() {
       const url = input.value.trim();
-      fetch(`/api/track/${mixName}/link`, {
+      fetch(`/api/track/${_e(mixName)}/link`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ index: trackIndex, service, url })

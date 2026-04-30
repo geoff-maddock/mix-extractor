@@ -82,6 +82,15 @@ directly to the `content/input/` folder, ready for analysis.
 - **Tag a genre** via the dropdown on each row
 - **Preview** — click stream links (Spotify/Bandcamp/SoundCloud embeds) without leaving
   the page
+- **Add a blank track** with the *Add Track* button to enter one manually
+- **Delete a track** with the trash icon at the end of each row
+- **Reorder tracks** by dragging the grip handle on the left edge of each row
+- **Edit any link** by clicking the pencil next to a service button to paste a custom URL
+
+**Mix-level player** (on the Mix detail page) — when a mix has a `source_url` (set
+automatically when analyzing a URL, or manually via the *Set Mix URL* button), an
+embedded SoundCloud / Mixcloud / YouTube player appears at the top of the page.
+Each track's timestamp becomes clickable and seeks the player to that position.
 
 **Library** — search across all mixes simultaneously by artist, title, label, or genre.
 Toggle *Kept tracks only* to see your curated selections.
@@ -95,9 +104,18 @@ The server also exposes a small JSON API for programmatic access:
 | `GET` | `/api/mixes` | List all mixes with metadata and tracks |
 | `GET` | `/api/library?q=<query>&keep_only=true` | Search tracks across all mixes |
 | `GET` | `/api/job/<job_id>` | Poll job status and log lines |
+| `GET` | `/api/embed-url?url=<music-url>` | Resolve an embeddable player URL for Bandcamp / YouTube / Spotify |
 | `POST` | `/api/track/<mix_name>/keep` | Set/unset a track's keep flag |
 | `POST` | `/api/track/<mix_name>/genre` | Set a track's genre tag |
 | `POST` | `/api/track/<mix_name>/edit` | Save a field override (artist/title/label/remix) |
+| `POST` | `/api/track/<mix_name>/link` | Override a single service URL for a track |
+| `POST` | `/api/track/<mix_name>/lookup-bandcamp` | Re-run Bandcamp direct-link lookup for one track |
+| `POST` | `/api/mix/<mix_name>/track/add` | Append a blank placeholder track |
+| `POST` | `/api/mix/<mix_name>/track/delete` | Delete a track from the mix |
+| `POST` | `/api/mix/<mix_name>/tracks/reorder` | Rearrange the tracks array (body: `{order: [index, …]}`) |
+| `POST` | `/api/mix/<mix_name>/source-url` | Set or clear the mix-level source URL (powers the embedded player) |
+| `POST` | `/api/mix/<mix_name>/lookup-bandcamp` | Re-run Bandcamp direct-link lookup for every track |
+| `POST` | `/api/mix/<mix_name>/publish` | Publish to buymusic.club (requires credentials) |
 
 ---
 
@@ -111,7 +129,16 @@ mix-extractor analyze <file> --no-fingerprint      # skip AudD audio fingerprint
 mix-extractor analyze <file> --fingerprint-only    # fingerprint only, no transcription
 mix-extractor analyze <file> --llm anthropic       # override LLM from .env
 mix-extractor analyze <file> --transcriber assemblyai
+mix-extractor reprocess <mix-name>                 # re-run pipeline on a previous mix
+mix-extractor reprocess <mix-name> --no-transcribe # re-enrich without re-transcribing
+mix-extractor import-text <file>                   # parse a pasted/text-file tracklist via LLM
+mix-extractor publish <mix-name>                   # post to buymusic.club (requires credentials)
+mix-extractor backfill-source-urls                 # set mix.source_url from yt-dlp .info.json sidecars
+mix-extractor cache info                           # show enrichment-cache stats
+mix-extractor cache clear                          # drop everything from the enrichment cache
+mix-extractor cache clear --max-age-days 30        # only drop entries older than N days
 mix-extractor config                               # interactive API key setup
+mix-extractor serve                                # start the web GUI
 ```
 
 ## Integrations
@@ -167,11 +194,18 @@ and SoundCloud are always generated as search URLs (no key required).
 | Service | Env vars | How to get credentials | Notes |
 |---|---|---|---|
 | **MusicBrainz** | *(none)* | Open database, no key needed | Always active |
-| **Bandcamp** | *(none)* | No key needed | Always active (search URL) |
+| **Bandcamp** | *(none)* | No key needed | Always active; resolves direct track URL when possible, falls back to search |
+| **Beatport** | *(none)* | No key needed | Always active; scrapes search results, falls back to search URL |
 | **SoundCloud** | *(none)* | No key needed | Always active (search URL) |
 | **YouTube Music** | *(none)* | No key needed — uses `ytmusicapi` | Always active |
+| **Deezer** | *(none)* | Open API, no key needed | Always active |
 | **Spotify** | `SPOTIFY_CLIENT_ID` + `SPOTIFY_CLIENT_SECRET` | [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard) — free, create an app and use Client Credentials flow | Optional |
 | **Discogs** | `DISCOGS_TOKEN` | [discogs.com/settings/developers](https://www.discogs.com/settings/developers) — free personal access token | Optional; requires `pip install discogs-client` |
+
+Enrichment results are cached on disk at `content/output/_cache/enrich.json`, keyed by
+normalized `(artist, title)`. Subsequent runs (especially `reprocess --no-transcribe`)
+hit the cache and skip API calls. Manage the cache with `mix-extractor cache info` and
+`mix-extractor cache clear`.
 
 ---
 
@@ -179,8 +213,15 @@ and SoundCloud are always generated as search URLs (no key required).
 
 Results are written to `content/output/<mix_name>/`:
 
-- `tracks.json` — machine-readable structured tracklist with links and `detection_source`
-- `report.md` — human-readable report with tracklist table (including Source column) and full transcript
+- `tracks.json` — machine-readable structured tracklist with links and `detection_source`.
+  When the source was a URL, `mix.source_url` is set so the web UI can render the
+  embedded player.
+- `report.md` — human-readable report with tracklist table (including Source column) and
+  full transcript. Regenerated automatically when tracks are edited via the web UI;
+  any existing transcript section is preserved.
+- `user_data.json` (web UI only) — stores keep flags, genre tags, field overrides, and
+  manual link overrides separately from the canonical scraped data.
+- `_jobs/` and `_cache/` — internal: persisted analyze-job state and the enrichment cache.
 
 Each track in the output includes a `detection_source` field:
 

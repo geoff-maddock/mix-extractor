@@ -213,3 +213,37 @@ def _transcribe_deepgram(audio_path: Path, settings: "Settings") -> list[Transcr
 def segments_to_text(segments: list[TranscriptSegment]) -> str:
     """Concatenate all segment text into a single string."""
     return " ".join(s.text for s in segments if s.text)
+
+
+def segments_to_timestamped_text(segments: list[TranscriptSegment]) -> str:
+    """Concatenate segment text with ``[HH:MM:SS]`` markers.
+
+    Inserts a timestamp marker at each segment boundary so that downstream
+    consumers (e.g. the LLM parser) can associate spoken words with a
+    position in the mix.  Consecutive segments within the same 30-second
+    window share a single marker to keep the text compact.
+    """
+    if not segments:
+        return ""
+
+    parts: list[str] = []
+    last_marker = -999.0  # force first marker
+
+    for seg in segments:
+        if not seg.text:
+            continue
+        # Emit a new marker when we've moved ≥30s since the last one
+        if seg.start - last_marker >= 30:
+            parts.append(f"\n[{_fmt_ts(seg.start)}]")
+            last_marker = seg.start
+        parts.append(seg.text)
+
+    return " ".join(parts).strip()
+
+
+def _fmt_ts(seconds: float) -> str:
+    """Format seconds as ``HH:MM:SS``."""
+    h = int(seconds // 3600)
+    m = int((seconds % 3600) // 60)
+    s = int(seconds % 60)
+    return f"{h:02d}:{m:02d}:{s:02d}"

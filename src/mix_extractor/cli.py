@@ -56,7 +56,7 @@ def analyze(
     """Run the full extraction pipeline on a mix file or URL."""
     from mix_extractor.config import get_settings  # noqa: PLC0415
     from mix_extractor.normalizer import normalize  # noqa: PLC0415
-    from mix_extractor.transcriber import transcribe, segments_to_text  # noqa: PLC0415
+    from mix_extractor.transcriber import transcribe, segments_to_text, segments_to_timestamped_text  # noqa: PLC0415
     from mix_extractor.parser import parse_tracks  # noqa: PLC0415
     from mix_extractor.enricher import enrich  # noqa: PLC0415
     from mix_extractor.reporter import write_report  # noqa: PLC0415
@@ -70,6 +70,8 @@ def analyze(
         overrides["transcription_provider"] = transcriber
 
     settings = get_settings(**overrides)
+    from mix_extractor.downloader import is_url  # noqa: PLC0415
+    source_url = source if is_url(source) else None
     local_path, display_name = _resolve_input(source, settings.input_dir)
 
     # 1. Normalize audio
@@ -118,6 +120,7 @@ def analyze(
             settings=settings,
             transcription_provider="fingerprint_only",
             duration_seconds=None,
+            source_url=source_url,
         )
         return
     # ── end fingerprint-only ──────────────────────────────────────────────────
@@ -130,8 +133,9 @@ def analyze(
         console.print("[yellow]Transcription produced no text. Is there speech in the mix?[/yellow]")
         raise typer.Exit(1)
 
-    # 4. Parse tracklist via LLM
-    tracks = parse_tracks(transcript, segments, settings)
+    # 4. Parse tracklist via LLM (use timestamped text so the LLM can assign times)
+    timestamped_transcript = segments_to_timestamped_text(segments)
+    tracks = parse_tracks(timestamped_transcript, segments, settings)
 
     # 5. Merge transcript tracks with fingerprinted tracks
     if fingerprinted:
@@ -165,6 +169,7 @@ def analyze(
         settings=settings,
         transcription_provider=settings.transcription_provider,
         duration_seconds=duration,
+        source_url=source_url,
     )
 
 
@@ -270,6 +275,436 @@ def config() -> None:
 
     env_path.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
     console.print(f"\n[green]Saved:[/green] {env_path}")
+
+
+# ── publish ───────────────────────────────────────────────────────────────────
+
+@app.command()
+def publish(
+    mix_name: Annotated[str, typer.Argument(help="Name of the mix output directory (e.g. 'Fracture - 14 January 2026').")],
+    title: Annotated[Optional[str], typer.Option("--title", help="Title for the buymusic.club list (defaults to mix name).")] = None,
+    all_tracks: Annotated[bool, typer.Option("--all", help="Include all tracks, not just bookmarked ones.")] = False,
+) -> None:
+    """Publish a mix tracklist to buymusic.club."""
+    from mix_extractor.config import get_settings  # noqa: PLC0415
+    from mix_extractor.buymusic_club import publish_mix, BuymusicClubError  # noqa: PLC0415
+
+    settings = get_settings()
+
+    if not settings.buymusic_club_username or not settings.buymusic_club_password:
+        console.print(
+            "[red]Missing buymusic.club credentials.[/red]\n"
+            "Add [bold]BUYMUSIC_CLUB_USERNAME[/bold] and [bold]BUYMUSIC_CLUB_PASSWORD[/bold] "
+            "to your .env file, then run [bold]mix-extractor config[/bold]."
+        )
+        raise typer.Exit(1)
+
+    console.print(f"\n[bold blue]Publishing[/bold blue] {mix_name} → buymusic.club …\n")
+    try:
+        url = publish_mix(
+            mix_name=mix_name,
+            settings=settings,
+            list_title=title,
+            include_all=all_tracks,
+        )
+        console.print(f"\n[bold green]Done![/bold green] {url}\n")
+    except BuymusicClubError as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1)
+
+
+# ── reprocess ─────────────────────────────────────────────────────────────────
+
+_AUDIO_EXTS = {".mp3", ".flac", ".wav", ".m4a", ".ogg", ".opus", ".aac", ".webm", ".mp4"}
+
+
+def _find_source_audio(mix_dir: Path, source_name: str, input_dir: Path) -> Path | None:
+    """Locate the original audio for a previously analyzed mix.
+
+    Search order:
+      1. Original file in content/input/ (from tracks.json ``mix.source``)
+      2. Any audio file in content/input/ whose stem matches the output folder name
+      3. The cached normalized file in _work/
+    """
+    # 1. Exact source name in input dir
+    candidate = input_dir / source_name
+    if candidate.exists():
+        return candidate
+
+    # 2. Stem match (handles renamed extensions)
+    mix_stem = mix_dir.name
+    for f in input_dir.iterdir():
+        if f.suffix.lower() in _AUDIO_EXTS and f.stem == mix_stem:
+            return f
+
+    # 3. Fall back to normalized cache in _work/
+    work_dir = mix_dir / "_work"
+    if work_dir.is_dir():
+        for f in sorted(work_dir.iterdir()):
+            if f.suffix.lower() in _AUDIO_EXTS and "normalized" in f.name:
+                return f
+
+    return None
+
+
+@app.command()
+def reprocess(
+    mix_name: Annotated[Optional[str], typer.Argument(help="Name of a previously analyzed mix folder (tab-complete friendly). Omit to choose interactively.")] = None,
+    llm: Annotated[Optional[str], typer.Option("--llm", help="LLM provider: openai | anthropic")] = None,
+    model: Annotated[Optional[str], typer.Option("--model", help="LLM model name override")] = None,
+    transcriber: Annotated[Optional[str], typer.Option("--transcriber", help="Transcription backend: whisper_api | whisper_local | assemblyai | deepgram")] = None,
+    no_enrich: Annotated[bool, typer.Option("--no-enrich", help="Skip music API lookups")] = False,
+    no_fingerprint: Annotated[bool, typer.Option("--no-fingerprint", help="Skip audio fingerprinting via AudD")] = False,
+    fingerprint_only: Annotated[bool, typer.Option("--fingerprint-only", help="Run audio fingerprinting only")] = False,
+    no_transcribe: Annotated[bool, typer.Option("--no-transcribe", help="Skip transcription — re-enrich using existing tracks.json")] = False,
+) -> None:
+    """Re-run the extraction pipeline on a previously analyzed mix."""
+    import json as _json  # noqa: PLC0415
+    from mix_extractor.config import get_settings  # noqa: PLC0415
+
+    settings = get_settings()
+    output_dir = settings.output_dir
+
+    # ── discover available mixes ──────────────────────────────────────────────
+    if not output_dir.is_dir():
+        console.print("[red]No output directory found.[/red] Run [bold]analyze[/bold] first.")
+        raise typer.Exit(1)
+
+    available = sorted(
+        d.name for d in output_dir.iterdir()
+        if d.is_dir() and (d / "tracks.json").exists()
+    )
+    if not available:
+        console.print("[yellow]No previously analyzed mixes found.[/yellow]")
+        raise typer.Exit(1)
+
+    # ── interactive picker when no name given ────────────────────────────────
+    if mix_name is None:
+        console.print("\n[bold]Previously analyzed mixes:[/bold]\n")
+        for i, name in enumerate(available, 1):
+            console.print(f"  [dim]{i:3d}.[/dim] {name}")
+        console.print()
+        choice = Prompt.ask(
+            "Enter number or name",
+            default="1",
+        )
+        if choice.isdigit():
+            idx = int(choice) - 1
+            if idx < 0 or idx >= len(available):
+                console.print("[red]Invalid selection.[/red]")
+                raise typer.Exit(1)
+            mix_name = available[idx]
+        else:
+            mix_name = choice
+
+    mix_dir = output_dir / mix_name
+    if not mix_dir.is_dir():
+        # Try fuzzy match
+        matches = [n for n in available if mix_name.lower() in n.lower()]
+        if len(matches) == 1:
+            mix_name = matches[0]
+            mix_dir = output_dir / mix_name
+        elif len(matches) > 1:
+            console.print(f"[yellow]Ambiguous name '{mix_name}'. Matches:[/yellow]")
+            for m in matches:
+                console.print(f"  {m}")
+            raise typer.Exit(1)
+        else:
+            console.print(f"[red]Mix not found:[/red] {mix_name}")
+            raise typer.Exit(1)
+
+    console.print(f"\n[bold blue]Re-processing[/bold blue] {mix_name}\n")
+
+    # ── no-transcribe shortcut: just re-enrich existing tracks ────────────────
+    if no_transcribe:
+        tracks_path = mix_dir / "tracks.json"
+        if not tracks_path.exists():
+            console.print("[red]No tracks.json found — cannot skip transcription.[/red]")
+            raise typer.Exit(1)
+
+        data = _json.loads(tracks_path.read_text(encoding="utf-8"))
+        existing_tracks = data.get("tracks", [])
+        if not existing_tracks:
+            console.print("[yellow]tracks.json has no tracks.[/yellow]")
+            raise typer.Exit(1)
+
+        console.print(f"  [dim]Loaded {len(existing_tracks)} existing track(s) from tracks.json[/dim]")
+
+        if not no_enrich:
+            from mix_extractor.enricher import enrich  # noqa: PLC0415
+
+            overrides = {}
+            if llm:
+                overrides["llm_provider"] = llm
+            if model:
+                overrides["llm_model"] = model
+            enrichment_settings = get_settings(**overrides)
+            console.print("[bold blue]Enriching tracks[/bold blue] …")
+            existing_tracks = enrich(existing_tracks, enrichment_settings)
+
+        from mix_extractor.reporter import write_report  # noqa: PLC0415
+
+        source_name = data.get("mix", {}).get("source", f"{mix_name}.mp3")
+        duration = data.get("mix", {}).get("duration_seconds")
+        provider = data.get("mix", {}).get("transcription_provider", "unknown")
+
+        write_report(
+            source_name=source_name,
+            segments=[],
+            enriched_tracks=existing_tracks,
+            settings=settings,
+            transcription_provider=provider,
+            duration_seconds=duration,
+        )
+        return
+
+    # ── full re-run: locate source audio ──────────────────────────────────────
+    tracks_path = mix_dir / "tracks.json"
+    source_name = ""
+    if tracks_path.exists():
+        data = _json.loads(tracks_path.read_text(encoding="utf-8"))
+        source_name = data.get("mix", {}).get("source", "")
+
+    audio_path = _find_source_audio(mix_dir, source_name, settings.input_dir)
+    if audio_path is None:
+        console.print(
+            f"[red]Cannot find source audio for '{mix_name}'.[/red]\n"
+            f"Looked in: {settings.input_dir} and {mix_dir / '_work'}\n"
+            f"Use [bold]--no-transcribe[/bold] to re-enrich without re-transcribing."
+        )
+        raise typer.Exit(1)
+
+    console.print(f"  [dim]Source audio:[/dim] {audio_path}")
+
+    # Delegate to the analyze pipeline with the resolved path
+    analyze(
+        source=str(audio_path),
+        llm=llm,
+        model=model,
+        transcriber=transcriber,
+        no_enrich=no_enrich,
+        no_fingerprint=no_fingerprint,
+        fingerprint_only=fingerprint_only,
+    )
+
+
+# ── import-text ──────────────────────────────────────────────────────────────
+
+@app.command(name="import-text")
+def import_text(
+    source: Annotated[str, typer.Argument(help="Path to a text file containing a tracklist, or '-' for stdin.")],
+    name: Annotated[Optional[str], typer.Option("--name", help="Mix name for the output folder (auto-generated if omitted).")] = None,
+    llm: Annotated[Optional[str], typer.Option("--llm", help="LLM provider: openai | anthropic")] = None,
+    model: Annotated[Optional[str], typer.Option("--model", help="LLM model name override")] = None,
+    no_enrich: Annotated[bool, typer.Option("--no-enrich", help="Skip link enrichment.")] = False,
+) -> None:
+    """Import a tracklist from a text file (or stdin) and optionally enrich with links."""
+    import sys  # noqa: PLC0415
+
+    from mix_extractor.config import get_settings  # noqa: PLC0415
+    from mix_extractor.text_import import import_tracklist  # noqa: PLC0415
+    from mix_extractor.reporter import _print_summary  # noqa: PLC0415
+
+    overrides: dict = {}
+    if llm:
+        overrides["llm_provider"] = llm
+    if model:
+        overrides["llm_model"] = model
+    settings = get_settings(**overrides)
+
+    # Read text from stdin or file
+    if source == "-":
+        text = sys.stdin.read()
+    else:
+        p = Path(source)
+        if not p.exists():
+            console.print(f"[red]File not found:[/red] {p}")
+            raise typer.Exit(1)
+        text = p.read_text(encoding="utf-8")
+
+    if not text.strip():
+        console.print("[red]Input text is empty.[/red]")
+        raise typer.Exit(1)
+
+    tracks, out_dir = import_tracklist(
+        text=text,
+        mix_name=name or "",
+        settings=settings,
+        run_enrich=not no_enrich,
+    )
+
+    if not tracks:
+        console.print("[yellow]No tracks were extracted. Nothing written.[/yellow]")
+        raise typer.Exit(1)
+
+    _print_summary(tracks)
+
+
+# ── cache ─────────────────────────────────────────────────────────────────────
+
+cache_app = typer.Typer(name="cache", help="Inspect and manage the enrichment cache.")
+app.add_typer(cache_app)
+
+
+@cache_app.command("info")
+def cache_info() -> None:
+    """Show enrichment-cache stats: entry count, file size, oldest entry."""
+    import json as _json  # noqa: PLC0415
+    from datetime import datetime as _dt, timezone as _tz  # noqa: PLC0415
+    from mix_extractor.config import get_settings  # noqa: PLC0415
+    from mix_extractor.enricher import _cache_path  # noqa: PLC0415
+
+    settings = get_settings()
+    path = _cache_path(settings)
+    if not path.exists():
+        console.print(f"[yellow]No cache file at[/yellow] {path}")
+        raise typer.Exit(0)
+
+    try:
+        data = _json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        console.print(f"[red]Could not read cache:[/red] {exc}")
+        raise typer.Exit(1)
+
+    size_kb = path.stat().st_size / 1024
+    timestamps: list[str] = [
+        v.get("cached_at", "") for v in data.values() if isinstance(v, dict) and v.get("cached_at")
+    ]
+    oldest = min(timestamps) if timestamps else None
+
+    console.print(f"\n[bold]Enrichment cache[/bold] — {path}\n")
+    console.print(f"  Entries:         {len(data)}")
+    console.print(f"  File size:       {size_kb:.1f} KB")
+    if oldest:
+        try:
+            age_days = (_dt.now(_tz.utc) - _dt.fromisoformat(oldest)).days
+            console.print(f"  Oldest entry:    {oldest[:19]}  ({age_days} days ago)")
+        except ValueError:
+            console.print(f"  Oldest entry:    {oldest}")
+    untimed = len(data) - len(timestamps)
+    if untimed:
+        console.print(f"  Without timestamp: {untimed} (pre-TTL entries)")
+    console.print()
+
+
+@cache_app.command("clear")
+def cache_clear(
+    max_age_days: Annotated[
+        Optional[int],
+        typer.Option("--max-age-days", help="Only drop entries older than this. Default: drop all."),
+    ] = None,
+    yes: Annotated[bool, typer.Option("--yes", "-y", help="Skip confirmation.")] = False,
+) -> None:
+    """Drop entries from the enrichment cache.  Without --max-age-days, removes everything."""
+    import json as _json  # noqa: PLC0415
+    from datetime import datetime as _dt, timezone as _tz, timedelta  # noqa: PLC0415
+    from mix_extractor.config import get_settings  # noqa: PLC0415
+    from mix_extractor.enricher import _cache_path  # noqa: PLC0415
+
+    settings = get_settings()
+    path = _cache_path(settings)
+    if not path.exists():
+        console.print(f"[yellow]No cache file at[/yellow] {path}")
+        raise typer.Exit(0)
+
+    try:
+        data = _json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        console.print(f"[red]Could not read cache:[/red] {exc}")
+        raise typer.Exit(1)
+
+    before = len(data)
+    if max_age_days is None:
+        if not yes and not typer.confirm(f"Clear all {before} cache entries?"):
+            raise typer.Exit(0)
+        data = {}
+    else:
+        cutoff = _dt.now(_tz.utc) - timedelta(days=max_age_days)
+        kept = {}
+        for k, v in data.items():
+            ts = v.get("cached_at") if isinstance(v, dict) else None
+            if not ts:
+                continue  # drop entries with no timestamp (legacy entries)
+            try:
+                cached = _dt.fromisoformat(ts)
+            except ValueError:
+                continue
+            if cached >= cutoff:
+                kept[k] = v
+        data = kept
+
+    removed = before - len(data)
+    path.write_text(_json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    console.print(f"[green]Cleared {removed} entries.[/green] {len(data)} remain.")
+
+
+# ── backfill-source-urls ──────────────────────────────────────────────────────
+
+@app.command(name="backfill-source-urls")
+def backfill_source_urls(
+    dry_run: Annotated[bool, typer.Option("--dry-run", help="Preview without writing.")] = False,
+) -> None:
+    """Populate `mix.source_url` in tracks.json using yt-dlp `.info.json` sidecars.
+
+    Looks for ``content/input/<mix-name>.info.json`` next to each mix folder
+    and copies its ``webpage_url`` (or ``original_url``) into the mix metadata.
+    """
+    import json as _json  # noqa: PLC0415
+    from mix_extractor.config import get_settings  # noqa: PLC0415
+
+    settings = get_settings()
+    if not settings.output_dir.is_dir():
+        console.print("[yellow]No output directory found.[/yellow]")
+        raise typer.Exit(0)
+
+    updated = 0
+    skipped = 0
+    missing = 0
+
+    for mix_dir in sorted(settings.output_dir.iterdir()):
+        if not mix_dir.is_dir():
+            continue
+        tracks_file = mix_dir / "tracks.json"
+        if not tracks_file.exists():
+            continue
+        try:
+            data = _json.loads(tracks_file.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        mix_meta = data.get("mix", {})
+        if mix_meta.get("source_url"):
+            skipped += 1
+            continue
+
+        info_path = settings.input_dir / f"{mix_dir.name}.info.json"
+        if not info_path.exists():
+            missing += 1
+            continue
+        try:
+            info = _json.loads(info_path.read_text(encoding="utf-8"))
+        except Exception:
+            missing += 1
+            continue
+        webpage_url = info.get("webpage_url") or info.get("original_url")
+        if not webpage_url:
+            missing += 1
+            continue
+
+        mix_meta["source_url"] = webpage_url
+        data["mix"] = mix_meta
+        if not dry_run:
+            tracks_file.write_text(
+                _json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
+            )
+        console.print(f"  [green]✓[/green] {mix_dir.name} → {webpage_url}")
+        updated += 1
+
+    console.print(
+        f"\n[bold]Summary:[/bold] {updated} updated, "
+        f"{skipped} already had URL, {missing} without sidecar"
+    )
+    if dry_run:
+        console.print("[dim](dry run — no files written)[/dim]")
 
 
 # ── serve ─────────────────────────────────────────────────────────────────────

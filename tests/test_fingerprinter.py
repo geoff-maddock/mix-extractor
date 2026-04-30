@@ -130,11 +130,9 @@ class TestFingerprintMix:
 
         fake_probe = {"format": {"duration": "200"}}
 
-        with (
-            patch("ffmpeg.probe", return_value=fake_probe),
-            patch("mix_extractor.fingerprinter._extract_snippet", return_value=b"audio"),
-            patch("mix_extractor.fingerprinter._query_audd", return_value=fp_track),
-        ):
+        with patch("ffmpeg.probe", return_value=fake_probe), \
+             patch("mix_extractor.fingerprinter._extract_snippet", return_value=b"audio"), \
+             patch("mix_extractor.fingerprinter._query_audd", return_value=fp_track):
             results = fingerprint_mix(tmp_path / "mix.mp3", settings, sample_interval=90)
 
         # Two sample points (0s, 90s) but same track → deduplicated to 1
