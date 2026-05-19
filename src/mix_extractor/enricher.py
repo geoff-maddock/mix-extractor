@@ -283,36 +283,63 @@ def _lookup_musicbrainz(track: "Track", links: TrackLinks) -> None:
 # ── Bandcamp ─────────────────────────────────────────────────────────────────
 
 def _lookup_bandcamp(track: "Track", links: TrackLinks) -> None:
-    """Search Bandcamp and resolve a direct track link when possible.
+    """Search Bandcamp's public autocomplete API for a direct track link.
 
-    Falls back to the search URL if no matching track is found or the
-    request fails.
+    Uses the ``bcsearch_public_api`` JSON endpoint which doesn't require
+    JavaScript rendering.  Prefers results where the band name matches
+    the searched artist.
+
+    Falls back to the Bandcamp search URL if no matching track is found.
     """
-    import re  # noqa: PLC0415
     from urllib.parse import quote_plus  # noqa: PLC0415
 
-    query = f"{track.artist} {track.title}"
-    search_url = f"https://bandcamp.com/search?q={quote_plus(query)}&item_type=t"
+    import httpx  # noqa: PLC0415
 
-    resp = _http_get_with_retry(
-        search_url,
-        headers={"User-Agent": "mix-extractor/0.1.0 (track enrichment)"},
-    )
-    if resp is None:
-        links["bandcamp"] = search_url
+    query = f"{track.artist} {track.title}"
+    fallback_url = f"https://bandcamp.com/search?q={quote_plus(query)}&item_type=t"
+
+    api_url = "https://bandcamp.com/api/bcsearch_public_api/1/autocomplete_elastic"
+    _throttle("bandcamp.com")
+    try:
+        resp = httpx.post(
+            api_url,
+            json={"search_text": query, "search_filter": "t", "full_page": False, "fan_id": None},
+            headers={"User-Agent": "mix-extractor/0.1.0 (track enrichment)"},
+            timeout=10.0,
+        )
+    except Exception:  # noqa: BLE001
+        links["bandcamp"] = fallback_url
         return
 
-    match = re.search(
-        r'class="searchresult[^"]*".*?'
-        r'href="(https://[^"]*\.bandcamp\.com/track/[^?"]*)',
-        resp.text,
-        re.DOTALL,
-    )
-    if match:
-        links["bandcamp"] = match.group(1)
+    if resp.status_code != 200:
+        links["bandcamp"] = fallback_url
+        return
+
+    try:
+        data = resp.json()
+    except ValueError:
+        links["bandcamp"] = fallback_url
+        return
+
+    results = data.get("auto", {}).get("results", [])
+    if not results:
+        links["bandcamp"] = fallback_url
+        return
+
+    # Prefer results where band_name matches the searched artist
+    artist_lower = (track.artist or "").lower()
+    best = results[0]
+    for r in results:
+        if r.get("band_name", "").lower() == artist_lower:
+            best = r
+            break
+
+    url = best.get("item_url_path", "")
+    if url and "/track/" in url:
+        links["bandcamp"] = url.split("?")[0]
         console.print("    [green]✓ Bandcamp direct link[/green]")
     else:
-        links["bandcamp"] = search_url
+        links["bandcamp"] = fallback_url
 
 
 # ── Beatport ─────────────────────────────────────────────────────────────────
