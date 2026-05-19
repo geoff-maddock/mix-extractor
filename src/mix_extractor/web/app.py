@@ -294,9 +294,9 @@ async def index(request: Request):
     input_files = _list_input_files()
     jobs = {jid: j for jid, j in _JOBS.items() if j["status"] in ("pending", "running")}
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "mixes": mixes,
             "input_files": input_files,
             "active_jobs": jobs,
@@ -330,9 +330,9 @@ async def library(request: Request, q: str = "", keep_only: bool = False):
     if keep_only:
         all_tracks = [t for t in all_tracks if t.get("keep")]
     return templates.TemplateResponse(
+        request,
         "library.html",
         {
-            "request": request,
             "tracks": all_tracks,
             "q": q,
             "keep_only": keep_only,
@@ -349,9 +349,9 @@ async def mix_detail(request: Request, mix_name: str):
     settings = _settings()
     user_data = _load_user_data(mix_name)
     return templates.TemplateResponse(
+        request,
         "mix.html",
         {
-            "request": request,
             "mix_name": mix_name,
             "mix": data.get("mix", {}),
             "tracks": data.get("tracks", []),
@@ -495,8 +495,9 @@ async def job_status(request: Request, job_id: str):
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found")
     return templates.TemplateResponse(
+        request,
         "job.html",
-        {"request": request, "job_id": job_id, "job": job},
+        {"job_id": job_id, "job": job},
     )
 
 
