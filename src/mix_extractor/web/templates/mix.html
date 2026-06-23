@@ -38,6 +38,10 @@
           title="Copy tracklist with verified links">
           <i class="bi bi-clipboard-plus me-1"></i>Enhanced
         </button>
+        <button class="btn btn-sm btn-outline-secondary" onclick="exportTracklist('bandcamp')"
+          title="Copy tracklist as: timestamp artist - title bandcamp-link">
+          <i class="bi bi-bandcamp me-1"></i>Bandcamp
+        </button>
       </div>
       <button class="btn btn-sm btn-outline-secondary" id="embedToggleBtn" onclick="toggleEmbedPlayers()"
         title="Toggle inline music players">
@@ -663,16 +667,38 @@
 
   // ── Export ──────────────────────────────────────────────────────────────────
 
+  // Return the verified (manually confirmed/overridden) link URL for a service, or ''.
+  function verifiedLinkUrl(row, service) {
+    let found = '';
+    row.querySelectorAll('.link-wrap').forEach(wrap => {
+      if (wrap.dataset.service !== service) return;
+      const editBtn = wrap.querySelector('.link-edit-btn');
+      if (!(editBtn && editBtn.querySelector('.bi-pencil-fill'))) return;
+      const url = wrap.querySelector('a')?.href || '';
+      if (url) found = url;
+    });
+    return found;
+  }
+
   function exportTracklist(mode) {
     const rows = document.querySelectorAll('#mixTable tbody tr.track-row');
     const lines = [];
     rows.forEach(row => {
-      const artist = row.querySelector('td:nth-child(4) .field-value')?.textContent.trim() || '';
-      const titleEl = row.querySelector('td:nth-child(5) .field-value');
+      const timestamp = row.querySelector('td:nth-child(4)')?.textContent.trim().replace(/^—$/, '') || '';
+      const artist = row.querySelector('td:nth-child(5) .field-value')?.textContent.trim() || '';
+      const titleEl = row.querySelector('td:nth-child(6) .field-value');
       const title = titleEl?.textContent.trim() || '';
-      const label = row.querySelector('td:nth-child(6) .field-value')?.textContent.trim().replace(/^—$/, '') || '';
+      const label = row.querySelector('td:nth-child(7) .field-value')?.textContent.trim().replace(/^—$/, '') || '';
 
       if (!artist && !title) return;
+
+      if (mode === 'bandcamp') {
+        let line = (timestamp ? timestamp + ' ' : '') + artist + ' - ' + title;
+        const url = verifiedLinkUrl(row, 'bandcamp');
+        if (url) line += ' ' + url;
+        lines.push(line);
+        return;
+      }
 
       let line = artist + ' - ' + title;
       if (label) line += ' [' + label + ']';
@@ -696,7 +722,9 @@
 
     document.getElementById('exportTextarea').value = lines.join('\n');
     document.getElementById('exportModalLabel').textContent =
-      mode === 'enhanced' ? 'Export Tracklist (Enhanced)' : 'Export Tracklist (Plain Text)';
+      mode === 'bandcamp' ? 'Bandcamp Export'
+      : mode === 'enhanced' ? 'Export Tracklist (Enhanced)'
+      : 'Export Tracklist (Plain Text)';
     new bootstrap.Modal(document.getElementById('exportModal')).show();
   }
 
