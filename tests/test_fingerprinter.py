@@ -137,3 +137,14 @@ class TestFingerprintMix:
 
         # Two sample points (0s, 90s) but same track → deduplicated to 1
         assert len(results) == 1
+
+
+def test_fingerprint_interval_setting(monkeypatch):
+    import pydantic
+    from mix_extractor.config import get_settings
+
+    monkeypatch.setenv("FINGERPRINT_INTERVAL", "45")
+    assert get_settings().fingerprint_interval == 45
+    assert get_settings(fingerprint_interval=60).fingerprint_interval == 60
+    with pytest.raises(pydantic.ValidationError):
+        get_settings(fingerprint_interval=5)

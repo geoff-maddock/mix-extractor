@@ -14,6 +14,7 @@ app = typer.Typer(
     name="mix-extractor",
     help="Extract tracklists from DJ mix audio files.",
     add_completion=False,
+    pretty_exceptions_show_locals=False,  # never dump Settings/API keys in tracebacks
 )
 console = Console()
 
@@ -52,6 +53,7 @@ def analyze(
     no_enrich: Annotated[bool, typer.Option("--no-enrich", help="Skip music API lookups")] = False,
     no_fingerprint: Annotated[bool, typer.Option("--no-fingerprint", help="Skip audio fingerprinting via AudD")] = False,
     fingerprint_only: Annotated[bool, typer.Option("--fingerprint-only", help="Run audio fingerprinting only — skip transcription and LLM parsing")] = False,
+    fingerprint_interval: Annotated[Optional[int], typer.Option("--fingerprint-interval", min=15, help="Seconds between fingerprint samples (default 90, or FINGERPRINT_INTERVAL in .env). Lower catches more tracks but uses more AudD requests.")] = None,
 ) -> None:
     """Run the full extraction pipeline on a mix file or URL."""
     from mix_extractor.config import get_settings  # noqa: PLC0415
@@ -68,6 +70,8 @@ def analyze(
         overrides["llm_model"] = model
     if transcriber:
         overrides["transcription_provider"] = transcriber
+    if fingerprint_interval:
+        overrides["fingerprint_interval"] = fingerprint_interval
 
     settings = get_settings(**overrides)
     from mix_extractor.downloader import is_url  # noqa: PLC0415
@@ -83,7 +87,11 @@ def analyze(
     fingerprinted = []
     if not no_fingerprint and settings.audd_api_key:
         from mix_extractor.fingerprinter import fingerprint_mix  # noqa: PLC0415
-        fingerprinted = fingerprint_mix(normalized, settings)
+        # Fingerprint the original audio: the normalized copy is downsampled to
+        # 16 kHz mono for speech-to-text, which throws away detail AudD can use.
+        fingerprinted = fingerprint_mix(
+            local_path, settings, sample_interval=settings.fingerprint_interval
+        )
     elif not no_fingerprint and not settings.audd_api_key:
         console.print("[dim]Fingerprinting skipped (no AUDD_API_KEY set)[/dim]")
 
@@ -356,6 +364,7 @@ def reprocess(
     no_enrich: Annotated[bool, typer.Option("--no-enrich", help="Skip music API lookups")] = False,
     no_fingerprint: Annotated[bool, typer.Option("--no-fingerprint", help="Skip audio fingerprinting via AudD")] = False,
     fingerprint_only: Annotated[bool, typer.Option("--fingerprint-only", help="Run audio fingerprinting only")] = False,
+    fingerprint_interval: Annotated[Optional[int], typer.Option("--fingerprint-interval", min=15, help="Seconds between fingerprint samples (default 90, or FINGERPRINT_INTERVAL in .env). Lower catches more tracks but uses more AudD requests.")] = None,
     no_transcribe: Annotated[bool, typer.Option("--no-transcribe", help="Skip transcription — re-enrich using existing tracks.json")] = False,
 ) -> None:
     """Re-run the extraction pipeline on a previously analyzed mix."""
@@ -485,6 +494,7 @@ def reprocess(
         no_enrich=no_enrich,
         no_fingerprint=no_fingerprint,
         fingerprint_only=fingerprint_only,
+        fingerprint_interval=fingerprint_interval,
     )
 
 

@@ -127,6 +127,7 @@ mix-extractor analyze <file-or-url>                # full pipeline
 mix-extractor analyze <file> --no-enrich           # skip music API lookups
 mix-extractor analyze <file> --no-fingerprint      # skip AudD audio fingerprinting
 mix-extractor analyze <file> --fingerprint-only    # fingerprint only, no transcription
+mix-extractor analyze <file> --fingerprint-interval 60  # sample every 60s (default 90; or FINGERPRINT_INTERVAL in .env)
 mix-extractor analyze <file> --llm anthropic       # override LLM from .env
 mix-extractor analyze <file> --transcriber assemblyai
 mix-extractor reprocess <mix-name>                 # re-run pipeline on a previous mix
@@ -153,7 +154,7 @@ At least one LLM key is required to parse the transcript into a structured track
 | **Anthropic** | `ANTHROPIC_API_KEY` | [console.anthropic.com](https://console.anthropic.com) — pay-per-use |
 
 Set `LLM_PROVIDER=openai` or `LLM_PROVIDER=anthropic` in `.env`.  
-Recommended models: `gpt-4o` (OpenAI) or `claude-3-7-sonnet-20250219` (Anthropic).
+Recommended models: `gpt-4o` (OpenAI) or `claude-haiku-5-5` (Anthropic — cheapest; use `claude-sonnet-5-5` for higher accuracy).
 
 ---
 
