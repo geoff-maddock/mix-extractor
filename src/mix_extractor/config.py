@@ -11,7 +11,8 @@ from pydantic import BaseModel, Field, model_validator
 
 # Load .env from the project root (two levels up from this file's package)
 _PROJECT_ROOT = Path(__file__).resolve().parents[2]
-load_dotenv(_PROJECT_ROOT / ".env")
+# override=True: the project .env wins over stale keys exported in the shell
+load_dotenv(_PROJECT_ROOT / ".env", override=True)
 
 
 LLMProvider = Literal["openai", "anthropic"]
@@ -27,16 +28,22 @@ class Settings(BaseModel):
     transcription_provider: TranscriptionProvider = Field(default="whisper_api")
 
     # ── API Keys ──────────────────────────────────────────────────────────────
-    openai_api_key: str = Field(default="")
-    anthropic_api_key: str = Field(default="")
-    assemblyai_api_key: str = Field(default="")
-    deepgram_api_key: str = Field(default="")
+    openai_api_key: str = Field(default="", repr=False)
+    anthropic_api_key: str = Field(default="", repr=False)
+    assemblyai_api_key: str = Field(default="", repr=False)
+    deepgram_api_key: str = Field(default="", repr=False)
     spotify_client_id: str = Field(default="")
-    spotify_client_secret: str = Field(default="")
-    discogs_token: str = Field(default="")
-    audd_api_key: str = Field(default="")
+    spotify_client_secret: str = Field(default="", repr=False)
+    discogs_token: str = Field(default="", repr=False)
+    audd_api_key: str = Field(default="", repr=False)
     buymusic_club_username: str = Field(default="")
-    buymusic_club_password: str = Field(default="")
+    buymusic_club_password: str = Field(default="", repr=False)
+
+    # ── Fingerprinting ────────────────────────────────────────────────────────
+    # Seconds between AudD samples. Lower = catches short tracks, costs more requests.
+    fingerprint_interval: int = Field(default=90, ge=15)
+    # Retry unmatched samples once at a half-interval offset.
+    fingerprint_second_pass: bool = Field(default=True)
 
     # ── Web UI ────────────────────────────────────────────────────────────────
     embed_players: bool = Field(default=False)
@@ -63,6 +70,8 @@ class Settings(BaseModel):
             "buymusic_club_username": "BUYMUSIC_CLUB_USERNAME",
             "buymusic_club_password": "BUYMUSIC_CLUB_PASSWORD",
             "embed_players": "EMBED_PLAYERS",
+            "fingerprint_interval": "FINGERPRINT_INTERVAL",
+            "fingerprint_second_pass": "FINGERPRINT_SECOND_PASS",
         }
         for field, env_var in mapping.items():
             if env_val := os.getenv(env_var):

@@ -65,3 +65,51 @@ class TestTrackModel:
         d = t.model_dump()
         assert d["artist"] == "Daft Punk"
         assert d["label"] == "Virgin"
+
+
+class TestCallAnthropic:
+    def _run(self, model, content):
+        from mix_extractor.parser import _call_anthropic
+
+        settings = MagicMock(llm_model=model)
+        settings.require_key.return_value = "key"
+        client = MagicMock()
+        client.messages.create.return_value = MagicMock(content=content)
+        with patch("anthropic.Anthropic", return_value=client):
+            out = _call_anthropic("sys", "msg", settings)
+        return out, client.messages.create.call_args.kwargs
+
+    def test_skips_thinking_block(self):
+        thinking = MagicMock(type="thinking")
+        text = MagicMock(type="text", text="[]")
+        out, kwargs = self._run("claude-haiku-5-5", [thinking, text])
+        assert out == "[]"
+        assert kwargs["extra_body"] == {"output_config": {"effort": "low"}}
+
+    def test_no_text_block_returns_empty_array(self):
+        out, _ = self._run("claude-haiku-5-5", [MagicMock(type="thinking")])
+        assert out == "[]"
+
+    def test_old_model_gets_no_effort(self):
+        _, kwargs = self._run("claude-haiku-4-5-20251001", [MagicMock(type="text", text="[]")])
+        assert "extra_body" not in kwargs
+
+
+@pytest.mark.parametrize(
+    "model,expected",
+    [
+        ("claude-haiku-5-5", True),
+        ("claude-sonnet-5-5", True),
+        ("claude-opus-4-5", True),
+        ("claude-sonnet-4-6", True),
+        ("claude-haiku-4-5-20251001", False),
+        ("claude-haiku-4-5", False),
+        ("claude-sonnet-4-20250514", False),
+        ("claude-opus-4-1", False),
+        ("claude-3-7-sonnet-20250219", False),
+    ],
+)
+def test_anthropic_supports_effort(model, expected):
+    from mix_extractor.parser import _anthropic_supports_effort
+
+    assert _anthropic_supports_effort(model) is expected

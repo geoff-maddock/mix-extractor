@@ -154,15 +154,38 @@ def _call_anthropic(system_prompt: str, user_message: str, settings: "Settings")
     import anthropic  # noqa: PLC0415
 
     client = anthropic.Anthropic(api_key=settings.require_key("anthropic_api_key"))
+    kwargs = {}
+    if _anthropic_supports_effort(settings.llm_model):
+        # Tracklist extraction needs little reasoning; low effort keeps it fast/cheap.
+        # Passed via extra_body because older SDKs lack the output_config kwarg.
+        kwargs["extra_body"] = {"output_config": {"effort": "low"}}
     message = client.messages.create(
         model=settings.llm_model,
-        max_tokens=4096,
+        # Newer models think before answering and thinking counts toward max_tokens,
+        # so leave headroom for the JSON answer.
+        max_tokens=16000,
         system=system_prompt,
         messages=[
             {"role": "user", "content": user_message},
         ],
+        **kwargs,
     )
-    return message.content[0].text if message.content else "[]"
+    # The response may start with a thinking block — return the first text block.
+    for block in message.content:
+        if block.type == "text":
+            return block.text
+    return "[]"
+
+
+# Models that reject the `effort` parameter (Claude 3.x and the 4.0–4.5 line,
+# except Opus 4.5 which accepts it).
+_NO_EFFORT_MODEL = re.compile(
+    r"^claude-(3|(opus|sonnet|haiku)-4-\d{8}|(sonnet|haiku)-4-[0-5]|opus-4-[0-4])($|-)"
+)
+
+
+def _anthropic_supports_effort(model: str) -> bool:
+    return not _NO_EFFORT_MODEL.match(model)
 
 
 def _parse_response(raw: str) -> list[Track]:

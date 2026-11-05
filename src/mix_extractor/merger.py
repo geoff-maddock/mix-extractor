@@ -22,6 +22,9 @@ if TYPE_CHECKING:
     from mix_extractor.fingerprinter import FingerprintedTrack
     from mix_extractor.parser import Track
 
+_CONFIRMED_CONFIDENCE = 1.0
+_UNCONFIRMED_CONFIDENCE = 0.5
+
 # Timestamp tolerance for matching fingerprint ↔ transcript (seconds)
 _TIMESTAMP_WINDOW = 90
 
@@ -53,6 +56,8 @@ def merge_tracks(
             used_transcript_indices.add(match_idx)
             # Merge supplementary fields from transcript into fingerprint entry
             entry["detection_source"] = "fingerprint+transcript"
+            entry["confirmed"] = True  # the transcript backs up the audio match
+            entry["confidence"] = _CONFIRMED_CONFIDENCE
             entry["label"] = entry["label"] or match.get("label", "")
             entry["remix"] = entry.get("remix", "") or match.get("remix", "")
             entry["extra_info"] = entry.get("extra_info", "") or match.get("extra_info", "")
@@ -93,10 +98,25 @@ def _fingerprint_to_dict(fp: "FingerprintedTrack") -> dict:
         "release_date": fp.release_date,
         "album": fp.album,
         "score": fp.score,
-        "confidence": round(fp.score / 100, 2) if fp.score else 1.0,
+        # AudD's standard endpoint returns no score, so confidence reflects whether
+        # 2+ samples (or the transcript) agreed rather than a made-up 1.0.
+        "confidence": _CONFIRMED_CONFIDENCE if fp.confirmed else _UNCONFIRMED_CONFIDENCE,
+        "confirmed": fp.confirmed,
+        "hits": fp.hits,
         "detection_source": fp.detection_source,
         "links": dict(fp.links),
     }
+
+
+def fingerprints_to_dicts(fingerprinted_tracks: "list[FingerprintedTrack]") -> list[dict]:
+    """Convert fingerprint results to report-ready dicts (no transcript to merge)."""
+    out = []
+    for i, fp in enumerate(fingerprinted_tracks, start=1):
+        d = _fingerprint_to_dict(fp)
+        d["index"] = i
+        d.pop("_timestamp_sec", None)
+        out.append(d)
+    return out
 
 
 def _parse_timestamps(tracks: list[dict]) -> None:

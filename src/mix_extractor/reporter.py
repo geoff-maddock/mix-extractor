@@ -115,7 +115,7 @@ def _render_tracklist_md(tracks: list[dict]) -> list[str]:
         links_md = _format_links(t.get("links", {}))
         remix = t.get("remix") or ""
         label = t.get("label") or ""
-        source = _format_source(t.get("detection_source", "transcript"))
+        source = _format_source(t.get("detection_source", "transcript"), t.get("confirmed"))
         lines.append(
             f"| {i} "
             f"| {t.get('timestamp', '')} "
@@ -172,8 +172,10 @@ _SOURCE_LABELS = {
 }
 
 
-def _format_source(source: str) -> str:
-    return _SOURCE_LABELS.get(source, source)
+def _format_source(source: str, confirmed: bool | None = None) -> str:
+    label = _SOURCE_LABELS.get(source, source)
+    # Only flag tracks explicitly marked unconfirmed (older reports lack the field).
+    return f"{label} (unconfirmed)" if confirmed is False else label
 
 
 def _format_links(links: dict) -> str:
@@ -223,7 +225,7 @@ def _print_summary(enriched_tracks: list[dict]) -> None:
 
     for t in enriched_tracks:
         link_count = len(t.get("links", {}))
-        source = _format_source(t.get("detection_source", "transcript"))
+        source = _format_source(t.get("detection_source", "transcript"), t.get("confirmed"))
         table.add_row(
             str(t["index"]),
             t.get("timestamp", ""),

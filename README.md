@@ -127,6 +127,9 @@ mix-extractor analyze <file-or-url>                # full pipeline
 mix-extractor analyze <file> --no-enrich           # skip music API lookups
 mix-extractor analyze <file> --no-fingerprint      # skip AudD audio fingerprinting
 mix-extractor analyze <file> --fingerprint-only    # fingerprint only, no transcription
+mix-extractor analyze <file> --fingerprint-interval 60  # sample every 60s (default 90; or FINGERPRINT_INTERVAL in .env)
+mix-extractor analyze <file> --no-second-pass      # don't retry unmatched samples at a half-interval offset
+mix-extractor analyze <file> --refingerprint       # ignore saved fingerprint results and query AudD again
 mix-extractor analyze <file> --llm anthropic       # override LLM from .env
 mix-extractor analyze <file> --transcriber assemblyai
 mix-extractor reprocess <mix-name>                 # re-run pipeline on a previous mix
@@ -153,7 +156,7 @@ At least one LLM key is required to parse the transcript into a structured track
 | **Anthropic** | `ANTHROPIC_API_KEY` | [console.anthropic.com](https://console.anthropic.com) — pay-per-use |
 
 Set `LLM_PROVIDER=openai` or `LLM_PROVIDER=anthropic` in `.env`.  
-Recommended models: `gpt-4o` (OpenAI) or `claude-3-7-sonnet-20250219` (Anthropic).
+Recommended models: `gpt-4o` (OpenAI) or `claude-haiku-5-5` (Anthropic — cheapest; use `claude-sonnet-5-5` for higher accuracy).
 
 ---
 
@@ -183,6 +186,22 @@ output indicates whether each track came from `fingerprint`, `transcript`, or bo
 
 Fingerprinting is skipped automatically if `AUDD_API_KEY` is not set, or can be disabled
 explicitly with `--no-fingerprint`.
+
+How fingerprinting works:
+
+- **Sampling:** a 15-second clip is sent to AudD every `FINGERPRINT_INTERVAL` seconds (default 90).
+  A **second pass** then retries each sample that found no match, offset by half the interval
+  (turn off with `--no-second-pass` or `FINGERPRINT_SECOND_PASS=false`).
+- **Saved results:** results are saved to `content/output/<mix>/_work/fingerprints.json` and reused
+  when you re-run the same audio with the same settings, so a failed transcription doesn't cost
+  another round of AudD requests. Use `--refingerprint` to query again.
+- **Confirmed vs unconfirmed:** a track matched by 2+ samples, or also named in the transcript,
+  is *confirmed*. A track matched by a single sample is kept but marked *unconfirmed* (shown with
+  a `?` badge in the web UI), since single hits are more often false matches.
+- **Repeats:** hits on the same track are combined into one entry; hits 10+ minutes apart are kept
+  as separate plays.
+- **No transcript:** if transcription produces no text, the report is written from the fingerprint
+  matches alone.
 
 ---
 

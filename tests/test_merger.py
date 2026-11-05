@@ -115,3 +115,28 @@ class TestHelpers:
     def test_ts_to_seconds_invalid(self):
         import math
         assert math.isinf(_ts_to_seconds(""))
+
+
+# ── Issue #12: confirmation ──────────────────────────────────────────────────
+
+def test_unconfirmed_fingerprint_gets_lower_confidence():
+    from mix_extractor.fingerprinter import FingerprintedTrack
+    from mix_extractor.merger import fingerprints_to_dicts
+
+    single = FingerprintedTrack(timestamp=0, artist="A", title="One")
+    double = FingerprintedTrack(timestamp=90, artist="B", title="Two", hits=2, confirmed=True)
+    d1, d2 = fingerprints_to_dicts([single, double])
+    assert (d1["confidence"], d1["confirmed"], d1["hits"]) == (0.5, False, 1)
+    assert (d2["confidence"], d2["confirmed"], d2["index"]) == (1.0, True, 2)
+    assert "_timestamp_sec" not in d1
+
+
+def test_transcript_match_confirms_single_hit():
+    from mix_extractor.fingerprinter import FingerprintedTrack
+    from mix_extractor.merger import merge_tracks
+    from mix_extractor.parser import Track
+
+    fp = FingerprintedTrack(timestamp=60, artist="Bicep", title="Glue")
+    tx = Track(index=1, artist="Bicep", title="Glue", timestamp="01:10")
+    [entry] = merge_tracks([tx], [fp])
+    assert entry["confirmed"] is True and entry["confidence"] == 1.0
