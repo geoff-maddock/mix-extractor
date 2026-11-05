@@ -54,6 +54,8 @@ def analyze(
     no_fingerprint: Annotated[bool, typer.Option("--no-fingerprint", help="Skip audio fingerprinting via AudD")] = False,
     fingerprint_only: Annotated[bool, typer.Option("--fingerprint-only", help="Run audio fingerprinting only — skip transcription and LLM parsing")] = False,
     fingerprint_interval: Annotated[Optional[int], typer.Option("--fingerprint-interval", min=15, help="Seconds between fingerprint samples (default 90, or FINGERPRINT_INTERVAL in .env). Lower catches more tracks but uses more AudD requests.")] = None,
+    no_second_pass: Annotated[bool, typer.Option("--no-second-pass", help="Don't retry unmatched fingerprint samples at a half-interval offset.")] = False,
+    refingerprint: Annotated[bool, typer.Option("--refingerprint", help="Query AudD again even if saved fingerprint results exist.")] = False,
 ) -> None:
     """Run the full extraction pipeline on a mix file or URL."""
     from mix_extractor.config import get_settings  # noqa: PLC0415
@@ -72,6 +74,8 @@ def analyze(
         overrides["transcription_provider"] = transcriber
     if fingerprint_interval:
         overrides["fingerprint_interval"] = fingerprint_interval
+    if no_second_pass:
+        overrides["fingerprint_second_pass"] = False
 
     settings = get_settings(**overrides)
     from mix_extractor.downloader import is_url  # noqa: PLC0415
@@ -83,41 +87,27 @@ def analyze(
     audio_fmt = "wav" if settings.transcription_provider == "whisper_local" else "mp3"
     normalized = normalize(local_path, work_dir, format=audio_fmt)
 
-    # 2. Audio fingerprinting
+    # 2. Audio fingerprinting (results saved so a later failure doesn't waste them)
+    fingerprint_cache = work_dir / "fingerprints.json"
     fingerprinted = []
     if not no_fingerprint and settings.audd_api_key:
         from mix_extractor.fingerprinter import fingerprint_mix  # noqa: PLC0415
         # Fingerprint the original audio: the normalized copy is downsampled to
         # 16 kHz mono for speech-to-text, which throws away detail AudD can use.
         fingerprinted = fingerprint_mix(
-            local_path, settings, sample_interval=settings.fingerprint_interval
+            local_path,
+            settings,
+            sample_interval=settings.fingerprint_interval,
+            second_pass=settings.fingerprint_second_pass,
+            cache_path=fingerprint_cache,
+            refresh=refingerprint,
         )
     elif not no_fingerprint and not settings.audd_api_key:
         console.print("[dim]Fingerprinting skipped (no AUDD_API_KEY set)[/dim]")
 
-    # ── fingerprint-only short-circuit ────────────────────────────────────────
-    if fingerprint_only:
-        if not fingerprinted:
-            console.print("[yellow]Fingerprinting returned no results. Is AUDD_API_KEY set?[/yellow]")
-            raise typer.Exit(1)
-        merged_dicts = [
-            {
-                "index": i + 1,
-                "timestamp": fp.timestamp_str,
-                "artist": fp.artist,
-                "title": fp.title,
-                "label": fp.label,
-                "remix": "",
-                "extra_info": f"album: {fp.album}" if fp.album else "",
-                "album": fp.album,
-                "release_date": fp.release_date,
-                "score": fp.score,
-                "confidence": round(fp.score / 100, 2) if fp.score else 1.0,
-                "detection_source": fp.detection_source,
-                "links": dict(fp.links),
-            }
-            for i, fp in enumerate(fingerprinted)
-        ]
+    def _write_fingerprint_report() -> None:
+        from mix_extractor.merger import fingerprints_to_dicts  # noqa: PLC0415
+        merged_dicts = fingerprints_to_dicts(fingerprinted)
         if not no_enrich:
             console.print("[bold blue]Enriching tracks[/bold blue] …")
             merged_dicts = enrich(merged_dicts, settings)
@@ -130,15 +120,37 @@ def analyze(
             duration_seconds=None,
             source_url=source_url,
         )
+
+    if fingerprint_only:
+        if not fingerprinted:
+            console.print("[yellow]Fingerprinting returned no results. Is AUDD_API_KEY set?[/yellow]")
+            raise typer.Exit(1)
+        _write_fingerprint_report()
         return
-    # ── end fingerprint-only ──────────────────────────────────────────────────
 
     # 3. Transcribe
-    segments = transcribe(normalized, settings)
+    try:
+        segments = transcribe(normalized, settings)
+    except Exception:
+        if fingerprinted:
+            console.print(
+                f"[bold red]Transcription failed.[/bold red] {len(fingerprinted)} fingerprinted track(s) "
+                f"are saved in {fingerprint_cache} and will be reused on the next run "
+                "(or use --fingerprint-only to write a report from them now)."
+            )
+        raise
     transcript = segments_to_text(segments)
 
     if not transcript.strip():
-        console.print("[yellow]Transcription produced no text. Is there speech in the mix?[/yellow]")
+        if fingerprinted:
+            console.print(
+                "[yellow]Transcription produced no text — writing the report from "
+                "fingerprint matches only.[/yellow]"
+            )
+            _write_fingerprint_report()
+            return
+        console.print("[yellow]Transcription produced no text and fingerprinting found nothing. "
+                      "Is there speech in the mix?[/yellow]")
         raise typer.Exit(1)
 
     # 4. Parse tracklist via LLM (use timestamped text so the LLM can assign times)
@@ -365,6 +377,8 @@ def reprocess(
     no_fingerprint: Annotated[bool, typer.Option("--no-fingerprint", help="Skip audio fingerprinting via AudD")] = False,
     fingerprint_only: Annotated[bool, typer.Option("--fingerprint-only", help="Run audio fingerprinting only")] = False,
     fingerprint_interval: Annotated[Optional[int], typer.Option("--fingerprint-interval", min=15, help="Seconds between fingerprint samples (default 90, or FINGERPRINT_INTERVAL in .env). Lower catches more tracks but uses more AudD requests.")] = None,
+    no_second_pass: Annotated[bool, typer.Option("--no-second-pass", help="Don't retry unmatched fingerprint samples at a half-interval offset.")] = False,
+    refingerprint: Annotated[bool, typer.Option("--refingerprint", help="Query AudD again even if saved fingerprint results exist.")] = False,
     no_transcribe: Annotated[bool, typer.Option("--no-transcribe", help="Skip transcription — re-enrich using existing tracks.json")] = False,
 ) -> None:
     """Re-run the extraction pipeline on a previously analyzed mix."""
@@ -495,6 +509,8 @@ def reprocess(
         no_fingerprint=no_fingerprint,
         fingerprint_only=fingerprint_only,
         fingerprint_interval=fingerprint_interval,
+        no_second_pass=no_second_pass,
+        refingerprint=refingerprint,
     )
 
 

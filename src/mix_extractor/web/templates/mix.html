@@ -281,6 +281,9 @@
             {% else %}
             <span class="text-body-secondary">{{ track.detection_source or '—' }}</span>
             {% endif %}
+            {% if track.confirmed is sameas false %}
+            <span class="badge bg-secondary" title="Matched by a single fingerprint sample — may be a false match">?</span>
+            {% endif %}
           </small>
         </td>
 

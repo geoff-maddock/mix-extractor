@@ -42,6 +42,8 @@ class Settings(BaseModel):
     # ── Fingerprinting ────────────────────────────────────────────────────────
     # Seconds between AudD samples. Lower = catches short tracks, costs more requests.
     fingerprint_interval: int = Field(default=90, ge=15)
+    # Retry unmatched samples once at a half-interval offset.
+    fingerprint_second_pass: bool = Field(default=True)
 
     # ── Web UI ────────────────────────────────────────────────────────────────
     embed_players: bool = Field(default=False)
@@ -69,6 +71,7 @@ class Settings(BaseModel):
             "buymusic_club_password": "BUYMUSIC_CLUB_PASSWORD",
             "embed_players": "EMBED_PLAYERS",
             "fingerprint_interval": "FINGERPRINT_INTERVAL",
+            "fingerprint_second_pass": "FINGERPRINT_SECOND_PASS",
         }
         for field, env_var in mapping.items():
             if env_val := os.getenv(env_var):
