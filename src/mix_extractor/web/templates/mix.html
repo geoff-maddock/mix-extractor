@@ -830,7 +830,7 @@
   function bulkResolveBandcamp() {
     const btn = document.getElementById('bcBulkLookupBtn');
     const trackCount = document.querySelectorAll('#mixTable tbody tr.track-row').length;
-    if (!confirm(`Re-lookup Bandcamp direct links for all ${trackCount} tracks?\n\nThis may take a moment.`)) return;
+    if (!confirm(`Look up Bandcamp direct links for tracks that don't have one yet (${trackCount} tracks in this mix)?\n\nUses MusicBrainz, which allows 1 request per second, so this takes a few seconds per track.`)) return;
 
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Resolving…';
@@ -844,7 +844,7 @@
         btn.disabled = false;
         btn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i>Resolve BC Links';
         if (data.ok) {
-          alert(`Done! Found ${data.direct} direct link(s) out of ${data.total} tracks.`);
+          alert(`Done! Found ${data.found} new direct link(s). ${data.existing} already had one, ${data.not_found} not found (search link kept).`);
           location.reload();
         } else {
           alert('Lookup failed: ' + (data.detail || JSON.stringify(data)));

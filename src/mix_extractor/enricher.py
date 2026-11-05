@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import re
+import threading
 import time
 from collections import defaultdict
 from datetime import datetime, timezone
@@ -38,21 +39,28 @@ _MB_DELAY = 1.1  # MusicBrainz rate limit: 1 request per second
 # Minimum interval between requests to the same host.  Used to be polite
 # against rate-limited public endpoints.
 _MIN_INTERVAL: dict[str, float] = {
-    "bandcamp.com": 0.4,
+    "bandcamp.com": 1.0,  # also applies to every *.bandcamp.com artist/label page
     "api.deezer.com": 0.2,
     "www.beatport.com": 0.5,
 }
 _LAST_REQUEST: dict[str, float] = defaultdict(float)
+_THROTTLE_LOCK = threading.Lock()  # web lookups call this from worker threads
 
 
 def _throttle(host: str) -> None:
+    if host.endswith(".bandcamp.com"):
+        host = "bandcamp.com"
     interval = _MIN_INTERVAL.get(host, 0)
     if interval <= 0:
         return
-    elapsed = time.monotonic() - _LAST_REQUEST[host]
-    if elapsed < interval:
-        time.sleep(interval - elapsed)
-    _LAST_REQUEST[host] = time.monotonic()
+    # Reserve the next free slot under the lock, then sleep outside it so
+    # other hosts aren't held up.
+    with _THROTTLE_LOCK:
+        now = time.monotonic()
+        slot = max(now, _LAST_REQUEST[host] + interval)
+        _LAST_REQUEST[host] = slot
+    if slot > now:
+        time.sleep(slot - now)
 
 
 def _http_get_with_retry(
@@ -89,6 +97,11 @@ def _http_get_with_retry(
             last_error = exc
             time.sleep(backoff_base * (2 ** attempt))
             continue
+        except httpx.TooManyRedirects:
+            # e.g. Bandcamp custom domains that bounce between the custom domain
+            # and *.bandcamp.com for non-browser clients — retrying won't help.
+            console.print(f"    [dim]Redirect loop at {url}[/dim]")
+            return None
 
         if resp.status_code == 429:
             try:
@@ -212,7 +225,8 @@ def enrich(tracks: "list[Track] | list[dict]", settings: "Settings") -> list[dic
 
         links = TrackLinks(existing_links)
         _lookup_musicbrainz(track, links)
-        _lookup_bandcamp(track, links)
+        # _lookup_musicbrainz just searched; don't repeat it if it found nothing
+        _lookup_bandcamp(track, links, search_musicbrainz=False)
         _lookup_beatport(track, links)
         _lookup_soundcloud(track, links, settings)
         _lookup_youtube_music(track, links)
@@ -282,35 +296,31 @@ def _lookup_musicbrainz(track: "Track", links: TrackLinks) -> None:
 
 # ── Bandcamp ─────────────────────────────────────────────────────────────────
 
-def _lookup_bandcamp(track: "Track", links: TrackLinks) -> None:
-    """Search Bandcamp and resolve a direct track link when possible.
+def _lookup_bandcamp(track: "Track", links: TrackLinks, *, search_musicbrainz: bool = True) -> None:
+    """Find a direct Bandcamp track/album link via MusicBrainz.
 
-    Falls back to the search URL if no matching track is found or the
-    request fails.
+    Bandcamp's own search page blocks automated clients, so we go through
+    MusicBrainz instead (see ``bandcamp_lookup``).  Reuses the recording MBID
+    when ``links`` already has a MusicBrainz link.  Falls back to the Bandcamp
+    search URL, which still works when the user opens it in a browser.
     """
-    import re  # noqa: PLC0415
     from urllib.parse import quote_plus  # noqa: PLC0415
+
+    from mix_extractor.bandcamp_lookup import (  # noqa: PLC0415
+        find_bandcamp_url,
+        recording_id_from_links,
+    )
 
     query = f"{track.artist} {track.title}"
     search_url = f"https://bandcamp.com/search?q={quote_plus(query)}&item_type=t"
 
-    resp = _http_get_with_retry(
-        search_url,
-        headers={"User-Agent": "mix-extractor/0.1.0 (track enrichment)"},
+    url = find_bandcamp_url(
+        track.artist, track.title, recording_id_from_links(links), search=search_musicbrainz
     )
-    if resp is None:
-        links["bandcamp"] = search_url
-        return
-
-    match = re.search(
-        r'class="searchresult[^"]*".*?'
-        r'href="(https://[^"]*\.bandcamp\.com/track/[^?"]*)',
-        resp.text,
-        re.DOTALL,
-    )
-    if match:
-        links["bandcamp"] = match.group(1)
-        console.print("    [green]✓ Bandcamp direct link[/green]")
+    if url:
+        links["bandcamp"] = url
+        kind = "track" if "/track/" in url else "album"
+        console.print(f"    [green]✓ Bandcamp direct {kind} link[/green]")
     else:
         links["bandcamp"] = search_url
 
