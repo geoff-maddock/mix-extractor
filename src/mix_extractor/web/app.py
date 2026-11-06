@@ -6,6 +6,7 @@ import json
 import shutil
 import subprocess
 import sys
+import threading
 import uuid
 from pathlib import Path
 from typing import Any
@@ -294,9 +295,9 @@ async def index(request: Request):
     input_files = _list_input_files()
     jobs = {jid: j for jid, j in _JOBS.items() if j["status"] in ("pending", "running")}
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "mixes": mixes,
             "input_files": input_files,
             "active_jobs": jobs,
@@ -330,9 +331,9 @@ async def library(request: Request, q: str = "", keep_only: bool = False):
     if keep_only:
         all_tracks = [t for t in all_tracks if t.get("keep")]
     return templates.TemplateResponse(
+        request,
         "library.html",
         {
-            "request": request,
             "tracks": all_tracks,
             "q": q,
             "keep_only": keep_only,
@@ -349,9 +350,9 @@ async def mix_detail(request: Request, mix_name: str):
     settings = _settings()
     user_data = _load_user_data(mix_name)
     return templates.TemplateResponse(
+        request,
         "mix.html",
         {
-            "request": request,
             "mix_name": mix_name,
             "mix": data.get("mix", {}),
             "tracks": data.get("tracks", []),
@@ -495,8 +496,9 @@ async def job_status(request: Request, job_id: str):
     if job is None:
         raise HTTPException(status_code=404, detail="Job not found")
     return templates.TemplateResponse(
+        request,
         "job.html",
-        {"request": request, "job_id": job_id, "job": job},
+        {"job_id": job_id, "job": job},
     )
 
 
@@ -585,12 +587,77 @@ async def edit_track_field(mix_name: str, request: Request):
     return JSONResponse({"ok": True, "field": field, "value": value, "original": original})
 
 
-@app.post("/api/track/{mix_name}/lookup-bandcamp")
-async def lookup_bandcamp_single(mix_name: str, request: Request):
-    """Re-run Bandcamp direct-link lookup for a single track."""
+def _is_direct_bandcamp(url: str) -> bool:
+    return bool(url) and "/search?" not in url
+
+
+def _has_name_override(td: dict) -> bool:
+    overrides = td.get("overrides", {})
+    return bool(overrides.get("artist") or overrides.get("title"))
+
+
+def _bandcamp_lookup_for(raw_track: dict, td: dict) -> str:
+    """Run the Bandcamp lookup for one track, applying user artist/title overrides.
+
+    Returns the new URL (direct link or search URL).
+    """
     from types import SimpleNamespace  # noqa: PLC0415
 
     from mix_extractor.enricher import TrackLinks, _lookup_bandcamp  # noqa: PLC0415
+
+    overrides = td.get("overrides", {})
+    artist = overrides.get("artist") or raw_track.get("artist", "")
+    title = overrides.get("title") or raw_track.get("title", "")
+
+    links = TrackLinks()
+    # The stored MusicBrainz match is only valid for the original artist/title
+    if not _has_name_override(td):
+        mb_link = raw_track.get("links", {}).get("musicbrainz")
+        if mb_link:
+            links["musicbrainz"] = mb_link
+
+    _lookup_bandcamp(SimpleNamespace(artist=artist, title=title), links)
+    return links.get("bandcamp", "")
+
+
+def _choose_bandcamp_url(current: str, new_url: str, *, allow_downgrade: bool = False) -> str:
+    """Keep an existing direct link rather than replace it with a search URL,
+    unless ``allow_downgrade`` (e.g. the user corrected the artist/title, so the
+    old link is probably for the wrong track)."""
+    if _is_direct_bandcamp(current) and not _is_direct_bandcamp(new_url) and not allow_downgrade:
+        return current
+    return new_url or current
+
+
+_TRACKS_WRITE_LOCK = threading.Lock()
+
+
+def _save_bandcamp_url(tracks_file: Path, index: Any, looked_up: dict, url: str) -> bool:
+    """Write one track's Bandcamp link into a fresh read of tracks.json.
+
+    Lookups take seconds to minutes, so the file is re-read here instead of
+    writing back the copy loaded at the start — otherwise deletes, reorders
+    and edits made in the meantime would be lost.  Skips the write if the
+    track was deleted or its artist/title changed since ``looked_up``.
+    """
+    with _TRACKS_WRITE_LOCK:
+        data = json.loads(tracks_file.read_text(encoding="utf-8"))
+        track = next((t for t in data.get("tracks", []) if t.get("index") == index), None)
+        if track is None:
+            return False
+        if (track.get("artist"), track.get("title")) != (looked_up.get("artist"), looked_up.get("title")):
+            return False
+        if track.get("links", {}).get("bandcamp") == url:
+            return True
+        track.setdefault("links", {})["bandcamp"] = url
+        tracks_file.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+        return True
+
+
+@app.post("/api/track/{mix_name}/lookup-bandcamp")
+async def lookup_bandcamp_single(mix_name: str, request: Request):
+    """Re-run Bandcamp direct-link lookup for a single track."""
+    from starlette.concurrency import run_in_threadpool  # noqa: PLC0415
 
     body = await request.json()
     track_index = body.get("index")
@@ -605,26 +672,17 @@ async def lookup_bandcamp_single(mix_name: str, request: Request):
     if raw_track is None:
         raise HTTPException(status_code=404, detail="Track not found")
 
-    # Apply user overrides for artist/title so the search uses corrected values
     user_data = _load_user_data(mix_name)
-    tid = _track_id(mix_name, raw_track)
-    td = user_data.get("tracks", {}).get(tid, {})
-    artist = td.get("overrides", {}).get("artist") or raw_track.get("artist", "")
-    title = td.get("overrides", {}).get("title") or raw_track.get("title", "")
+    td = user_data.get("tracks", {}).get(_track_id(mix_name, raw_track), {})
 
-    track_ns = SimpleNamespace(artist=artist, title=title)
-    links = TrackLinks()
-    _lookup_bandcamp(track_ns, links)
+    # Several MusicBrainz calls at 1 req/s — keep it off the event loop
+    new_url = await run_in_threadpool(_bandcamp_lookup_for, raw_track, td)
+    current = raw_track.get("links", {}).get("bandcamp", "")
+    url = _choose_bandcamp_url(current, new_url, allow_downgrade=_has_name_override(td))
+    if url and url != current:
+        await run_in_threadpool(_save_bandcamp_url, tracks_file, track_index, raw_track, url)
 
-    new_url = links.get("bandcamp", "")
-    if new_url:
-        raw_track.setdefault("links", {})["bandcamp"] = new_url
-        tracks_file.write_text(
-            json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
-        )
-
-    is_direct = new_url and "/search?" not in new_url
-    return JSONResponse({"ok": True, "url": new_url, "direct": is_direct})
+    return JSONResponse({"ok": True, "url": url, "direct": _is_direct_bandcamp(url)})
 
 
 @app.post("/api/track/{mix_name}/link")
@@ -872,12 +930,13 @@ async def resolve_embed_url(url: str = ""):
 # ── Bandcamp bulk re-lookup ────────────────────────────────────────────────────
 
 @app.post("/api/mix/{mix_name}/lookup-bandcamp")
-async def lookup_bandcamp_bulk(mix_name: str):
-    """Re-run Bandcamp direct-link lookup for every track in a mix."""
-    from types import SimpleNamespace  # noqa: PLC0415
+def lookup_bandcamp_bulk(mix_name: str):
+    """Look up Bandcamp direct links for every track in a mix that lacks one.
 
-    from mix_extractor.enricher import TrackLinks, _lookup_bandcamp  # noqa: PLC0415
-
+    Sync handler on purpose: FastAPI runs it in a worker thread, so the
+    multi-minute MusicBrainz crawl doesn't block other requests.  Each link is
+    saved as it's found (see ``_save_bandcamp_url``).
+    """
     settings = _settings()
     tracks_file = settings.output_dir / mix_name / "tracks.json"
     if not tracks_file.exists():
@@ -888,35 +947,28 @@ async def lookup_bandcamp_bulk(mix_name: str):
     results = []
 
     for raw_track in data.get("tracks", []):
-        tid = _track_id(mix_name, raw_track)
-        td = user_data.get("tracks", {}).get(tid, {})
-        artist = td.get("overrides", {}).get("artist") or raw_track.get("artist", "")
-        title = td.get("overrides", {}).get("title") or raw_track.get("title", "")
+        index = raw_track.get("index")
+        current = raw_track.get("links", {}).get("bandcamp", "")
+        if _is_direct_bandcamp(current):
+            results.append({"index": index, "url": current, "direct": True, "status": "existing"})
+            continue
 
-        track_ns = SimpleNamespace(artist=artist, title=title)
-        links = TrackLinks()
-        _lookup_bandcamp(track_ns, links)
+        td = user_data.get("tracks", {}).get(_track_id(mix_name, raw_track), {})
+        url = _choose_bandcamp_url(current, _bandcamp_lookup_for(raw_track, td))
+        if url and url != current and not _save_bandcamp_url(tracks_file, index, raw_track, url):
+            continue  # track deleted or edited while we were looking it up
+        direct = _is_direct_bandcamp(url)
+        results.append({"index": index, "url": url, "direct": direct,
+                        "status": "found" if direct else "not_found"})
 
-        new_url = links.get("bandcamp", "")
-        if new_url:
-            raw_track.setdefault("links", {})["bandcamp"] = new_url
-
-        is_direct = new_url and "/search?" not in new_url
-        results.append({
-            "index": raw_track.get("index"),
-            "url": new_url,
-            "direct": is_direct,
-        })
-
-    tracks_file.write_text(
-        json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
-    )
-
-    direct_count = sum(1 for r in results if r["direct"])
+    count = lambda status: sum(1 for r in results if r["status"] == status)  # noqa: E731
     return JSONResponse({
         "ok": True,
         "total": len(results),
-        "direct": direct_count,
+        "direct": count("found") + count("existing"),
+        "found": count("found"),
+        "existing": count("existing"),
+        "not_found": count("not_found"),
         "results": results,
     })
 

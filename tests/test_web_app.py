@@ -341,3 +341,89 @@ class TestMarkdownRegen:
         assert "Updated" in md
         assert "Lone" in md  # survivor track surfaced in new tracklist
         assert "hello world" in md  # transcript preserved
+
+
+class TestBandcampLookup:
+    SEARCH = "https://bandcamp.com/search?q=x&item_type=t"
+
+    def _seed_links(self, env, links_by_index: dict):
+        data = json.loads(env["tracks_file"].read_text())
+        for t in data["tracks"]:
+            t["links"] = links_by_index.get(t["index"], {})
+        env["tracks_file"].write_text(json.dumps(data))
+
+    def _links(self, env, index: int) -> dict:
+        data = json.loads(env["tracks_file"].read_text())
+        return next(t for t in data["tracks"] if t["index"] == index)["links"]
+
+    def test_bulk_skips_existing_and_keeps_search_fallback(self, env):
+        self._seed_links(env, {
+            1: {"bandcamp": "https://bicep.bandcamp.com/track/glue"},
+            2: {"bandcamp": self.SEARCH},
+        })
+        found = {"Lone": "https://lone.bandcamp.com/track/be-mine"}
+        with patch.object(web_app, "_bandcamp_lookup_for",
+                          side_effect=lambda t, td: found.get(t["artist"], self.SEARCH)) as lookup:
+            r = env["client"].post(f"/api/mix/{env['mix_name']}/lookup-bandcamp")
+        body = r.json()
+        assert (body["found"], body["existing"], body["not_found"]) == (1, 1, 1)
+        assert lookup.call_count == 2  # track 1 skipped
+        assert self._links(env, 2)["bandcamp"] == "https://lone.bandcamp.com/track/be-mine"
+        assert self._links(env, 3)["bandcamp"] == self.SEARCH
+
+    def test_single_does_not_downgrade_direct_link(self, env):
+        self._seed_links(env, {1: {"bandcamp": "https://bicep.bandcamp.com/track/glue"}})
+        with patch.object(web_app, "_bandcamp_lookup_for", return_value=self.SEARCH):
+            r = env["client"].post(
+                f"/api/track/{env['mix_name']}/lookup-bandcamp", json={"index": 1}
+            )
+        assert r.json() == {"ok": True, "url": "https://bicep.bandcamp.com/track/glue", "direct": True}
+        assert self._links(env, 1)["bandcamp"] == "https://bicep.bandcamp.com/track/glue"
+
+    def test_bulk_keeps_edits_made_during_lookup(self, env):
+        """A delete/reorder saved while bulk is running must survive."""
+        def lookup(raw_track, td):
+            if raw_track["index"] == 1:  # simulate the user deleting track 3 mid-run
+                data = json.loads(env["tracks_file"].read_text())
+                data["tracks"] = [t for t in data["tracks"] if t["index"] != 3][::-1]
+                env["tracks_file"].write_text(json.dumps(data))
+            return f"https://x.bandcamp.com/track/{raw_track['index']}"
+
+        with patch.object(web_app, "_bandcamp_lookup_for", side_effect=lookup):
+            body = env["client"].post(f"/api/mix/{env['mix_name']}/lookup-bandcamp").json()
+        data = json.loads(env["tracks_file"].read_text())
+        assert [t["index"] for t in data["tracks"]] == [2, 1]  # delete + reorder kept
+        assert all(t["links"]["bandcamp"].endswith(f"/{t['index']}") for t in data["tracks"])
+        assert body["found"] == 2
+
+    def test_bulk_skips_track_edited_during_lookup(self, env):
+        def lookup(raw_track, td):
+            data = json.loads(env["tracks_file"].read_text())
+            data["tracks"][0]["title"] = "Glue (VIP)"
+            env["tracks_file"].write_text(json.dumps(data))
+            return "https://bicep.bandcamp.com/track/glue"
+
+        with patch.object(web_app, "_bandcamp_lookup_for", side_effect=lookup):
+            env["client"].post(f"/api/mix/{env['mix_name']}/lookup-bandcamp")
+        assert "bandcamp" not in self._links(env, 1)
+
+    def test_single_replaces_direct_link_after_name_override(self, env):
+        self._seed_links(env, {1: {"bandcamp": "https://wrong.bandcamp.com/track/glue"}})
+        with patch.object(web_app, "_load_user_data",
+                          return_value={"tracks": {"1": {"overrides": {"title": "Glue (VIP)"}}}}), \
+                patch.object(web_app, "_bandcamp_lookup_for", return_value=self.SEARCH):
+            r = env["client"].post(
+                f"/api/track/{env['mix_name']}/lookup-bandcamp", json={"index": 1}
+            )
+        assert r.json()["url"] == self.SEARCH
+        assert self._links(env, 1)["bandcamp"] == self.SEARCH
+
+    def test_stored_musicbrainz_match_dropped_after_title_edit(self):
+        raw = {"artist": "Bicep", "title": "Glue",
+               "links": {"musicbrainz": "https://musicbrainz.org/recording/abc"}}
+        with patch("mix_extractor.enricher._lookup_bandcamp") as lookup:
+            web_app._bandcamp_lookup_for(raw, {})
+            assert lookup.call_args.args[1].get("musicbrainz")
+            web_app._bandcamp_lookup_for(raw, {"overrides": {"title": "Glue (Edit)"}})
+            assert "musicbrainz" not in lookup.call_args.args[1]
+            assert lookup.call_args.args[0].title == "Glue (Edit)"
